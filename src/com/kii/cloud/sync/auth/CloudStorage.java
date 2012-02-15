@@ -114,12 +114,13 @@ public class CloudStorage implements Authentication{
 		UserResult result = mUserMgr.login(username, password);
 		KiiUser user = result.getKiiUser();
 		if(user!=null){
+			SyncPref.setUsername(username);
 			KiiUMInfo info = new KiiUMInfo(mContext,
 					username, 
 					password,  
 					"http://dev-usergrid.kii.com/app/sync/pfs",
 					"KII_ID",
-					username);
+					null);
 			mSyncClient.setKiiUMInfo(info);
 		}
 		return 0;
