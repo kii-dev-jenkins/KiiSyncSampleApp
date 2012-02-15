@@ -1,0 +1,28 @@
+<resources>
+	<string-array name="samples">
+		<item>Register</item>
+		<item>Login</item>
+		<item>Sync + Show KiiFile List</item>
+		<item>Logout</item>
+	</string-array>
+	<string-array name="sync_modes">
+	    <item>Auto</item>
+	    <item>Manual</item>
+	    <item>Periodical</item>
+	</string-array>
+	<string-array name="sync_mode_values">
+	    <item>0</item>
+	    <item>1</item>
+	    <item>2</item>
+	</string-array>
+	<string-array name="sync_peridical_values">
+	    <item>4</item>
+	    <item>12</item>
+	    <item>24</item>
+	</string-array>
+	<string-array name="sync_peridical">
+	    <item>Every 4 hours</item>
+	    <item>Every 12 hours</item>
+	    <item>Every 24 hours</item>
+	</string-array>
+</resources>

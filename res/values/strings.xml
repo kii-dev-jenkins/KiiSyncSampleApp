@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="hello">Kii Demo App for Astro</string>
+	<string name="app_name">PFS Client</string>
+	<string name="spinner_prompt">Choose a sample</string>
+
+	<string name="msg_ERROR_RECORD_NOT_FOUND">The file is not found on device.</string>
+	<string name="msg_ERROR_LOGIN_ERROR">Invalid password or username.</string>
+	<string name="msg_ERROR_AUTHENTICAION_ERROR">Invalid password or username. Username can be email
+		address(e.g. support@kii.com) or phone number(e.g. +1 650 240-0431).
+	</string>
+	<string name="msg_ERROR_NO_ACCOUNT">Sorry, you must be Logged in.</string>
+	<string name="msg_ERROR_DIFFERENT_USERNAME">Trying to Log In with a different email address is
+		not allowed.</string>
+	<string name="msg_ERROR_NON_VERIFIED_USERNAME">A verification email or SMS has been sent to you.
+		Please click on the verification link to activate your account.
+	</string>
+	<string name="msg_ERROR_ALREADY_KII_USER">The account is already registered.</string>
+	<string name="msg_ERROR_ALREADY_KII_USER_SHARE">There is already a registered user with that
+		information, please Log In.</string>
+	<string name="msg_ERROR_INVALID_INPUT">Incorrect/invalid input.</string>
+	<string name="msg_ERROR_NO_CONNECTION">No Internet connection.</string>
+	<string name="msg_ERROR_NO_HOST">Can\'t locate the server.</string>
+	<string name="msg_ERROR_TIMEOUT">Internet connection timeout.</string>
+	<string name="msg_ERROR_IO">Internet connection error (IO Exception).</string>
+	<string name="msg_ERROR_PROTOCOL">Internet connection error (Protocol Exception).
+	</string>
+	<string name="msg_ERROR_SERVER_HARD_ERROR">Server error.</string>
+	<string name="msg_ERROR_SERVER_TEMP_ERROR">Server temporary error.</string>
+	<string name="msg_ERROR_GET_SITE_ERROR">Server error (GetSite Exception).</string>
+	<string name="msg_ERROR_GET_ACCOUNTS">Server error (Accounts retrieval Exception).
+	</string>
+	<string name="msg_ERROR_JSON">Protocol error (JSON Exception).</string>
+	<string name="msg_ERROR_OTHERS">Unknown Error(%d).</string>
+	<string name="msg_ERROR_UPLOAD_FILES">Upload File Error.</string>
+	<string name="msg_invalid_sms_verification">Invalid verification message, error code(%d).
+	</string>
+
+	<string name="msg_ERROR_FORCE_STOP">Sync cancel by user.</string>
+	<string name="msg_ERROR_BUSY">An existing sync is progress, please try again later.</string>
+	<string name="sync_progress_notification">Sync in progress.</string>
+	<string name="download_progress_notification">Downloading&#8230;</string>
+	<string name="pref_sync_mode">Sync Mode</string>
+	<string name="pref_sync_periodical">Periodical Time</string>
+	<string name="pref_wifi_only">WIFI Only</string>
+	<string name="tab_cloud">Cloud</string>
+	<string name="tab_device">Device</string>
+	<string name="tab_progress">Progress</string>
+	<string name="menu_item_upload_file">Upload File</string>
+	<string name="menu_item_upload_folder">Upload Folder</string>
+	<string name="menu_item_move_to_trash">Move to Trash</string>
+	<string name="menu_item_download_all">Download All</string>
+</resources>

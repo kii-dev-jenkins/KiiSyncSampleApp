@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.kii.demo.sync"
+      android:versionCode="3"
+      android:versionName="1.1">
+    <uses-sdk android:minSdkVersion="8" />
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
+        
+        <meta-data android:name="app-id" android:value="6b587cee" />
+        <meta-data android:name="app-key" android:value="82946bf6961f4e34d3a53bbc941ac115" />
+        
+        <activity android:name="com.kii.demo.sync.activities.StartActivity"
+        		  android:screenOrientation="portrait"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="com.kii.demo.sync.activities.FilePickerActivity"
+        	android:label="FilePicker" android:configChanges="keyboardHidden|orientation" />   
+        	
+        <activity android:name="com.kii.demo.sync.activities.KiiFilePickerActivity"
+        	android:label="KiiFileViewer" 
+        	android:launchMode="singleTask"
+            android:configChanges="keyboardHidden|orientation"
+        	/>
+        
+        <activity android:name="com.kii.demo.sync.activities.FileTabActivity"
+            android:label="@string/hello"
+            android:launchMode="singleTask"
+            android:configChanges="keyboardHidden|orientation"
+            />
+        	  	     
+		<service android:name="com.synclore.android.pfscsdk.PFSyncService">
+			<intent-filter>
+				<action android:name="com.synclore.android.pfscsdk.ISessionManager" />
+				<action android:name="com.synclore.android.pfscsdk.IChangeLogger" />
+			</intent-filter>
+			<meta-data android:name="com.synclore.android.pfscsdk.PFSyncService.preferences"
+				android:resource="@xml/pfsyncservice_preferences" />
+			<meta-data android:name="com.synclore.android.pfscsdk.PFSyncService.logconfig"
+				android:resource="@xml/pfsyncservice_logconfig" />
+		</service>
+				
+		<provider android:name="com.kii.sync.provider.GenericSyncProvider"
+			android:authorities="com.kii.sync.generic.cloud"
+			android:exported="false"
+			android:label="Generic Sync Provider">
+		</provider>	
+		
+		<activity android:name="com.kii.demo.sync.activities.Settings">
+		</activity>
+		
+		<service android:name="com.kii.cloud.sync.BackupService"></service>
+		
+		<receiver
+		    android:name="com.kii.demo.sync.tasks.KiiRefReceiver">
+			<intent-filter>
+				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+			</intent-filter>
+		</receiver>
+		<activity android:name="com.kii.demo.sync.activities.ProgressListActivity"></activity>
+    </application>
+</manifest>

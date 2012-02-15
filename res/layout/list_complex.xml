@@ -1,0 +1,111 @@
+<!-- list_complex.xml -->
+	<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent"
+		android:layout_height="?android:attr/listPreferredItemHeight"
+		android:orientation="horizontal"
+		android:layout_alignParentTop="true"
+		android:paddingLeft="38dip"
+		android:paddingRight="2dip">
+	    <RelativeLayout
+	    	android:id="@+id/list_complex_icon_main"
+	        android:layout_width="48dip"
+	        android:layout_height="48dip"
+	        android:layout_marginLeft="7dip"
+	        android:layout_marginTop="8dip">
+		<ImageView
+			android:id="@+id/list_complex_icon"
+			android:layout_width="48dip"
+			android:layout_height="48dip"
+			android:scaleType="centerInside"
+			/>
+	    <ImageView
+	        android:id="@+id/list_sync_status_icon"
+	        android:layout_width="22dip"
+	        android:layout_height="22dip"
+	        android:src="@drawable/sync_sync"
+	        android:focusable="false"
+	        android:visibility="gone"
+	        android:scaleType="fitCenter"
+	        />
+		</RelativeLayout>	
+		
+		<RelativeLayout
+			android:id="@+id/list_complex_2lines_text"	
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:orientation="vertical"  
+			android:layout_centerVertical="true"
+			android:layout_marginLeft="7dip" >
+		
+			<TextView
+				android:id="@+id/list_complex_title"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:singleLine="true"
+				android:paddingRight="33dip"
+				android:layout_marginTop="6dip"
+        		android:layout_marginRight="5dip"
+        		android:layout_alignParentTop="true"
+        		android:ellipsize="end"
+				/>
+			<LinearLayout
+				android:id="@+id/list_complex_2lines_text"	
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:layout_below="@id/list_complex_title"
+				android:layout_marginTop="2dip"
+			>	
+			<TextView
+				android:id="@+id/list_complex_caption"
+				android:layout_width="0dip"
+				android:layout_height="wrap_content"
+				android:layout_weight="0.6"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:singleLine="true"
+				android:paddingRight="33dip"
+        		android:layout_alignParentBottom="true"
+        		android:ellipsize="end"
+				/>
+				
+			<TextView
+				android:id="@+id/list_complex_sub_caption"
+				android:layout_width="0dip"
+				android:layout_height="wrap_content"
+				android:layout_weight="0.4"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:singleLine="true"
+				android:paddingRight="3dip"
+				android:visibility="gone"
+				android:layout_gravity="right"
+				android:gravity="right"
+        		android:layout_marginLeft="5dip"
+        		android:ellipsize="end"
+				/>
+		</LinearLayout>
+			
+		</RelativeLayout>
+		
+		<RelativeLayout
+			android:id="@+id/list_complex_1line_text"	
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:visibility="gone"  
+			android:paddingRight="33dip"  
+			android:paddingLeft="7dip" >
+		
+			<TextView
+				android:id="@+id/list_complex_1line_title"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:singleLine="true"
+				android:layout_centerVertical="true"
+				android:ellipsize="end"
+			/>
+			
+		</RelativeLayout>
+				
+	</LinearLayout>	

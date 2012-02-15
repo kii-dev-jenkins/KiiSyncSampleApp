@@ -1,0 +1,497 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sync-setting>
+
+  <!-- PFSyncService (PFS Engine) parameters -->
+  <engine-param>
+    <client name="dev00" client-id="kii-sync" />
+    <charset>UTF-8</charset>
+    <client-timeout>60000</client-timeout>
+    <base-directory
+      path="./">
+      <data-directory
+        path="pfsdata/pfs_data" />
+      <record-directory
+        path="pfsrec/pfs_rec" />
+    </base-directory>
+  </engine-param>
+
+  <!-- Sync parameters-->
+  <sync-param>
+    <server
+      name="Sync Server"
+      url="https://117.135.132.48:8443/pumpkin/syncml/pfs" />
+    <tweakable-params>
+
+      <!-- tweakable param for 2G without compression "2g" -->
+      <tweakable-param id="2g">
+        <authtype>raw</authtype>
+        <transport-timeout>120000</transport-timeout>
+        <server-timeout>100000</server-timeout>
+        <max-msg-size>65536</max-msg-size>
+        <max-cmd-permsg
+          add="100"
+          replace="100"
+          delete="200" />
+        <max-obj-size>10485760</max-obj-size>
+        <compression>none</compression>
+      </tweakable-param>
+
+      <!-- tweakable param for 2G with compression "2g_gzip" -->
+      <tweakable-param id="2g_gzip">
+        <authtype>raw</authtype>
+        <transport-timeout>120000</transport-timeout>
+        <server-timeout>100000</server-timeout>
+        <max-msg-size>65536</max-msg-size>
+        <max-cmd-permsg
+          add="100"
+          replace="100"
+          delete="200" />
+        <max-obj-size>10485760</max-obj-size>
+        <compression>gzip</compression>
+      </tweakable-param>
+
+      <!-- tweakable param for 3G without compression "3g" -->
+      <tweakable-param id="3g">
+        <authtype>raw</authtype>
+        <transport-timeout>60000</transport-timeout>
+        <server-timeout>50000</server-timeout>
+        <max-msg-size>262144</max-msg-size>
+        <max-cmd-permsg
+          add="100"
+          replace="100"
+          delete="200" />
+        <max-obj-size>10485760</max-obj-size>
+        <compression>none</compression>
+      </tweakable-param>
+      <!-- tweakable param for 3G without compression "3g" -->
+      <tweakable-param id="3g_gzip">
+        <authtype>raw</authtype>
+        <transport-timeout>60000</transport-timeout>
+        <server-timeout>50000</server-timeout>
+        <max-msg-size>262144</max-msg-size>
+        <max-cmd-permsg
+          add="100"
+          replace="100"
+          delete="200" />
+        <max-obj-size>10485760</max-obj-size>
+        <compression>gzip</compression>
+      </tweakable-param>
+    </tweakable-params>
+  </sync-param>
+
+  <!-- Datastore definition -->
+  <datastores>
+
+    <!-- GSCT for Kii Sync -->
+    <datastore
+      id="datastore_generic">
+       <default-resolve-policy-idref>resolve_policy_clientwin</default-resolve-policy-idref>
+      <server-datastore storepath="Generic2" />
+      <client-datastore storepath="Generic"
+        content-uri="content://com.kii.sync.generic/files" 
+        insert-allowed="true" update-allowed="true" delete-allowed="true"/>
+      <record-directory
+        path="{EXT}/pfs_file_out" />
+      <datatype-idrefs>
+        <datatype-idref>datatype_generic</datatype-idref>
+      </datatype-idrefs>
+      <notify-record-progress>
+        <content-uri>content://com.kii.sync.generic/progress</content-uri>
+        <query>progress</query>
+        <record-uri-field-name>RECORD_URI</record-uri-field-name>
+        <percentage-field-name>PERCENTAGE</percentage-field-name>
+        <updown-field-name>UPDOWN</updown-field-name>
+      </notify-record-progress>
+      <anchor-stores>
+        <anchor-store id="generic_search_all" />
+      </anchor-stores>
+    </datastore>
+
+  </datastores>
+
+  <!-- Datatype definition -->
+  <datatypes>
+
+    <!-- GSCT for Kii Sync -->
+    <datatype id="datatype_generic" content-type="application/vnd.com.kii.generic2" use-default-serialization="true">
+      <properties>
+        <property-filepath name="_recordFilepath" attribute="body" cleanup="false" />
+        <property-filepath name="_recordFilepath2" attribute="body" cleanup="false" />
+        <property-string name="Title" attribute="temporal" /> 
+        <property-string name="ResourceURL" attribute="temporal" /> 
+        <property-long name="Size" attribute="temporal" /> 
+        <property-long name="CreationTime" attribute="temporal" /> 
+        <property-long name="UpdateTime" attribute="temporal" /> 
+        <property-string name="AppName" attribute="temporal" />
+        <property-string name="Type" attribute="temporal" /> 
+        <property-string name="MimeType" attribute="temporal" /> 
+        <property-string name="Keywords" attribute="temporal" /> 
+        <property-string name="Longitude" attribute="temporal" />
+        <property-string name="Latitude" attribute="temporal" />
+        <property-binary name="Thumbnail" attribute="temporal" />
+        <property-string name="Description" attribute="temporal" />
+        <property-string name="UniqueKey" attribute="merge_sort_filter_key" />
+        <property-string name="ShareFrom" attribute="temporal" />
+        <property-string name="ShareTo" attribute="temporal" />
+        <property-long name="ShareTimestamp" attribute="temporal" />
+        <property-string name="X-KiiFile-FingerPrint" attribute="temporal" /> 
+        <property-string name="X-KiiFile-Album" attribute="temporal" />
+        <property-string name="X-KiiFile-Read" attribute="temporal" />
+        <property-string name="X-APP-Data" attribute="temporal" />
+        <property-string name="SeemsLike" attribute="temporal" />
+        <property-string name="VirtualRoot" attribute="temporal" />
+        <property-string name="VirtualPath" attribute="temporal" />
+      </properties>
+      <recviews>
+        <recview name="recbody:recview_generic"/>
+        <recview name="rechdr:recview_generic"/>
+      </recviews>
+    </datatype>
+  </datatypes>
+
+  <!-- Resolve policy definition -->
+  <resolve-policies>
+    <resolve-policy id="resolve_policy_clientwin">
+      <default-resolve-collision type="clientwin" merge="false" />
+      <default-resolve-duplication type="clientwin" merge="false" />
+    </resolve-policy>
+    <resolve-policy id="resolve_policy_serverwin_for_dup">
+      <default-resolve-collision type="clientwin" merge="false" />
+      <default-resolve-duplication type="serverwin" merge="false" />
+    </resolve-policy>
+  </resolve-policies>
+
+  <!-- Arrangement definition -->
+  <arrangements>    
+    <!-- Generic Get one Recbody  -->
+    <arrangement-get id="arrangement_generic_get">
+      <retrieval-policy> 
+        <mode>maximal</mode> 
+        <level>none</level> 
+        <recview-refs> 
+          <recview-ref name="recbody:recview_generic"> 
+            <datatype-idref>datatype_generic</datatype-idref> 
+          </recview-ref> 
+        </recview-refs> 
+      </retrieval-policy> 
+      <storeview-ref idref="storeview_generic" /> 
+    </arrangement-get>
+
+    <!-- Generic Get one Rechdr  -->
+    <arrangement-get id="arrangement_generic_get_header">
+      <retrieval-policy> 
+        <mode>maximal</mode> 
+        <level>none</level> 
+        <recview-refs> 
+          <recview-ref name="rechdr:recview_generic"> 
+            <datatype-idref>datatype_generic</datatype-idref> 
+          </recview-ref> 
+        </recview-refs> 
+      </retrieval-policy> 
+      <storeview-ref idref="storeview_generic" /> 
+    </arrangement-get>
+
+    <!-- Generic Put one Recbody  -->
+    <arrangement-put id="arrangement_generic_put">
+      <transmission-policy> 
+        <mode>maximal</mode> 
+        <level>none</level> 
+        <recview-refs> 
+          <recview-ref name="recbody:recview_generic"> 
+            <datatype-idref>datatype_generic</datatype-idref> 
+          </recview-ref> 
+        </recview-refs> 
+      </transmission-policy> 
+      <storeview-ref idref="storeview_generic" /> 
+    </arrangement-put>
+
+    <!-- GSCT oneway_from_client search -->
+    <arrangement-search id="arrangement_generic_onewayfromclient">
+      <transmission-policy>
+        <mode>minimal</mode>
+        <level>none</level>
+        <recview-refs>
+          <recview-ref name="recbody:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </transmission-policy>
+      <retrieval-policy>
+        <mode>none</mode>
+        <level>none</level>
+        <recview-refs>
+          <recview-ref name="recbody:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </retrieval-policy>
+       <storeview-ref idref="storeview_generic" />
+    </arrangement-search>
+
+    <!-- GSCT oneway_from_server (not used) -->
+    <arrangement-search id="arrangement_generic_onewayfromserver">
+      <transmission-policy>
+        <mode>none</mode>
+        <level>none</level>
+        <recview-refs>
+          <recview-ref name="rechdr:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </transmission-policy>
+      <retrieval-policy>
+        <mode>minimal</mode>
+        <level>none</level>
+        <recview-refs>
+          <recview-ref name="rechdr:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </retrieval-policy>
+      <storeview-ref idref="storeview_generic" />
+      <anchor-store-id-ref id="generic_search_all"/>
+    </arrangement-search>
+
+    <!-- Generic twoway search (Download:Rechdr, Upload: Rechdr+Recbody) -->
+    <arrangement-search id="arrangement_generic_twoway2">
+      <transmission-policy>
+        <mode>minimal</mode>
+        <level>normal</level>
+        <recview-refs>
+          <recview-ref name="recbody:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </transmission-policy>
+      <retrieval-policy>
+        <mode>minimal</mode>
+        <level>normal</level>
+        <recview-refs>
+          <recview-ref name="rechdr:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </retrieval-policy>
+      <storeview-ref idref="storeview_generic" />
+      <anchor-store-id-ref id="generic_search_all"/>
+    </arrangement-search>
+
+    <arrangement-search id="arrangement_generic_twoway_header">
+      <transmission-policy>
+        <mode>minimal</mode>
+        <level>normal</level>
+        <recview-refs>
+          <recview-ref name="rechdr:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </transmission-policy>
+      <retrieval-policy>
+        <mode>minimal</mode>
+        <level>normal</level>
+        <recview-refs>
+          <recview-ref name="rechdr:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </retrieval-policy>
+      <storeview-ref idref="storeview_generic" />
+      <anchor-store-id-ref id="generic_search_all"/>
+    </arrangement-search>
+
+    <arrangement-search id="arrangement_generic_oneway_from_server_header">
+      <transmission-policy>
+        <mode>none</mode>
+        <level>none</level>
+        <recview-refs>
+          <recview-ref name="rechdr:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </transmission-policy>
+      <retrieval-policy>
+        <mode>minimal</mode>
+        <level>normal</level>
+        <recview-refs>
+          <recview-ref name="rechdr:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </retrieval-policy>
+      <storeview-ref idref="storeview_generic" />
+      <anchor-store-id-ref id="generic_search_all"/>
+    </arrangement-search>
+
+    <arrangement-search id="arrangement_generic_oneway_from_client">
+      <transmission-policy>
+        <mode>minimal</mode>
+        <level>normal</level>
+        <recview-refs>
+          <recview-ref name="recbody:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </transmission-policy>
+      <retrieval-policy>
+        <mode>none</mode>
+        <level>none</level>
+        <recview-refs>
+          <recview-ref name="rechdr:recview_generic">
+            <datatype-idref>datatype_generic</datatype-idref>
+          </recview-ref>
+        </recview-refs>
+      </retrieval-policy>
+      <storeview-ref idref="storeview_generic" />
+    </arrangement-search>
+
+  </arrangements>
+
+  <!-- Syncmode definition -->
+  <syncmodes>
+    
+    <!-- Kii sync: GSCT twoway header sync -->
+    <syncmode id="syncmode_generic_twoway_rechdr">
+      <arguments>
+        <argument-id id="tweakable_param_string">3g</argument-id>
+      </arguments>
+      <arrangement-refs>
+        <arrangement-ref
+            name="arrangement_generic_twoway_header_name_ref"
+            idref="arrangement_generic_twoway_header" />
+      </arrangement-refs>
+      <tweakable-param-idref argument-idref="tweakable_param_string"/>
+    </syncmode>
+
+    <!-- Kii sync: GSCT oneway from server header sync -->
+    <syncmode id="syncmode_generic_oneway_from_server_rechdr">
+      <arguments>
+        <argument-id id="tweakable_param_string">3g</argument-id>
+      </arguments>
+      <arrangement-refs>
+        <arrangement-ref
+            name="arrangement_generic_oneway_from_server_header_ref"
+            idref="arrangement_generic_oneway_from_server_header" />
+      </arrangement-refs>
+      <tweakable-param-idref argument-idref="tweakable_param_string"/>
+    </syncmode>
+
+    <!-- Kii sync: GSCT Get one pic -->
+    <syncmode id="syncmode_generic_get">
+      <arguments>
+        <argument-id id="tweakable_param_string">3g</argument-id>
+      </arguments>
+      <arrangement-refs>
+        <arrangement-ref
+            name="arrangement_generic_get_name_ref"
+            idref="arrangement_generic_get">
+          <arguments>
+	    	<argument-luid id="generic_luid" />
+          </arguments>
+        </arrangement-ref>
+      </arrangement-refs>
+      <tweakable-param-idref argument-idref="tweakable_param_string"/>
+    </syncmode>
+
+    <!-- Kii sync: GSCT Get one pic -->
+    <syncmode id="syncmode_generic_get_header">
+      <arguments>
+        <argument-id id="tweakable_param_string">3g</argument-id>
+      </arguments>
+      <arrangement-refs>
+        <arrangement-ref
+            name="arrangement_generic_get_header_name_ref"
+            idref="arrangement_generic_get_header">
+          <arguments>
+            <argument-luid id="generic_luid" />
+          </arguments>
+        </arrangement-ref>
+      </arrangement-refs>
+      <tweakable-param-idref argument-idref="tweakable_param_string"/>
+    </syncmode>
+
+    <!-- Kii sync: GSCT Put one pic -->
+    <syncmode id="syncmode_generic_put">
+      <arguments>
+        <argument-id id="tweakable_param_string">3g</argument-id>
+      </arguments>
+      <arrangement-refs>
+        <arrangement-ref
+            name="arrangement_generic_put_name_ref"
+            idref="arrangement_generic_put">
+          <arguments>
+	    	<argument-luid id="generic_luid" />
+          </arguments>
+        </arrangement-ref>
+      </arrangement-refs>
+      <tweakable-param-idref argument-idref="tweakable_param_string"/>
+    </syncmode>
+
+    <!-- Kii sync: GSCT upload -->
+    <syncmode id="syncmode_generic_upload">
+      <arguments>
+        <argument-id id="tweakable_param_string">3g</argument-id>
+      </arguments>
+      <arrangement-refs>
+        <arrangement-ref
+            name="arrangement_generic_onewayfromclient_name_ref"
+            idref="arrangement_generic_onewayfromclient" />
+      </arrangement-refs>
+      <tweakable-param-idref argument-idref="tweakable_param_string"/>
+    </syncmode>
+
+    <!-- Kii sync: GSCT twoway (Upload: Rechdr+Recbody, then Download: Rechdr) -->
+    <syncmode id="syncmode_generic_twoway_sync">
+      <arguments>
+        <argument-id id="tweakable_param_string">3g</argument-id>
+      </arguments>
+      <arrangement-refs>
+        <arrangement-ref
+            name="arrangement_generic_twoway2_name_ref"
+            idref="arrangement_generic_twoway2" />
+      </arrangement-refs>
+      <tweakable-param-idref argument-idref="tweakable_param_string"/>
+    </syncmode>
+
+
+    <!-- Kii sync: GSCT twoway (Download: Rechdr, then Upload: Rechdr+Recbody) -->
+    <syncmode id="syncmode_generic_twoway_sync2">
+      <arguments>
+        <argument-id id="tweakable_param_string">3g</argument-id>
+      </arguments>
+      <arrangement-refs>
+        <arrangement-ref
+            name="arrangement_generic_twoway2_name_ref"
+            idref="arrangement_generic_twoway2" />
+      </arrangement-refs>
+      <tweakable-param-idref argument-idref="tweakable_param_string"/>
+    </syncmode>
+
+    <!-- Upload Recbody from client search -->
+    <syncmode id="syncmode_generic_oneway_from_client">
+      <arguments>
+        <argument-id id="tweakable_param_string">3g</argument-id>
+      </arguments>
+      <arrangement-refs>
+        <arrangement-ref
+            name="arrangement_generic_oneway_from_client_ref"
+            idref="arrangement_generic_oneway_from_client" />
+      </arrangement-refs>
+      <tweakable-param-idref argument-idref="tweakable_param_string"/>
+    </syncmode>
+
+  </syncmodes>
+
+
+  <store-views>
+
+    <!-- Storeview for Kii sync's GSCT -->
+    <store-view id="storeview_generic" datastore-idref="datastore_generic">
+      <recview-refs>
+        <recview-ref name="recbody:recview_generic">
+          <datatype-idref>datatype_generic</datatype-idref>
+        </recview-ref>
+      </recview-refs>
+    </store-view>
+  </store-views>
+
+</sync-setting>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="KiiSyncAPIDemos" default="help">
+    <!-- Add by Kii -->
+    <property name="svn" value="svn" />
+    <property file="${sign.properties}" />
+    <property name="kii.absolute.dir" location="release" />
+
+    <target name="package-src">
+        <zip destfile="KiiSyncAPIDemos.zip">
+            <zipfileset prefix="KiiSyncAPIDemos" dir="." excludes="gen/, bin/,  demo.zip" />
+        </zip>
+    </target>
+
+    <target name="svnrevert">
+        <exec dir="." executable="${svn}" failifexecutionfails="false">
+            <arg line="revert" />
+            <arg line="-R" />
+            <arg line="." /> 
+        </exec>
+    </target>
+    <target name="svnversion">
+        <exec dir="." executable="svnversion" outputproperty="svnversion" failifexecutionfails="false">
+            <arg line="-c" />
+            <redirector>
+                <outputfilterchain>
+                    <tokenfilter>
+                        <replaceregex pattern="[0-9]+\:" replace="" />
+                        <replaceregex pattern="[^0-9]+" replace="" />
+                    </tokenfilter>
+                </outputfilterchain>
+            </redirector>
+        </exec>
+        <echo>SVN Version:${svnversion}</echo>
+    </target>
+    <target name="set-version-channel" depends="svnrevert, svnversion">
+        <condition property="channel" value="${channel_id}" else="Developing">
+            <isset property="channel_id" />
+        </condition>
+        <echo>Channel:${channel}</echo>
+        <replaceregexp file="AndroidManifest.xml"
+            match="^(\s*android\:versionName=.*)(.*)debug(.*)"
+            replace="\1${svnversion}\3"
+            byline="true"
+            encoding="UTF-8" />
+        <replaceregexp file="AndroidManifest.xml"
+            match="(\s*android\:versionCode=.*)(&quot;.*&quot;)"
+            replace="\1&quot;${svnversion}&quot;"
+            byline="true"
+            encoding="UTF-8" />
+        <replaceregexp file="AndroidManifest.xml"
+            match="^(.*)(Developing)(.*)"
+            replace="\1${channel}\3"
+            byline="true"
+            encoding="UTF-8" />
+    </target>
+    <target name="kii-release" depends="clean, set-version-channel, release">
+        <mkdir dir="${kii.absolute.dir}" />
+        <property name="kii.release.file.name"
+            value="${ant.project.name}-${channel}-r${svnversion}.apk" />
+        <property name="kii.release.file"
+            location="${kii.absolute.dir}/${kii.release.file.name}" />
+        <copy overwrite="true" file="${out.final.file}" tofile="${kii.release.file}" />
+    </target>
+    <!-- End add by Kii -->
+    <property file="local.properties" />
+
+
+    <property file="ant.properties" />
+
+
+    <loadproperties srcFile="project.properties" />
+
+    <!-- quick check on sdk.dir -->
+    <fail
+            message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'"
+            unless="sdk.dir"
+    />
+    
+    <!-- version-tag: 1 -->
+    <import file="${sdk.dir}/tools/ant/build.xml" />
+
+</project>

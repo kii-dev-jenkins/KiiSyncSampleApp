@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="User Name:" />
+
+            <EditText
+                android:id="@+id/username"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="h1@testkii.com" />
+<!--            android:text="kii_yszvjvjs0" /> -->                 
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Password:" />
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="123456" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                 >
+
+                <LinearLayout 
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/register"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:layout_weight="1"
+                        android:text="Register" >
+
+                    </Button>
+
+                    <Button
+                        android:id="@+id/login"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:layout_weight="1"
+                        android:text="Log In" >
+
+                    </Button>
+
+                    <Button
+                        android:id="@+id/logout"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:layout_weight="1"
+                        android:text="Log Out" >
+
+                    </Button>
+                </LinearLayout>
+
+                <LinearLayout 
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/changePwd"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:layout_weight="1"
+                        android:text="ChangePwd" >
+                    </Button>
+                    
+                    <Button
+                        android:id="@+id/sync"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:layout_weight="1"
+                        android:text="Sync">
+                    </Button>    
+                        
+                    <Button
+                        android:id="@+id/viewer"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:layout_weight="1"
+                        android:text="KiiFileViewer">
+                    </Button>
+                    
+                </LinearLayout>
+                <LinearLayout 
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/launch_settings"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:text="Backup Settings">
+                    </Button>
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="2dp"
+                android:scaleType="fitXY"
+                android:src="@android:drawable/divider_horizontal_dark" />
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="10dip" />
+
+            <TextView
+                android:id="@+id/progress_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginBottom="10dip"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="2dip"
+                android:text="0% 0/0"
+                android:textStyle="normal" />
+
+            <TextView
+                android:id="@+id/lastSyncTime"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Last successful sync -1" />
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="2dp"
+                android:scaleType="fitXY"
+                android:src="@android:drawable/divider_horizontal_dark" />
+
+            <TextView
+                android:id="@+id/storage"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Storage Uasge is 0" />
+
+            <TextView
+                android:id="@+id/server"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Connect to Server:?" />
+
+            <TextView
+                android:id="@+id/kiiid"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="KiiID:?" />
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="2dp"
+                android:scaleType="fitXY"
+                android:src="@android:drawable/divider_horizontal_dark" />
+           
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
