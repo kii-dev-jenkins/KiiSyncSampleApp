@@ -11,9 +11,6 @@
 
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
         
-        <meta-data android:name="app-id" android:value="6b587cee" />
-        <meta-data android:name="app-key" android:value="82946bf6961f4e34d3a53bbc941ac115" />
-        
         <activity android:name="com.kii.demo.sync.activities.StartActivity"
         		  android:screenOrientation="portrait"
                   android:label="@string/app_name">
@@ -50,9 +47,10 @@
 		</service>
 				
 		<provider android:name="com.kii.sync.provider.GenericSyncProvider"
-			android:authorities="com.kii.sync.generic.cloud"
+			android:authorities="com.kii.sync.generic.6b587cee"
 			android:exported="false"
 			android:label="Generic Sync Provider">
+			<meta-data android:name="app-key" android:value="82946bf6961f4e34d3a53bbc941ac115" />
 		</provider>	
 		
 		<activity android:name="com.kii.demo.sync.activities.Settings">
