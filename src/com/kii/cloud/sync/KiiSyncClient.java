@@ -276,8 +276,12 @@ public class KiiSyncClient {
      */
     public String getTrashTempFolder() {
         if (mContext != null) {
-            String cacheDir = this.mContext.getCacheDir().getAbsolutePath();
-            return cacheDir + "/trash/";
+            String cacheDir = this.mContext.getCacheDir().getAbsolutePath() + "/trash/";
+            File directory = new File(cacheDir);
+            if( ! directory.exists() ){
+            	directory.mkdir();
+            }
+            return cacheDir;	
         } else {
             return null;
         }
@@ -610,6 +614,12 @@ public class KiiSyncClient {
      */
     public int moveToTrash(String originalPath, String mimeType) {
 
+    	File src = new File(originalPath);
+    	
+    	if(!src.isFile()){
+    		return SyncMsg.ERROR_FILE_NOT_FOUND;
+    	}
+    	
         KiiFile kiFile = createKiiFileByPath(originalPath);
 
         // if the file already exist as KiiFile, just update the category
@@ -636,34 +646,70 @@ public class KiiSyncClient {
     						getTempThumbnailFolder()+unique+".jpg", mimeType);
     	}
         
-        File dest = new File(getTrashTempFolder(), unique+"."+MimeUtil.getSuffixOfFile(originalPath));
-        File src = new File(originalPath);
+    	// application specific data
+        kiFile.setAppData("application specific data");
+        kiFile.setCategory(CATEGORY_TRASH);        	
+        // check if application has provided the mimetype
+        // it will override the default
+    	if (!TextUtils.isEmpty(mimeType)) {
+    		kiFile.setMimeType(mimeType);
+    	}
+    	// check if application has provided thumbnail
+    	// it will override the default 
+    	if (!TextUtils.isEmpty(thumbnail)) {
+    		kiFile.setThumbnail(thumbnail);
+    	}
+    	
+//    	File dest = new File(getTrashTempFolder()+unique+"."+MimeUtil.getSuffixOfFile(originalPath));
+//    	
+//    	try {
+//			dest.createNewFile();
+//		} catch (IOException e) {
+//			return SyncMsg.ERROR_IO;
+//		}
+		
+    	int res = kiFile.copyToTmp(getTrashTempFolder()+unique+"."+MimeUtil.getSuffixOfFile(originalPath)); 
+    	
+    	if( res == SyncMsg.OK ){
+    		// delete the original file
+        	if( src.delete() ){
+        		return upload(kiFile);
+        	}else{
+        		return SyncMsg.ERROR_ACCESS_FILE;
+        	}
+        	
+    	}
         
-        if (Utils.moveFile(dest, src) != null) {
-        	KiiFile kiTrashFile = createKiiFileByPath(dest.getAbsolutePath());
-        	kiTrashFile.setResourceUrl(originalPath);
-        	kiTrashFile.setTitle(new File(originalPath).getName());
-        	// appliction specific data
-        	kiTrashFile.setAppData("application specific data");
-        	kiTrashFile.setCategory(CATEGORY_TRASH);        	
-            // check if application has provided the mimetype
-            // it will override the default
-        	if (!TextUtils.isEmpty(mimeType)) {
-        		kiTrashFile.setMimeType(mimeType);
-        	}
-        	// check if application has provided thumbnail
-        	// it will override the default 
-        	if (!TextUtils.isEmpty(thumbnail)) {
-        		kiTrashFile.setThumbnail(thumbnail);
-        	}
-        	
-        	// delete the original file
-        	src.delete();
-        	
-        	return upload(kiTrashFile);
-        }
-
-        return SyncMsg.ERROR_ACCESS_FILE;
+    	return res;
+//        
+//        File dest = new File(getTrashTempFolder(), unique+"."+MimeUtil.getSuffixOfFile(originalPath));
+//        File src = new File(originalPath);
+//        
+//        if (Utils.moveFile(dest, src) != null) {
+//        	KiiFile kiTrashFile = createKiiFileByPath(dest.getAbsolutePath());
+//        	kiTrashFile.setResourceUrl(originalPath);
+//        	kiTrashFile.setTitle(new File(originalPath).getName());
+//        	// appliction specific data
+//        	kiTrashFile.setAppData("application specific data");
+//        	kiTrashFile.setCategory(CATEGORY_TRASH);        	
+//            // check if application has provided the mimetype
+//            // it will override the default
+//        	if (!TextUtils.isEmpty(mimeType)) {
+//        		kiTrashFile.setMimeType(mimeType);
+//        	}
+//        	// check if application has provided thumbnail
+//        	// it will override the default 
+//        	if (!TextUtils.isEmpty(thumbnail)) {
+//        		kiTrashFile.setThumbnail(thumbnail);
+//        	}
+//        	
+//        	// delete the original file
+//        	src.delete();
+//        	
+//        	return upload(kiTrashFile);
+//        }
+//
+//        return SyncMsg.ERROR_ACCESS_FILE;
     }
 
     /**
