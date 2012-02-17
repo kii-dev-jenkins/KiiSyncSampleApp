@@ -89,8 +89,8 @@ public class KiiSyncClient {
     /**
      * Register user if no account has been registered
      * 
-     * @param userName
-     *            : user name for login
+     * @param email
+     *            : email address for login
      * @param password
      *            : password (min length and max length)
      * @param country
@@ -109,9 +109,9 @@ public class KiiSyncClient {
      * {@link SyncMsg#ERROR_UNKNOWN_STATUSCODE}         Unknown HTTP status code.<br>
      *
      */
-    public int register(String userName, String password, String country,
+    public int register(String email, String password, String country,
             String nickName, String mobile) {
-        return mAuthManager.register(userName, password, country, nickName, mobile);
+        return mAuthManager.register(email, password, country, nickName, mobile);
     }
     
     /**

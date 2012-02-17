@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.kii.cloud.storage.EasyClient;
 import com.kii.cloud.storage.dataType.KiiUser;
@@ -19,6 +20,7 @@ import com.kii.sync.KiiClient;
 import com.kii.sync.KiiUMInfo;
 import com.kii.sync.SyncMsg;
 import com.kii.sync.SyncPref;
+import com.kii.sync.AppUtil;
 
 /**
  * The Authentication is using the Cloud Storage 
@@ -26,9 +28,6 @@ import com.kii.sync.SyncPref;
 public class CloudStorage implements Authentication{
 	
 	static final String TAG = "CloudStorageAuthentication";
-	
-    static final String PREF_UM_APP_ID = "app-id";
-    static final String PREF_UM_APP_KEY = "app-key";
     
     static final String PROPERTY_COUNTRY = "country";
     	
@@ -40,14 +39,14 @@ public class CloudStorage implements Authentication{
 		mSyncClient = client;
 		mContext = context;
 		
-		Bundle data = getAppMetadata(context);
-        String appId = data.getString(PREF_UM_APP_ID);
+		Bundle data = AppUtil.getAppInfo(context);
+        String appId = data.getString(AppUtil.PREF_UM_APP_ID);
         if(TextUtils.isEmpty(appId)) {
-            throw new RuntimeException(PREF_UM_APP_ID+" meta data is not found in Manifest");
+            throw new RuntimeException(AppUtil.PREF_UM_APP_ID+" meta data is not found in Manifest");
         }
-        String appKey = data.getString(PREF_UM_APP_KEY);
+        String appKey = data.getString(AppUtil.PREF_UM_APP_KEY);
         if(TextUtils.isEmpty(appKey)) {
-            throw new RuntimeException(PREF_UM_APP_KEY+" meta data is not found in Manifest");
+            throw new RuntimeException(AppUtil.PREF_UM_APP_KEY+" meta data is not found in Manifest");
         }
 		
         EasyClient.start(context, appId, appKey);
@@ -98,27 +97,36 @@ public class CloudStorage implements Authentication{
 	}
 
 	@Override
-	public int register(String userName, String password, String country,
+	public int register(String email, String password, String country,
 			String nickName, String mobile) {
-		if(TextUtils.isEmpty(userName) || TextUtils.isEmpty(password)){
+		if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)){
 			return SyncMsg.ERROR_INVALID_INPUT;
 		}
+		
 		KiiUser user = new KiiUser();
-		user.setUsername(userName);
+		String userName = "cloud"+System.currentTimeMillis();
 		
-		if(userName.contains("@")){
-			user.setEmail(userName);
+		try{		
+			
+			// auto generate the username
+			user.setUsername(userName);
+			
+			user.setEmail(email);
+			
+			if(!TextUtils.isEmpty(country)){
+				user.setStringProperty(PROPERTY_COUNTRY, country);
+			}
+			if(!TextUtils.isEmpty(nickName)){
+				user.setName(nickName);
+			}
+			if(!TextUtils.isEmpty(mobile)){
+				user.setName(mobile);
+			}
+		}catch(IllegalArgumentException e){
+			Log.e(TAG,"IllegalArgumentException:"+e.getMessage());
+			return SyncMsg.ERROR_INVALID_INPUT;
 		}
 		
-		if(!TextUtils.isEmpty(country)){
-			user.setStringProperty(PROPERTY_COUNTRY, country);
-		}
-		if(!TextUtils.isEmpty(nickName)){
-			user.setName(nickName);
-		}
-		if(!TextUtils.isEmpty(mobile)){
-			user.setName(mobile);
-		}
 		UserResult result;
 		try {
 			result = mUserMgr.createUser(user, password);
@@ -136,10 +144,10 @@ public class CloudStorage implements Authentication{
 	}
 
 	@Override
-	public int login(String username, String password) {
+	public int login(String email, String password) {
 		UserResult result;
 		try {
-			result = mUserMgr.login(username, password);
+			result = mUserMgr.login(email, password);
 		} catch (CloudExecutionException e) {
 			return SyncMsg.ERROR_AUTHENTICAION_ERROR;
 		} catch (IOException e) {
@@ -148,16 +156,16 @@ public class CloudStorage implements Authentication{
 		String accType = "KII_ID";
 		KiiUser user = result.getKiiUser();
 		if(user!=null){
-			SyncPref.setUsername(username);
-			if(username.contains("@")){
+			SyncPref.setUsername(email);
+			if(email.contains("@")){
 				accType = "EMAIL";
 			}
 			KiiUMInfo info = new KiiUMInfo(mContext,
-					username, 
+					email, 
 					password,  
 					"http://dev-usergrid.kii.com/app/sync/pfs",
 					accType,
-					username);
+					email);
 			mSyncClient.setKiiUMInfo(info);
 		}
 		return 0;

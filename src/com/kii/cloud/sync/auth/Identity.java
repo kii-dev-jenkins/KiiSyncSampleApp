@@ -27,9 +27,9 @@ public class Identity implements Authentication{
     }
     
 	@Override
-    public int register(String userName, String password, String country,
+    public int register(String email, String password, String country,
             String nickName, String mobile) {
-        return mSyncManager.register(userName, password, country, nickName, mobile, null,
+        return mSyncManager.register(email, password, country, nickName, mobile, null,
                 null);
     }
     
