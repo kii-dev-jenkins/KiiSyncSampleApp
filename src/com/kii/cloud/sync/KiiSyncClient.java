@@ -659,14 +659,6 @@ public class KiiSyncClient {
     	if (!TextUtils.isEmpty(thumbnail)) {
     		kiFile.setThumbnail(thumbnail);
     	}
-    	
-//    	File dest = new File(getTrashTempFolder()+unique+"."+MimeUtil.getSuffixOfFile(originalPath));
-//    	
-//    	try {
-//			dest.createNewFile();
-//		} catch (IOException e) {
-//			return SyncMsg.ERROR_IO;
-//		}
 		
     	int res = kiFile.copyToTmp(getTrashTempFolder()+unique+"."+MimeUtil.getSuffixOfFile(originalPath)); 
     	
@@ -681,35 +673,6 @@ public class KiiSyncClient {
     	}
         
     	return res;
-//        
-//        File dest = new File(getTrashTempFolder(), unique+"."+MimeUtil.getSuffixOfFile(originalPath));
-//        File src = new File(originalPath);
-//        
-//        if (Utils.moveFile(dest, src) != null) {
-//        	KiiFile kiTrashFile = createKiiFileByPath(dest.getAbsolutePath());
-//        	kiTrashFile.setResourceUrl(originalPath);
-//        	kiTrashFile.setTitle(new File(originalPath).getName());
-//        	// appliction specific data
-//        	kiTrashFile.setAppData("application specific data");
-//        	kiTrashFile.setCategory(CATEGORY_TRASH);        	
-//            // check if application has provided the mimetype
-//            // it will override the default
-//        	if (!TextUtils.isEmpty(mimeType)) {
-//        		kiTrashFile.setMimeType(mimeType);
-//        	}
-//        	// check if application has provided thumbnail
-//        	// it will override the default 
-//        	if (!TextUtils.isEmpty(thumbnail)) {
-//        		kiTrashFile.setThumbnail(thumbnail);
-//        	}
-//        	
-//        	// delete the original file
-//        	src.delete();
-//        	
-//        	return upload(kiTrashFile);
-//        }
-//
-//        return SyncMsg.ERROR_ACCESS_FILE;
     }
 
     /**
@@ -1121,7 +1084,48 @@ public class KiiSyncClient {
             return true;
         }
         return false;
-    } 
+    }
+    
+    /**
+     * Upload all the files in a given folder, support recursive  
+     * 
+     * @param filePath
+     * @return SyncMsg
+     * @see SyncMsg
+     */
+    public int uploadByFolder(String filePath) {
+    	int ret;
+    	File file = new File(filePath);
+    	if(file.isDirectory()){
+    		upload(file);
+    		ret = SyncMsg.OK;
+    	}else{
+    		ret = upload(file.getAbsoluteFile());
+    	}
+        if (ret == SyncMsg.OK) {
+        	mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
+            return mSyncManager.refresh();
+        }
+        return SyncMsg.OK;
+    }
+    
+    private int upload(File directory){
+    	int total = 0;
+    	File [] files = directory.listFiles();
+    	
+    	for(int ct=0; ct<files.length; ct++){
+    		if( files[ct].isFile() ){
+    			int ret = upload(files[ct].getAbsolutePath(), false);
+    			if (ret != SyncMsg.OK) {
+    				Log.e(TAG,"Fail("+ret+") to Upload file:"+files[ct].getAbsolutePath());
+    			}
+    		}else{
+    			total += upload(files[ct]);
+    		}
+    	}
+    	
+    	return total;
+    }    
 
     /**
      * @param fullPathOfFolder

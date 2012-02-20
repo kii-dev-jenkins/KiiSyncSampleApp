@@ -267,6 +267,8 @@ public class KiiClientTask extends AsyncTask<Object, Void, Integer> {
                 break;
         }
         switch (result) {
+    		case SyncMsg.ERROR_INTERRUPTED:
+    		case SyncMsg.ERROR_PFS_BUSY:
             case SyncMsg.PFS_SYNCRESULT_FORCE_STOP:
             case SyncMsg.OK:
                 break;
