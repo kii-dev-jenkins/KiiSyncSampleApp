@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -43,7 +44,7 @@ import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.sync.KiiFile;
 
-public class FilePickerActivity extends ListActivity {
+public class FilePickerActivity extends ListActivity implements View.OnClickListener{
 
     /**
      * The file path
@@ -118,6 +119,7 @@ public class FilePickerActivity extends ListActivity {
             acceptedFileExtensions = (String[]) collection
                     .toArray(new String[collection.size()]);
         }
+        
     }
 
     @Override
@@ -341,7 +343,10 @@ public class FilePickerActivity extends ListActivity {
                 imageView.setImageResource(R.drawable.folder);
 
             }
-
+            
+            ImageButton ib = (ImageButton)row.findViewById(R.id.menu_button);
+            ib.setTag(row);
+            ib.setOnClickListener(FilePickerActivity.this);
             return row;
         }
 
@@ -442,4 +447,17 @@ public class FilePickerActivity extends ListActivity {
             return true;
         }
     }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()) {
+            case R.id.menu_button:
+                View row = (View)v.getTag();
+                getListView().showContextMenuForChild(row);
+                break;
+        }
+        
+    }
+
+    
 }

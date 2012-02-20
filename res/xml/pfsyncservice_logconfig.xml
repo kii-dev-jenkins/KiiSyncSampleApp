@@ -17,12 +17,12 @@ http://logback.qos.ch/manual/configuration.html
 
   <logger name="synclore.pfsengine">
     <!-- PFSENGINE or NONE can be specified for the current version -->
-    <appender-ref ref="LOGCAT" />
+    <appender-ref ref="NONE" />
   </logger>
 
   <logger name="synclore.pfscsdk-trace">
     <!-- LOGCAT or NONE can be specified for the current version -->
-    <appender-ref ref="LOGCAT" />
+    <appender-ref ref="NONE" />
   </logger>
 
   <root>
