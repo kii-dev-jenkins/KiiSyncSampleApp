@@ -32,12 +32,16 @@ public class BackupService extends Service {
     public static final String ACTION_TIMER_TIMEOUT = "timer_timeout";
     public static final String ACTION_AUTO_SYNC_MODE = "auto_sync_mode";
     public static final String ACTION_SYNC_AFTER_LOGIN = "sync_after_login";
+    public static final String ACTION_REFRESH = "refresh";
+    public static final String ACTION_REFRESH_QUICK = "refresh_quick";
 
     private static final int DATA_CONNECTION_CHANGED = 0;
     private static final int TIMER_CHANGED = 1;
     private static final int TIMER_TIMEOUT = 2;
     private static final int AUTO_SYNC_MODE = 3;
     private static final int SYNC_AFTER_LOGIN = 4;
+    private static final int REFRESH = 5;
+    private static final int REFRESH_QUICK = 6;
 
     private static final int REQ_CODE_TIMER = 0;
 
@@ -49,6 +53,8 @@ public class BackupService extends Service {
         ACTION_MAP.put(ACTION_TIMER_TIMEOUT, TIMER_TIMEOUT);
         ACTION_MAP.put(ACTION_AUTO_SYNC_MODE, AUTO_SYNC_MODE);
         ACTION_MAP.put(ACTION_SYNC_AFTER_LOGIN, SYNC_AFTER_LOGIN);
+        ACTION_MAP.put(ACTION_REFRESH, REFRESH);
+        ACTION_MAP.put(ACTION_REFRESH_QUICK, REFRESH_QUICK);
     }
 
     @Override
@@ -85,10 +91,23 @@ public class BackupService extends Service {
         }
     }
 
+    private static final int SYNC_REFRESH = 0;
+    private static final int SYNC_REFRESH_QUICK = 1;
+
     private class SyncTask extends AsyncTask<Void, Void, Integer> {
+        int taskId = -1;
+
+        public SyncTask(int taskId) {
+            this.taskId = taskId;
+        }
+
         @Override
         protected Integer doInBackground(Void... params) {
-            return mSyncClient.refresh();
+            if (taskId == SYNC_REFRESH) {
+                return mSyncClient.refresh();
+            } else {
+                return mSyncClient.refreshQuick();
+            }
         }
     }
 
@@ -114,20 +133,27 @@ public class BackupService extends Service {
                 break;
             case TIMER_TIMEOUT:
                 if (hasPendingSync() && dataConnectionMatches()) {
-                    startSync();
+                    startSync(SYNC_REFRESH);
                 }
                 break;
             case DATA_CONNECTION_CHANGED:
             case AUTO_SYNC_MODE:
-                if (shouldStartSync()) {
-                    startSync();
+                if (shouldAutoSync()) {
+                    startSync(SYNC_REFRESH);
                 } else if (shouldStopSync()) {
                     stopSync();
                 }
                 break;
             case SYNC_AFTER_LOGIN:
-                startSync();
+                startSync(SYNC_REFRESH);
                 break;
+            case REFRESH:
+                startSync(SYNC_REFRESH);
+                break;
+            case REFRESH_QUICK:
+                startSync(SYNC_REFRESH_QUICK);
+                break;
+
         }
     }
 
@@ -136,18 +162,18 @@ public class BackupService extends Service {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case AUTO_SYNC_MODE:
-                    if (shouldStartSync()) {
-                        startSync();
+                    if (shouldAutoSync()) {
+                        startSync(SYNC_REFRESH);
                     }
                     break;
             }
         }
     };
 
-    private void startSync() {
+    private void startSync(int mode) {
         if (SyncPref.isLoggedIn()) {
             if (mSyncClient.getProgress() == SyncMsg.SYNC_NOT_RUNNING) {
-                new SyncTask().execute();
+                new SyncTask(mode).execute();
             }
         }
     }
@@ -159,7 +185,7 @@ public class BackupService extends Service {
         }
     }
 
-    private boolean shouldStartSync() {
+    private boolean shouldAutoSync() {
         if (hasPendingSync() && isAutoSync() && dataConnectionMatches()) {
             return true;
         }
@@ -203,7 +229,7 @@ public class BackupService extends Service {
     private void setAlarm() {
         int time = BackupPref.getUserIntentionTime();
         if (time > 0) {
-            long interval = time * 60 * 60; 
+            long interval = time * 60 * 60;
             mAlarmManager.setRepeating(AlarmManager.RTC,
                     System.currentTimeMillis() + interval, interval, mPi);
         }

@@ -11,7 +11,7 @@ public class KiiRefReceiver extends BroadcastReceiver {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-        Utils.startBackupService(context, BackupService.ACTION_DATA_CONNECTION_CHANGED);
+        Utils.startSync(context, BackupService.ACTION_DATA_CONNECTION_CHANGED);
     }
 
 }

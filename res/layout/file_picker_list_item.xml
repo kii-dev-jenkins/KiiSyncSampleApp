@@ -58,7 +58,7 @@
         android:text="filename"
         android:textSize="16sp" />
     
-    <ImageButton
+    <ImageView
         android:id="@+id/menu_button" android:background="@drawable/button_small_bg"
         android:src="@drawable/icon_kiisync"
         android:layout_width="40dip" android:layout_height="40dip"

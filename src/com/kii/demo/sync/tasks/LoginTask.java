@@ -85,7 +85,7 @@ public class LoginTask extends AsyncTask<String, Void, Integer> {
                             + "\nMaxUsage:" + services.get(2);
                 }
                 StartActivity.showAlertDialog(mContext, TAG, msg);
-                Utils.startBackupService(mContext, BackupService.ACTION_SYNC_AFTER_LOGIN);
+                Utils.startSync(mContext, BackupService.ACTION_SYNC_AFTER_LOGIN);
                 break;
             case SyncMsg.ERROR_SETUP:
             default:

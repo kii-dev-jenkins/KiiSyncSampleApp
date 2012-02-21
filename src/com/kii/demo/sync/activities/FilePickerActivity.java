@@ -34,14 +34,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.kii.cloud.sync.KiiClientTask;
+import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
+import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 
 public class FilePickerActivity extends ListActivity implements View.OnClickListener{
@@ -177,6 +177,7 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         File newFile = (File) l.getItemAtPosition(position);
+        Log.d(TAG, "onListItemClick, file is "+newFile.getAbsolutePath());
 
         if (newFile.isFile()) {
             // Set result
@@ -222,7 +223,11 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
                 .getMenuInfo();
         File selectedFile = (File) mAdapter.getItem(info.position);
         final String filePath = selectedFile.getAbsolutePath();
-        KiiClientTask task;
+        final KiiSyncClient client = KiiSyncClient.getInstance();
+        if (client == null) {
+            Log.d(TAG, "get KiiRefClient failed, return!");
+            return true;
+        }
         switch (item.getItemId()) {
             case MENU_RENAME:
 
@@ -236,18 +241,9 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
                                     int whichButton) {
                                 String newName = input.getText().toString()
                                         .trim();
-                                // Set result
-//                                Intent extra = new Intent();
-//                                extra.putExtra(EXTRA_FILE_PATH, filePath);
-//                                extra.putExtra(EXTRA_NEW_FOLDER_NAME, newName);
-//                                setResult(RESULT_OK, extra);
-                                // Finish the activity
-                                KiiClientTask renameTask = new KiiClientTask(
-                                        getApplicationContext(), "Rename Folder",
-                                        KiiClientTask.SYNC_RENAME_FOLDER, null);
-                                Log.v(TAG, "Going to execute rename task, oldPath="
-                                        + filePath + " new name :" + newName);
-                                renameTask.execute(filePath, newName);
+                                client.renameFolder(filePath, newName);
+                                Utils.startSync(getApplicationContext(),
+                                        BackupService.ACTION_REFRESH);
 
                             }
                         });
@@ -262,24 +258,29 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
                 alert.show();
                 break;
             case MENU_UPLOAD_FILE:
-                 task = new KiiClientTask(getApplicationContext(),
-                        "Upload", KiiClientTask.SYNC_UPLOAD, null);
-                task.execute(filePath);
+                client.upload(filePath);
+                Log.d(TAG, "before startSync");
+                Utils.startSync(getApplicationContext(),
+                        BackupService.ACTION_REFRESH);
                 break;
             case MENU_UPLOAD_FOLDER:
                 if (selectedFile.isDirectory()) {
-                    String folderPath = selectedFile.getAbsolutePath();
-                    task = new KiiClientTask(getApplicationContext(),
-                            "UploadFolder", KiiClientTask.SYNC_UPLOAD_FOLDER,
-                            null);
-                    task.execute(folderPath);
+                    File file = new File(filePath);
+                    File[] files = file.listFiles();
+                    for (int ct = 0; ct < files.length; ct++) {
+                        if (files[ct].isFile()) {
+                            client.upload(files[ct].getAbsolutePath());
+                        }
+                    }
+
+                    Utils.startSync(getApplicationContext(),
+                            BackupService.ACTION_REFRESH);
                 }
                 break;
             case MENU_MOVE_TO_TRASH:
-                task = new KiiClientTask(this
-                        .getApplicationContext(), "MoveTrash",
-                        KiiClientTask.SYNC_MOVE_TRASH_FILE, null);
-                task.execute(filePath);
+                client.moveToTrash(filePath, null);
+                Utils.startSync(getApplicationContext(),
+                        BackupService.ACTION_REFRESH);
                 break;
             default:
                 break;
@@ -344,7 +345,7 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
 
             }
             
-            ImageButton ib = (ImageButton)row.findViewById(R.id.menu_button);
+            ImageView ib = (ImageView)row.findViewById(R.id.menu_button);
             ib.setTag(row);
             ib.setOnClickListener(FilePickerActivity.this);
             return row;
@@ -456,8 +457,6 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
                 getListView().showContextMenuForChild(row);
                 break;
         }
-        
     }
 
-    
 }

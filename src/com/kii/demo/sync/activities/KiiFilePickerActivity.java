@@ -30,17 +30,17 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.Toast;
 
+import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.DownloadManager;
 import com.kii.cloud.sync.KiiClientTask;
 import com.kii.cloud.sync.KiiSyncClient;
+import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
-import com.kii.sync.SyncPref;
-import com.kii.demo.sync.R;
 
 public class KiiFilePickerActivity extends ExpandableListActivity {
 
@@ -62,10 +62,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
     final static int MENU_DOWNLOAD = 5;
     final static int MENU_CANCEL = 6;
 
-    private static final int REQUEST_PICK_FILE = 1;
-    private static final int REQUEST_PICK_FILE_TRASH = 2;
-    private static final int REQUEST_PICK_FOLDER = 3;
-    private static final int REQUEST_PICK_FOLDER_FOR_RENAME = 4;
     NewEventListener mNewEventListener = null;
     private boolean needDownload = false;
 
@@ -163,7 +159,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SETUP_ADPTOR:
-                    adpterSetup();
+                    adpaterSetup();
                     break;
                 case PROGRESS_AUTO:
                     if (updateProgress()) {
@@ -250,9 +246,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
             case R.id.refresh:
                 syncRefresh();
                 break;
-            case R.id.move_trash:
-                pickFile(REQUEST_PICK_FILE_TRASH);
-                break;
             case R.id.suspend:
                 syncStop();
                 break;
@@ -273,11 +266,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-    }
-
-    @Override
     protected void onDestroy() {
         // unregister the listener
         if (mNewEventListener != null) {
@@ -289,7 +277,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
     /**
      * suspend the existing sync if there is any
      */
-    protected void syncStop() {
+    private void syncStop() {
         KiiSyncClient kiiClient = KiiSyncClient.getInstance();
         if (kiiClient != null) {
             kiiClient.suspend();
@@ -303,7 +291,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
     /*
      * Check the existing backup files for changes
      */
-    protected void scanFileChange() {
+    private void scanFileChange() {
 
         scanChange = new ArrayList<KiiFile>();
         scanTotalCount = -1;
@@ -348,7 +336,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
                             int status = client.getStatus(file);
                             if (!KiiSyncClient.isFileInTrash(file)
                                     && (status == KiiFile.STATUS_BODY_OUTDATED || status == KiiFile.STATUS_NO_BODY)) {
-                                client.download(file, Utils.getKiiFileDest(file));
+                                client.download(file,
+                                        Utils.getKiiFileDest(file));
                             }
                         }
                         handler.sendEmptyMessage(KiiFilePickerActivity.PROGRESS_END);
@@ -358,40 +347,35 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
         };
         new Thread(r).start();
     }
-    
+
     /*
      * update the backup files which have changed must call scanFileChange
      * before this
      */
-    protected void updateFileChange() {
-        KiiClientTask task = new KiiClientTask(getApplicationContext(),
-                "Sync File Change", KiiClientTask.SYNC_UPDATE_KIIFILE_CHANGE,
-                null);
-        task.execute(scanChange);
+    private void updateFileChange() {
+        KiiSyncClient client = KiiSyncClient.getInstance();
+        client.updateBody(scanChange);
+        Utils.startSync(getApplicationContext(), BackupService.ACTION_REFRESH);
     }
 
     /**
      * resume upload
      */
-    protected void fullFefresh() {
-        KiiClientTask task = new KiiClientTask(getApplicationContext(),
-                "Upload", KiiClientTask.SYNC_FULL_REFRESH, null);
-        task.execute();
+    private void fullFefresh() {
+        Utils.startSync(this, BackupService.ACTION_REFRESH);
     }
 
     /**
      * get new records from server if there are any
      */
-    protected void syncRefresh() {
-        KiiClientTask task = new KiiClientTask(getApplicationContext(),
-                "Refresh", KiiClientTask.SYNC_REFRESH, null);
-        task.execute();
+    private void syncRefresh() {
+        Utils.startSync(this, BackupService.ACTION_REFRESH_QUICK);
     }
 
     /**
      * Login
      */
-    protected void connect() {
+    private void connect() {
 
         Receiver receiver = new Receiver();
         // register ACTION_INIT_COMPLETE which will be send by KiiClient
@@ -406,108 +390,18 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
         task.execute();
     }
 
-    protected void adpterSetup() {
+    private void adpaterSetup() {
         mAdapter = new KiiFileExpandableListAdapter(this,
-                KiiSyncClient.getInstance(), KiiFileExpandableListAdapter.TYPE_DATA);
+                KiiSyncClient.getInstance(),
+                KiiFileExpandableListAdapter.TYPE_DATA);
         setListAdapter(mAdapter);
         mNewEventListener.register();
     }
 
-    protected void pickFile(int mode) {
-        Intent intent = new Intent(this, FileTabActivity.class);
-        intent.putExtra(FileTabActivity.TAB_INDEX_EXTRA,
-                FileTabActivity.TAB_INDEX_DEVICE);
-        startActivityForResult(intent, mode);
-    }
-
-    protected void setting() {
+    private void setting() {
         Intent intent = new Intent(this, StartActivity.class);
         intent.setAction(Intent.ACTION_CONFIGURATION_CHANGED);
         startActivity(intent);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case REQUEST_PICK_FILE_TRASH:
-                    if (data.hasExtra(FilePickerActivity.EXTRA_FILE_PATH)) {
-                        // Get the file path
-                        File f = new File(
-                                data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH));
-                        String filePath = f.getPath();
-                        File file = new File(filePath);
-                        if (!file.exists()) {
-                            showToast("MoveTrash", "file not exist: "
-                                    + filePath);
-                            return;
-                        }
-                        KiiClientTask task = new KiiClientTask(
-                                this.getApplicationContext(), "MoveTrash",
-                                KiiClientTask.SYNC_MOVE_TRASH_FILE, null);
-                        task.execute(filePath);
-                    }
-                    break;
-                case REQUEST_PICK_FILE:
-                    if (data.hasExtra(FilePickerActivity.EXTRA_FILE_PATH)) {
-                        // Get the file path
-                        File f = new File(
-                                data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH));
-                        String filePath = f.getPath();
-                        File file = new File(filePath);
-                        if (!file.exists()) {
-                            showToast("Upload", "file not exist: " + filePath);
-                            return;
-                        }
-                        KiiClientTask task = new KiiClientTask(
-                                getApplicationContext(), "Upload",
-                                KiiClientTask.SYNC_UPLOAD, null);
-                        task.execute(filePath);
-                    }
-                    break;
-                case REQUEST_PICK_FOLDER:
-                    if (data.hasExtra(FilePickerActivity.EXTRA_FILE_PATH)) {
-                        // Get the file path
-                        File f = new File(
-                                data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH));
-                        if (!f.exists()) {
-                            showToast("UploadFolder",
-                                    "folder not exist: " + f.getAbsolutePath());
-                            return;
-                        }
-
-                        if (f.isFile()) {
-                            f = f.getParentFile();
-                        }
-                        String filePath = f.getAbsolutePath();
-                        KiiClientTask task = new KiiClientTask(
-                                getApplicationContext(), "UploadFolder",
-                                KiiClientTask.SYNC_UPLOAD_FOLDER, null);
-                        task.execute(filePath);
-                    }
-                    break;
-                case REQUEST_PICK_FOLDER_FOR_RENAME:
-                    String filePath = data
-                            .getStringExtra(FilePickerActivity.EXTRA_FILE_PATH);
-                    String newName = data
-                            .getStringExtra(FilePickerActivity.EXTRA_NEW_FOLDER_NAME);
-                    if (filePath != null && newName != null) {
-                        if (!SyncPref.isLoggedIn()) {
-                            Toast.makeText(KiiFilePickerActivity.this,
-                                    "user is not logged in", Toast.LENGTH_SHORT)
-                                    .show();
-                            return;
-                        }
-                        KiiClientTask task = new KiiClientTask(
-                                getApplicationContext(), "Rename Folder",
-                                KiiClientTask.SYNC_RENAME_FOLDER, null);
-                        Log.v(TAG, "Going to execute rename task, oldPath="
-                                + filePath + " new name :" + newName);
-                        task.execute(filePath, newName);
-                    }
-                    break;
-            }
-        }
     }
 
     public Intent getLaunchFileIntent(String path, MimeInfo mime) {
@@ -675,55 +569,40 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
             KiiFile kFile = (KiiFile) mAdapter.getChild((int) groupPos,
                     (int) childPos);
             if (kFile != null && kFile.isFile()) {
-                KiiClientTask task = null;
+                KiiSyncClient client = KiiSyncClient.getInstance();
+                if (client == null) {
+                    Log.d(TAG, "get KiiRefClient failed, return!");
+                    return true;
+                }
                 switch (item.getGroupId()) {
                     case MENU_RESTORE_TRASH:
-                        task = new KiiClientTask(getApplicationContext(),
-                                "Restore",
-                                KiiClientTask.SYNC_RESTORE_TRASH_KIIFILE, null);
+                        client.restoreFromTrash(kFile);
                         break;
                     case MENU_MOVE_TRASH:
-                        task = new KiiClientTask(getApplicationContext(),
-                                "MoveTrash",
-                                KiiClientTask.SYNC_MOVE_TRASH_KIIFILE, null);
+                        client.moveKiiFileToTrash(kFile);
                         break;
                     case MENU_DELETE:
-                        task = new KiiClientTask(getApplicationContext(),
-                                "Delete Backup",
-                                KiiClientTask.SYNC_DELETE_KIIFILE, null);
+                        client.delete(kFile, false);
                         break;
                     case MENU_DELETE_LOCAL:
-                        task = new KiiClientTask(getApplicationContext(),
-                                "Delete Local & Backup",
-                                KiiClientTask.SYNC_DELETE_LOCAL, null);
+                        client.delete(kFile, true);
                         break;
                     case MENU_CANCEL:
-                        task = new KiiClientTask(getApplicationContext(),
-                                "Cancel", KiiClientTask.SYNC_CANCEL_KIIFILE,
-                                null);
+                        client.cancel(kFile);
                         break;
                     case MENU_DOWNLOAD:
-                        task = new KiiClientTask(getApplicationContext(),
-                                "Download", KiiClientTask.SYNC_DOWNLOAD, null);
                         Toast.makeText(
                                 this,
                                 "Download at folder:"
                                         + KiiSyncClient.getInstance()
                                                 .getDownloadFolder(),
                                 Toast.LENGTH_SHORT).show();
+                        client.download(kFile);
                         break;
                 }
 
-                if (task != null) {
-                    task.execute(kFile);
-                } else {
-                    Toast.makeText(
-                            this,
-                            title + ": Child " + childPos
-                                    + " clicked in group " + groupPos,
-                            Toast.LENGTH_SHORT).show();
-                }
-
+                Utils.startSync(getApplicationContext(),
+                        BackupService.ACTION_REFRESH);
             }
 
             return true;
@@ -804,7 +683,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
             if (msg != null) {
                 if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
                     Intent apiIntent = new Intent(
-                            context.getApplicationContext(), StartActivity.class);
+                            context.getApplicationContext(),
+                            StartActivity.class);
                     apiIntent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
                     context.startActivity(apiIntent);
                 } else if (msg.sync_result == SyncMsg.ERROR_PFS_BUSY) {
@@ -835,7 +715,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
         }
 
         public void onConnectComplete() {
-            adpterSetup();
+            adpaterSetup();
         }
 
     }

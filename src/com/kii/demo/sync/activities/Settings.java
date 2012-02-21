@@ -28,12 +28,12 @@ public class Settings extends PreferenceActivity implements
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
             String key) {
         if (key.contentEquals(BackupPref.PREF_USER_INTENTION)) {
-            Utils.startBackupService(this, BackupService.ACTION_TIMER_CHANGED);
+            Utils.startSync(this, BackupService.ACTION_TIMER_CHANGED);
         } else if ((key.contentEquals(BackupPref.PREF_SYNC_MODE) || (key
                 .contentEquals(BackupPref.PREF_SYNC_WIFI_ONLY)))) {
             handleUserIntention();
             if (BackupPref.getSyncMode() == BackupPref.MODE_AUTO) {
-                Utils.startBackupService(this, BackupService.ACTION_AUTO_SYNC_MODE);
+                Utils.startSync(this, BackupService.ACTION_AUTO_SYNC_MODE);
             }
         }
     }

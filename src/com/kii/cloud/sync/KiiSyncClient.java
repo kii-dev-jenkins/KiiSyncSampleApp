@@ -28,7 +28,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.kii.cloud.sync.auth.CloudStorage;
-import com.kii.cloud.sync.auth.Identity;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.Utils;
@@ -50,7 +49,7 @@ public class KiiSyncClient {
 
     private static String TAG = "KiiSyncClient";
     private static KiiSyncClient mInstance = null;
-    
+
     private KiiClient mSyncManager = null;
     private Authentication mAuthManager = null;
 
@@ -69,12 +68,12 @@ public class KiiSyncClient {
     public static final String CATEGORY_NONE = "none";
 
     public static final String CATEGORY_ASTRO = "file";
-    
+
     public static final String CATEGORY_BACKUP = "backup";
 
     Context mContext;
     static KiiFileListener mFileStatusCache;
-    
+
     /**
      * Change the password of the user.
      * 
@@ -85,7 +84,7 @@ public class KiiSyncClient {
     public int changePassword(String oldPassword, String newPassword) {
         return mAuthManager.changePassword(oldPassword, newPassword);
     }
-    
+
     /**
      * Register user if no account has been registered
      * 
@@ -99,35 +98,35 @@ public class KiiSyncClient {
      *            :
      * @param mobile
      *            :
-     * @return
-     * {@link SyncMsg#OK }      Registration successful.<br>
-     * {@link SyncMsg#ERROR_INVALID_INPUT}      Input is invalid.<br>
-     * {@link SyncMsg#ERROR_ALREADY_KII_USER}         User  is already registered.<br>
-     * {@link SyncMsg#ERROR_PROTOCOL}   Protocol error.<br>
-     * {@link SyncMsg#ERROR_IO}         IO error.<br>
-     * {@link SyncMsg#ERROR_JSON}       Json format is invalid.<br>
-     * {@link SyncMsg#ERROR_UNKNOWN_STATUSCODE}         Unknown HTTP status code.<br>
-     *
+     * @return {@link SyncMsg#OK } Registration successful.<br>
+     *         {@link SyncMsg#ERROR_INVALID_INPUT} Input is invalid.<br>
+     *         {@link SyncMsg#ERROR_ALREADY_KII_USER} User is already
+     *         registered.<br>
+     *         {@link SyncMsg#ERROR_PROTOCOL} Protocol error.<br>
+     *         {@link SyncMsg#ERROR_IO} IO error.<br>
+     *         {@link SyncMsg#ERROR_JSON} Json format is invalid.<br>
+     *         {@link SyncMsg#ERROR_UNKNOWN_STATUSCODE} Unknown HTTP status
+     *         code.<br>
      */
     public int register(String email, String password, String country,
             String nickName, String mobile) {
-        return mAuthManager.register(email, password, country, nickName, mobile);
+        return mAuthManager
+                .register(email, password, country, nickName, mobile);
     }
-    
+
     /**
-     * Log in using the given username and password. 
-     * If the given password is different from previous one, it will login again
-     * else just return OK.
+     * Log in using the given username and password. If the given password is
+     * different from previous one, it will login again else just return OK.
      * 
      * @param username
      * @param password
      * @return
      */
     public int login(String username, String password) {
-        if (SyncPref.isLoggedIn()){
-        	if(SyncPref.getPassword().compareTo(password)==0){
-        		return SyncMsg.OK;
-        	}
+        if (SyncPref.isLoggedIn()) {
+            if (SyncPref.getPassword().compareTo(password) == 0) {
+                return SyncMsg.OK;
+            }
         }
         return mAuthManager.login(username, password);
     }
@@ -138,10 +137,10 @@ public class KiiSyncClient {
      * @return
      */
     public int logout() {
-    	mAuthManager.logout();
+        mAuthManager.logout();
         return mSyncManager.wipeOut();
     }
-    
+
     /**
      * Register event listener.
      * 
@@ -151,8 +150,7 @@ public class KiiSyncClient {
      *            Event Listener instance.
      *            {@link com.kii.sync.KiiNewEventListener KiiNewEventListener}
      * @return TRUE: success, FALSE: key has already in use.
-     * 
-     * {@link KiiSyncClient#unregisterNewEventListener(Long)}
+     *         {@link KiiSyncClient#unregisterNewEventListener(Long)}
      */
     public boolean registerNewEventListener(Long key,
             KiiNewEventListener listener) {
@@ -164,101 +162,110 @@ public class KiiSyncClient {
      * 
      * @param key
      *            used for register
-     * 
-     * {@link KiiSyncClient#registerNewEventListener(Long, KiiNewEventListener)}
-     *             
+     *            {@link KiiSyncClient#registerNewEventListener(Long, KiiNewEventListener)}
      */
     public void unregisterNewEventListener(Long key) {
-    	mSyncManager.unregisterNewEventListener(key);
+        mSyncManager.unregisterNewEventListener(key);
     }
-    
+
     /**
      * suspend the existing sync session.
-     * @return
-     * {@link SyncMsg#OK}      Successful.<br>
-     * {@link SyncMsg#ERROR_SETUP}      SyncManager is not instantiated.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION}          Remote method invocation failed.<br>
-     * {@link SyncMsg#ERROR_PFS_NOTFOUND}     There is not sync session to stop.<br>
-     * {@link SyncMsg#ERROR_PFS_NG}     Failed by unknown reason.<br>
-     * {@link SyncMsg#ERROR_PFS_INVARGS}     Failed by unknown reason.<br>
      * 
+     * @return {@link SyncMsg#OK} Successful.<br>
+     *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Remote method
+     *         invocation failed.<br>
+     *         {@link SyncMsg#ERROR_PFS_NOTFOUND} There is not sync session to
+     *         stop.<br>
+     *         {@link SyncMsg#ERROR_PFS_NG} Failed by unknown reason.<br>
+     *         {@link SyncMsg#ERROR_PFS_INVARGS} Failed by unknown reason.<br>
      */
     public int suspend() {
         return mSyncManager.suspend();
     }
 
     /**
-     * Sync the local records with the server records.
-     * It also upload file if there are any files in pending stage.
+     * Sync the local records with the server records. It also upload file if
+     * there are any files in pending stage. Note: This sync operation takes
+     * times especially when there are file to be uploaded. If you just want to
+     * sync the file metadata and not uploading the file to the server, refer to
+     * {@link KiiSyncClient#refreshQuick()}
      * 
-     * Note: This sync operation takes times especially when there are file to be uploaded. 
-     * If you just want to sync the file metadata and not uploading the file to the server,
-     * refer to {@link KiiSyncClient#refreshQuick()}
-     * 
-     * @return
-     * {@link SyncMsg#PFS_SYNCRESULT_SUCCESSFULLY}  Refresh successfully.<br>
-     * {@link SyncMsg#ERROR_AUTHENTICAION_ERROR}  Authentication error.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_NOT_SETUP}    SessionManager is not instantiated.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_OTHERERROR}  Unknown error.<br>
-     * {@link SyncMsg#ERROR_INTERRUPTED} Sync session is interrupted.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION}  Could not connect to remote method.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_MORE} sync OK but not complete yet (more item in server).<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_REQUEST_FORCE_STOP} Force stop is requested.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_FORCE_STOP} Sync is forcefully stopped.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_RUNNING} Another sync session is running.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_BUSY} sync cannot proceed because the sync system is busy.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_TIMEOUT} Sync is timeout.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_USER_EXPIRED} User has expired.<br>
-     * {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
-     * 
+     * @return {@link SyncMsg#PFS_SYNCRESULT_SUCCESSFULLY} Refresh successfully.<br>
+     *         {@link SyncMsg#ERROR_AUTHENTICAION_ERROR} Authentication error.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_NOT_SETUP} SessionManager is not
+     *         instantiated.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_OTHERERROR} Unknown error.<br>
+     *         {@link SyncMsg#ERROR_INTERRUPTED} Sync session is interrupted.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Could not connect
+     *         to remote method.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_MORE} sync OK but not complete yet
+     *         (more item in server).<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REQUEST_FORCE_STOP} Force stop is
+     *         requested.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_FORCE_STOP} Sync is forcefully
+     *         stopped.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_RUNNING} Another sync session is
+     *         running.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_BUSY} sync cannot proceed because
+     *         the sync system is busy.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_TIMEOUT} Sync is timeout.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_USER_EXPIRED} User has expired.<br>
+     *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
      */
-    public int refresh(){
-    	return mSyncManager.refresh();
+    public int refresh() {
+        return mSyncManager.refresh();
     }
-    
+
     /**
-     * Only sync the file meta data (to/from server).
-     * It will not upload files that are pending state.
-     * To upload files, refer to {@link KiiSyncClient#refresh()}
+     * Only sync the file meta data (to/from server). It will not upload files
+     * that are pending state. To upload files, refer to
+     * {@link KiiSyncClient#refresh()}
      * 
-     * @return
-     * {@link SyncMsg#PFS_SYNCRESULT_SUCCESSFULLY}  Refresh successfully.<br>
-     * {@link SyncMsg#ERROR_AUTHENTICAION_ERROR}  Authentication error.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_NOT_SETUP}    SessionManager is not instantiated.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_OTHERERROR}  Unknown error.<br>
-     * {@link SyncMsg#ERROR_INTERRUPTED} Sync session is interrupted.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION}  Could not connect to remote method.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_MORE} sync OK but not complete yet (more item in server).<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_REQUEST_FORCE_STOP} Force stop is requested.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_FORCE_STOP} Sync is forcefully stopped.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_RUNNING} Another sync session is running.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_BUSY} sync cannot proceed because the sync system is busy.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_TIMEOUT} Sync is timeout.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_USER_EXPIRED} User has expired.<br>
-     * {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br> 
+     * @return {@link SyncMsg#PFS_SYNCRESULT_SUCCESSFULLY} Refresh successfully.<br>
+     *         {@link SyncMsg#ERROR_AUTHENTICAION_ERROR} Authentication error.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_NOT_SETUP} SessionManager is not
+     *         instantiated.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_OTHERERROR} Unknown error.<br>
+     *         {@link SyncMsg#ERROR_INTERRUPTED} Sync session is interrupted.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Could not connect
+     *         to remote method.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_MORE} sync OK but not complete yet
+     *         (more item in server).<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REQUEST_FORCE_STOP} Force stop is
+     *         requested.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_FORCE_STOP} Sync is forcefully
+     *         stopped.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_RUNNING} Another sync session is
+     *         running.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_BUSY} sync cannot proceed because
+     *         the sync system is busy.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_TIMEOUT} Sync is timeout.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_USER_EXPIRED} User has expired.<br>
+     *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
      */
     public int refreshQuick() {
         return mSyncManager.refreshQuick();
     }
-    
+
     /**
      * Returns the sync overall progress if the sync is not running, it will
      * return -1
      * 
-     * @return 
-     * <b>Positive integer between 1 to 100 </b>     Percentage of progress.<br>
-     * {@link SyncMsg#ERROR_SETUP}      SyncManager is not instantiated.<br>
-     * {@link SyncMsg#SYNC_NOT_RUNNING}         Currently no sync session is running.<br>
-     * {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION}          Remote method invocation failed.
+     * @return <b>Positive integer between 1 to 100 </b> Percentage of progress.<br>
+     *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
+     *         {@link SyncMsg#SYNC_NOT_RUNNING} Currently no sync session is
+     *         running.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Remote method
+     *         invocation failed.
      */
     public int getProgress() {
         return mSyncManager.getProgress();
     }
-    
 
     /**
-     * Get the path to store the download files 
-     * Default directory is Environment.DIRECTORY_DOWNLOADS if not set
+     * Get the path to store the download files Default directory is
+     * Environment.DIRECTORY_DOWNLOADS if not set
      * 
      * @return absolute path of the download directory
      */
@@ -268,28 +275,30 @@ public class KiiSyncClient {
     }
 
     /**
-     * Get the path to temporary store the trash file.
-     * Once the trash files are backup to the cloud, it will be deleted.
-     * Default directory is application cache directory
+     * Get the path to temporary store the trash file. Once the trash files are
+     * backup to the cloud, it will be deleted. Default directory is application
+     * cache directory
      * 
      * @return absolute path of the temp trash folder
      */
     public String getTrashTempFolder() {
         if (mContext != null) {
-            String cacheDir = this.mContext.getCacheDir().getAbsolutePath() + "/trash/";
+            String cacheDir = this.mContext.getCacheDir().getAbsolutePath()
+                    + "/trash/";
             File directory = new File(cacheDir);
-            if( ! directory.exists() ){
-            	directory.mkdir();
+            if (!directory.exists()) {
+                directory.mkdir();
             }
-            return cacheDir;	
+            return cacheDir;
         } else {
             return null;
         }
     }
 
     /**
-     * Get the path to store the file thumbnail if there are any
-     * Deffault directory is application cache directory
+     * Get the path to store the file thumbnail if there are any Deffault
+     * directory is application cache directory
+     * 
      * @return absolute path of the thumbanil folder
      */
     public String getTempThumbnailFolder() {
@@ -308,9 +317,9 @@ public class KiiSyncClient {
      */
     private KiiSyncClient(Context context) throws InterruptedException,
             InstantiationException {
-    	
-    	mSyncManager = KiiClient.getInstance(context);
-    	mSyncManager.initSync();
+
+        mSyncManager = KiiClient.getInstance(context);
+        mSyncManager.initSync();
         mContext = context;
         // configure the KiiClient don't generate the thumbnail
         SyncPref.setGenerateThumbnail(false);
@@ -321,9 +330,10 @@ public class KiiSyncClient {
         // SyncPref.setIdentityUrl("http://test-ms2.kii.com/app/identity/");
         // SyncPref.setIdentityUrl("https://product-jp.kii.com/app/identity/");
         mAuthManager = new CloudStorage(context, mSyncManager);
-        //mAuthManager = new Identity(mSyncManager, "http://new-dev-us.kii.com/app/identity/");
+        // mAuthManager = new Identity(mSyncManager,
+        // "http://new-dev-us.kii.com/app/identity/");
     }
-    
+
     public static synchronized KiiSyncClient getInstance(Context context)
             throws InstantiationException {
         if (mInstance == null) {
@@ -374,7 +384,8 @@ public class KiiSyncClient {
      */
     public int getSyncCount() {
         int syncedRecords = mSyncManager.getCountKiiFile(KiiFile.STATUS_SYNCED);
-        int serverRecords = mSyncManager.getCountKiiFile(KiiFile.STATUS_NO_BODY);
+        int serverRecords = mSyncManager
+                .getCountKiiFile(KiiFile.STATUS_NO_BODY);
         return syncedRecords + serverRecords;
     }
 
@@ -403,7 +414,7 @@ public class KiiSyncClient {
             }
         }
         mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
-        return mSyncManager.refresh();
+        return SyncMsg.OK;
     }
 
     /**
@@ -423,8 +434,7 @@ public class KiiSyncClient {
             ret = mSyncManager.deleteRemainOrginalFile(file);
         }
         if (ret == SyncMsg.OK) {
-        	mSyncManager.getSyncObserver().notifySyncDelete(null);
-            return mSyncManager.refresh();
+            mSyncManager.getSyncObserver().notifySyncDelete(null);
         }
         return ret;
     }
@@ -449,16 +459,16 @@ public class KiiSyncClient {
 
         // Can iterate through the list of return values
         // for(int ct=0; ct<retValues.size(); ct++){
-        //	
+        //
         // }
 
         mSyncManager.getSyncObserver().notifySyncDelete(null);
-        return mSyncManager.refresh();
+        return SyncMsg.OK;
     }
 
     /**
-     * Cancel a file to be uploaded.
-     * To remove a uploaded file, refer to {@link KiiSyncClient#delete(KiiFile, boolean)}
+     * Cancel a file to be uploaded. To remove a uploaded file, refer to
+     * {@link KiiSyncClient#delete(KiiFile, boolean)}
      * 
      * @return
      */
@@ -468,8 +478,7 @@ public class KiiSyncClient {
                 || status == KiiFile.STATUS_UPLOADING_BODY) {
             int ret = mSyncManager.deleteRemainOrginalFile(file);
             if (ret == SyncMsg.OK) {
-            	mSyncManager.getSyncObserver().notifySyncDelete(null);
-            	mSyncManager.refresh();
+                mSyncManager.getSyncObserver().notifySyncDelete(null);
             }
             return ret;
         }
@@ -482,10 +491,8 @@ public class KiiSyncClient {
      * @return num of bytes
      */
     public long getStorageUsage() {
-    	return mSyncManager.getServerUsedDiskSpace();
+        return mSyncManager.getServerUsedDiskSpace();
     }
-
-
 
     /**
      * Get a list of trashed files. Non Blocking Call
@@ -524,8 +531,7 @@ public class KiiSyncClient {
     public int upload(String filePath) {
         int ret = upload(filePath, false);
         if (ret == SyncMsg.OK) {
-        	mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
-            return mSyncManager.refresh();
+            mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
         }
         return ret;
 
@@ -543,13 +549,11 @@ public class KiiSyncClient {
         for (String file : files) {
             int code = upload(file, false);
             if (code != SyncMsg.OK) {
-                Log
-                        .e(TAG, "Failed to upload(" + file + "), error code:"
-                                + code);
+                Log.e(TAG, "Failed to upload(" + file + "), error code:" + code);
             }
         }
         mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
-        return mSyncManager.refresh();
+        return SyncMsg.OK;
     }
 
     /**
@@ -564,42 +568,41 @@ public class KiiSyncClient {
     private int upload(String filePath, boolean commit) {
 
         // if a similiar file having the same unique key, it will be return
-        Log.d(TAG, "upload, filePath is "+filePath);
+        Log.d(TAG, "upload, filePath is " + filePath);
         KiiFile file = createKiiFileByPath(filePath);
 
         // check if the file has already been synced
         if (file.hasServerRecord()) {
             return SyncMsg.OK;
         }
-        
+
         String thumbnail = null;
         String mimeType = null;
         String unique = Long.toString(System.currentTimeMillis());
-        
+
         // application generates it own mimetype if any
         MimeInfo mime = MimeUtil.getInfoByFileName(filePath);
         if (mime != null) {
             mimeType = mime.getMimeType();
         }
-        
-    	// application generates it own thumbnail if any 
+
+        // application generates it own thumbnail if any
         if (!TextUtils.isEmpty(mimeType)) {
-    		thumbnail = Utils.generateThumbnail(mContext, 
-    				filePath, 
-    						getTempThumbnailFolder()+unique+".jpg", mimeType);
-    	}
-        
+            thumbnail = Utils.generateThumbnail(mContext, filePath,
+                    getTempThumbnailFolder() + unique + ".jpg", mimeType);
+        }
+
         // check if application has provided the mimetype
         // it will override the default
-    	if (!TextUtils.isEmpty(mimeType)) {
-    		file.setMimeType(mimeType);
-    	}
-    	// check if application has provided thumbnail
-    	// it will override the default 
-    	if (!TextUtils.isEmpty(thumbnail)) {
-    		file.setThumbnail(thumbnail);
-    	}
-    	
+        if (!TextUtils.isEmpty(mimeType)) {
+            file.setMimeType(mimeType);
+        }
+        // check if application has provided thumbnail
+        // it will override the default
+        if (!TextUtils.isEmpty(thumbnail)) {
+            file.setThumbnail(thumbnail);
+        }
+
         return mSyncManager.upload(file, commit);
     }
 
@@ -614,12 +617,12 @@ public class KiiSyncClient {
      */
     public int moveToTrash(String originalPath, String mimeType) {
 
-    	File src = new File(originalPath);
-    	
-    	if(!src.isFile()){
-    		return SyncMsg.ERROR_FILE_NOT_FOUND;
-    	}
-    	
+        File src = new File(originalPath);
+
+        if (!src.isFile()) {
+            return SyncMsg.ERROR_FILE_NOT_FOUND;
+        }
+
         KiiFile kiFile = createKiiFileByPath(originalPath);
 
         // if the file already exist as KiiFile, just update the category
@@ -627,52 +630,52 @@ public class KiiSyncClient {
             kiFile.setCategory(CATEGORY_TRASH);
             return moveKiiFileToTrash(kiFile);
         }
-        
+
         String thumbnail = null;
         String unique = Long.toString(System.currentTimeMillis());
-        
+
         // application generates it own mimetype if any
-        if(TextUtils.isEmpty(mimeType)){
-	        MimeInfo mime = MimeUtil.getInfoByFileName(originalPath);
-	        if (mime != null) {
-	            mimeType = mime.getMimeType();
+        if (TextUtils.isEmpty(mimeType)) {
+            MimeInfo mime = MimeUtil.getInfoByFileName(originalPath);
+            if (mime != null) {
+                mimeType = mime.getMimeType();
             }
         }
-        
-    	// application generates it own thumbnail if any 
+
+        // application generates it own thumbnail if any
         if (!TextUtils.isEmpty(mimeType)) {
-    		thumbnail = Utils.generateThumbnail(mContext, 
-    						originalPath, 
-    						getTempThumbnailFolder()+unique+".jpg", mimeType);
-    	}
-        
-    	// application specific data
+            thumbnail = Utils.generateThumbnail(mContext, originalPath,
+                    getTempThumbnailFolder() + unique + ".jpg", mimeType);
+        }
+
+        // application specific data
         kiFile.setAppData("application specific data");
-        kiFile.setCategory(CATEGORY_TRASH);        	
+        kiFile.setCategory(CATEGORY_TRASH);
         // check if application has provided the mimetype
         // it will override the default
-    	if (!TextUtils.isEmpty(mimeType)) {
-    		kiFile.setMimeType(mimeType);
-    	}
-    	// check if application has provided thumbnail
-    	// it will override the default 
-    	if (!TextUtils.isEmpty(thumbnail)) {
-    		kiFile.setThumbnail(thumbnail);
-    	}
-		
-    	int res = kiFile.copyToTmp(getTrashTempFolder()+unique+"."+MimeUtil.getSuffixOfFile(originalPath)); 
-    	
-    	if( res == SyncMsg.OK ){
-    		// delete the original file
-        	if( src.delete() ){
-        		return upload(kiFile);
-        	}else{
-        		return SyncMsg.ERROR_ACCESS_FILE;
-        	}
-        	
-    	}
-        
-    	return res;
+        if (!TextUtils.isEmpty(mimeType)) {
+            kiFile.setMimeType(mimeType);
+        }
+        // check if application has provided thumbnail
+        // it will override the default
+        if (!TextUtils.isEmpty(thumbnail)) {
+            kiFile.setThumbnail(thumbnail);
+        }
+
+        int res = kiFile.copyToTmp(getTrashTempFolder() + unique + "."
+                + MimeUtil.getSuffixOfFile(originalPath));
+
+        if (res == SyncMsg.OK) {
+            // delete the original file
+            if (src.delete()) {
+                return upload(kiFile);
+            } else {
+                return SyncMsg.ERROR_ACCESS_FILE;
+            }
+
+        }
+
+        return res;
     }
 
     /**
@@ -684,9 +687,8 @@ public class KiiSyncClient {
     public int upload(KiiFile file) {
         int ret = mSyncManager.upload(file, false);
         if (ret == SyncMsg.OK) {
-        	mSyncManager.getSyncObserver().notifyLocalChangeSynced(
+            mSyncManager.getSyncObserver().notifyLocalChangeSynced(
                     new Uri[] { file.getUri() });
-            return mSyncManager.refresh();
         }
         return ret;
     }
@@ -733,7 +735,7 @@ public class KiiSyncClient {
     public int getStatusFromCache(KiiFile file) {
         return getStatusFromCache(file.getResourceUrl());
     }
-    
+
     private KiiFileListener getFileStatusCache() {
         return mFileStatusCache;
     }
@@ -766,13 +768,12 @@ public class KiiSyncClient {
      * @return
      */
     public int getStatus(KiiFile file) {
-    	
-    	// read the status of the KiiFile
-    	// this status is reading from the database
-    	int status = file.getStatus(); 
-    	
-        if ( status == KiiFile.STATUS_SYNCED
-                || status == KiiFile.STATUS_NO_BODY) {
+
+        // read the status of the KiiFile
+        // this status is reading from the database
+        int status = file.getStatus();
+
+        if (status == KiiFile.STATUS_SYNCED || status == KiiFile.STATUS_NO_BODY) {
 
             // check if the exist, if not indicate only remote copy
             if (file.isFile()) {
@@ -800,8 +801,8 @@ public class KiiSyncClient {
      */
     public boolean bodySameAsLocal(KiiFile file) {
         String localPath = file.getLocalPath();
-        if(TextUtils.isEmpty(localPath)){
-        	return false;
+        if (TextUtils.isEmpty(localPath)) {
+            return false;
         }
         File localFile = new File(localPath);
         if (!(localFile.exists() && localFile.isFile())) {
@@ -823,7 +824,6 @@ public class KiiSyncClient {
         }
         return false;
     }
-
 
     /**
      * Get the list of KiiFile by matching the unique key Non Blocking Call
@@ -891,7 +891,7 @@ public class KiiSyncClient {
      */
     public int restoreFromTrash(KiiFile file) {
         try {
-        	// download a file 
+            // download a file
             download(file, true);
         } catch (IOException e) {
             Log.e(TAG, "restoreFromTrash download IOException", e);
@@ -901,7 +901,7 @@ public class KiiSyncClient {
         file.setAppData("File is restore from trash");
         // reset the category as NULL to indicate non trash
         file.setCategory(CATEGORY_NONE);
-        
+
         return update(file);
     }
 
@@ -909,14 +909,10 @@ public class KiiSyncClient {
      * Save the kFile to database Update to the cloud
      */
     public int update(KiiFile kFile) {
-        // int res = kFile.saveToDb();
-        // if (res == SyncMsg.OK) {
         int res = mSyncManager.update(kFile, false);
         if (res == SyncMsg.OK) {
-        	mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
-            return mSyncManager.refresh();
+            mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
         }
-        // }
         return res;
     }
 
@@ -940,6 +936,7 @@ public class KiiSyncClient {
         downManager.add(file, dest);
         return downManager.resume();
     }
+
     /**
      * Download the file to it original position
      * 
@@ -955,9 +952,9 @@ public class KiiSyncClient {
         downManager.downloadKiiFile(new File(kiFile.getResourceUrl()), kiFile,
                 true);
     }
-    
+
     public DownloadManager getDownloadManager() {
-        if(downManager == null) {
+        if (downManager == null) {
             downManager = new DownloadManager();
         }
         return downManager;
@@ -1059,8 +1056,6 @@ public class KiiSyncClient {
             } else {
                 servicesList.add(null);
             }
-            
-            
 
             return servicesList;
 
@@ -1071,61 +1066,62 @@ public class KiiSyncClient {
     }
 
     public static boolean isFileInTrash(KiiFile file) {
-        if(file == null) {
+        if (file == null) {
             return false;
         }
-        
+
         String category = file.getCategory();
-        if(category == null) {
+        if (category == null) {
             return false;
         }
-        
-        if(category.contentEquals(CATEGORY_TRASH)) {
+
+        if (category.contentEquals(CATEGORY_TRASH)) {
             return true;
         }
         return false;
     }
-    
+
     /**
-     * Upload all the files in a given folder, support recursive  
+     * Upload all the files in a given folder, support recursive
      * 
      * @param filePath
      * @return SyncMsg
      * @see SyncMsg
      */
     public int uploadByFolder(String filePath) {
-    	int ret;
-    	File file = new File(filePath);
-    	if(file.isDirectory()){
-    		upload(file);
-    		ret = SyncMsg.OK;
-    	}else{
-    		ret = upload(file.getAbsoluteFile());
-    	}
+        int ret;
+        File file = new File(filePath);
+        if (file.isDirectory()) {
+            upload(file);
+            ret = SyncMsg.OK;
+        } else {
+            ret = upload(file.getAbsoluteFile());
+        }
         if (ret == SyncMsg.OK) {
-        	mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
-            return mSyncManager.refresh();
+            mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
         }
         return SyncMsg.OK;
     }
-    
-    private int upload(File directory){
-    	int total = 0;
-    	File [] files = directory.listFiles();
-    	
-    	for(int ct=0; ct<files.length; ct++){
-    		if( files[ct].isFile() ){
-    			int ret = upload(files[ct].getAbsolutePath(), false);
-    			if (ret != SyncMsg.OK) {
-    				Log.e(TAG,"Fail("+ret+") to Upload file:"+files[ct].getAbsolutePath());
-    			}
-    		}else{
-    			total += upload(files[ct]);
-    		}
-    	}
-    	
-    	return total;
-    }    
+
+    private int upload(File directory) {
+        int total = 0;
+        File[] files = directory.listFiles();
+
+        for (int ct = 0; ct < files.length; ct++) {
+            if (files[ct].isFile()) {
+                int ret = upload(files[ct].getAbsolutePath(), false);
+                if (ret != SyncMsg.OK) {
+                    Log.e(TAG,
+                            "Fail(" + ret + ") to Upload file:"
+                                    + files[ct].getAbsolutePath());
+                }
+            } else {
+                total += upload(files[ct]);
+            }
+        }
+
+        return total;
+    }
 
     /**
      * @param fullPathOfFolder
@@ -1156,5 +1152,5 @@ public class KiiSyncClient {
         static final int INVARG = -1;
         static final int NG = -2;
     }
-    
+
 }

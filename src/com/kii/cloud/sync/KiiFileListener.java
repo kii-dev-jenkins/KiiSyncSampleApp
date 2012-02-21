@@ -1,6 +1,5 @@
 package com.kii.cloud.sync;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -8,14 +7,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.kii.demo.sync.activities.StartActivity;
 import com.kii.demo.sync.activities.ProgressListActivity;
+import com.kii.demo.sync.activities.StartActivity;
 import com.kii.demo.sync.utils.NotificationUtil;
 import com.kii.sync.KiiFile;
-import com.kii.sync.KiiFileUtil;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
@@ -37,9 +34,8 @@ public class KiiFileListener implements KiiNewEventListener {
         }
         id = System.currentTimeMillis();
         if (client.registerNewEventListener(id, this) == false) {
-            Log
-                    .e(TAG,
-                            "KiiFileStatusCache registerNewEventListener returns false");
+            Log.e(TAG,
+                    "KiiFileStatusCache registerNewEventListener returns false");
         }
 
         updateCache(true);
@@ -155,7 +151,7 @@ public class KiiFileListener implements KiiNewEventListener {
                 apiIntent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
                 context.startActivity(apiIntent);
             }
-            
+
             if (msg.sync_result == SyncMsg.PFS_SYNCRESULT_USER_EXPIRED) {
                 Intent apiIntent = new Intent(context.getApplicationContext(),
                         StartActivity.class);
@@ -169,8 +165,8 @@ public class KiiFileListener implements KiiNewEventListener {
     public void onSyncStart(String syncMode) {
         Intent progressIntent = new Intent(context.getApplicationContext(),
                 ProgressListActivity.class);
-        NotificationUtil.showSyncProgressNotification(context
-                .getApplicationContext(), progressIntent);
+        NotificationUtil.showSyncProgressNotification(
+                context.getApplicationContext(), progressIntent);
     }
 
     @Override
@@ -180,40 +176,41 @@ public class KiiFileListener implements KiiNewEventListener {
 
     @Override
     public void onLocalChangeSyncedEvent(Uri[] uris) {
-    	 //cleanUpTrashFile(uris);
+        // cleanUpTrashFile(uris);
         updateCache(false);
     }
-    
-//    /**
-//     * Delete the temp file which are created when uploading the trash file
-//     * @param uris is an array of Uri to indicate the list of KiiFiles that have updated the status
-//     */
-//    void cleanUpTrashFile(Uri[] uris){
-//    	if(uris!=null && uris.length!=0){
-//    		for(int ct=0; ct<uris.length; ct++){
-//    			// get KiiFile from given Uri
-//    			KiiFile kFile = KiiFileUtil.createKiiFileFromUri(context, uris[ct]);
-//    			if(kFile!=null){
-//    				// check if the file is trash and local path must not be empty
-//    				if(kFile.getCategory().compareTo(KiiSyncClient.CATEGORY_TRASH)==0 &&
-//    						!TextUtils.isEmpty(kFile.getLocalPath())){
-//    					// check if the file has already been synced successful
-//	    				if( kFile.getStatus() == KiiFile.STATUS_SYNCED ||
-//	    						kFile.getStatus() == KiiFile.STATUS_NO_BODY ){
-//	    					// get the file path 
-//	    					File file = new File(kFile.getLocalPath());
-//	    					// check the file exist and isFile
-//	    					if(file!=null && 
-//	    						file.exists() && 
-//	    							file.isFile()){
-//	    						file.delete();
-//	    						Log.d(TAG,"Delete a local trash file:"+file.getAbsolutePath());
-//	    					}
-//	    				}
-//    				}
-//    			}
-//    		}
-//    	}
-//
-//    }
+
+    // /**
+    // * Delete the temp file which are created when uploading the trash file
+    // * @param uris is an array of Uri to indicate the list of KiiFiles that
+    // have updated the status
+    // */
+    // void cleanUpTrashFile(Uri[] uris){
+    // if(uris!=null && uris.length!=0){
+    // for(int ct=0; ct<uris.length; ct++){
+    // // get KiiFile from given Uri
+    // KiiFile kFile = KiiFileUtil.createKiiFileFromUri(context, uris[ct]);
+    // if(kFile!=null){
+    // // check if the file is trash and local path must not be empty
+    // if(kFile.getCategory().compareTo(KiiSyncClient.CATEGORY_TRASH)==0 &&
+    // !TextUtils.isEmpty(kFile.getLocalPath())){
+    // // check if the file has already been synced successful
+    // if( kFile.getStatus() == KiiFile.STATUS_SYNCED ||
+    // kFile.getStatus() == KiiFile.STATUS_NO_BODY ){
+    // // get the file path
+    // File file = new File(kFile.getLocalPath());
+    // // check the file exist and isFile
+    // if(file!=null &&
+    // file.exists() &&
+    // file.isFile()){
+    // file.delete();
+    // Log.d(TAG,"Delete a local trash file:"+file.getAbsolutePath());
+    // }
+    // }
+    // }
+    // }
+    // }
+    // }
+    //
+    // }
 }

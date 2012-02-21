@@ -250,7 +250,7 @@ public class Utils {
         return dest;
     }
 
-    public static void startBackupService(Context context, String command) {
+    public static void startSync(Context context, String command) {
         Intent service = new Intent(context, BackupService.class);
         if (!TextUtils.isEmpty(command)) {
             service.setAction(command);

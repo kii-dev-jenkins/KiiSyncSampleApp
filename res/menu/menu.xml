@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/scan_change" android:title="ScanFileChange" />
-	<item android:id="@+id/move_trash" android:title="MoveTrash" />
 	<item android:id="@+id/refresh" android:title="Refresh" />
 	<item android:id="@+id/resume_upload" android:title="ResumeUpload" />
 	<item android:id="@+id/download_all" android:title="@string/menu_item_download_all" />
