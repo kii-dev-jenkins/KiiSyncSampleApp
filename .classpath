@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="libs/KiiSyncManager-r20101.jar"/>
-	<classpathentry kind="lib" path="libs/KiiCloudStorageSDK-r20182.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/KiiCloudStorageSDK"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/KiiSyncManager"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
