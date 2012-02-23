@@ -165,6 +165,9 @@ public class CloudStorage implements Authentication{
 					accType,
 					email);
 			mSyncClient.setKiiUMInfo(info);
+			
+			SyncPref.setShareUrl("http://dev-usergrid.kii.com/app/resource");
+			SyncPref.setResourceUrl("http://dev-usergrid.kii.com/app/resource");
 		}
 		return 0;
 	}
