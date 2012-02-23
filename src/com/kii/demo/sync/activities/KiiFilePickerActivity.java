@@ -42,7 +42,7 @@ import com.kii.sync.KiiFile;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
-public class KiiFilePickerActivity extends ExpandableListActivity {
+public class KiiFilePickerActivity extends ExpandableListActivity implements View.OnClickListener{
 
     public static final String TAG = "KiiFilePickerActivity";
     // message for the handler
@@ -393,7 +393,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
     private void adpaterSetup() {
         mAdapter = new KiiFileExpandableListAdapter(this,
                 KiiSyncClient.getInstance(),
-                KiiFileExpandableListAdapter.TYPE_DATA);
+                KiiFileExpandableListAdapter.TYPE_DATA, this);
         setListAdapter(mAdapter);
         mNewEventListener.register();
     }
@@ -718,6 +718,16 @@ public class KiiFilePickerActivity extends ExpandableListActivity {
             adpaterSetup();
         }
 
+    }
+    
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()) {
+            case R.id.menu_button:
+                View row = (View)v.getTag();
+                getExpandableListView().showContextMenuForChild(row);
+                break;
+        }
     }
 
 }

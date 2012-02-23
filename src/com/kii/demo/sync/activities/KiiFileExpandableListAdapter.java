@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
@@ -22,10 +23,10 @@ import android.widget.TextView;
 
 import com.kii.cloud.sync.DownloadManager;
 import com.kii.cloud.sync.KiiSyncClient;
+import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.sync.KiiFile;
-import com.kii.demo.sync.R;
 
 public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
 
@@ -34,6 +35,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
     ArrayList<KiiFileList> itemsList = new ArrayList<KiiFileList>();
 
     Activity mActivity = null;
+    View.OnClickListener mOnClickListener = null;
 
     KiiSyncClient kiiClient = null;
 
@@ -62,11 +64,12 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     public KiiFileExpandableListAdapter(Activity activity,
-            KiiSyncClient kiiClient, int type) {
+            KiiSyncClient kiiClient, int type, OnClickListener listener) {
         if (kiiClient == null)
             throw new NullPointerException();
         kiiClient.refreshKiiFileStatusCache();
         mActivity = activity;
+        mOnClickListener = listener;
         this.kiiClient = kiiClient;
         this.mType = type;
         addDataSet(itemsList);
@@ -193,10 +196,9 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             title = file.getTitle();
 
             // if the file is uploading, show the progress
-            if ( mType == TYPE_PROGRESS
-            	&& (status == KiiFile.STATUS_SYNC_IN_QUEUE
-                    || status == KiiFile.STATUS_UPLOADING_BODY
-                    || status == KiiFile.STATUS_PREPARE_TO_SYNC)) {
+            if (mType == TYPE_PROGRESS
+                    && (status == KiiFile.STATUS_SYNC_IN_QUEUE
+                            || status == KiiFile.STATUS_UPLOADING_BODY || status == KiiFile.STATUS_PREPARE_TO_SYNC)) {
                 int progress = file.getUploadProgress();
                 if (progress < 0)
                     progress = 0;
@@ -260,6 +262,13 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                 } else {
                     setIcon(R.drawable.icon_format_unsupport, view);
                 }
+            }
+            ImageView ib = (ImageView) view.findViewById(R.id.menu_button);
+            ib.setTag(view);
+            if (!(mOnClickListener == null)) {
+                ib.setOnClickListener(mOnClickListener);
+            } else {
+                ib.setVisibility(View.GONE);
             }
         }
 
@@ -532,4 +541,5 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         }
         return Long.toString(bytes);
     }
+
 }

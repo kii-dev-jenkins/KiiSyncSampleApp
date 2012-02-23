@@ -15,9 +15,9 @@ import android.view.Window;
 import com.kii.cloud.sync.DownloadManager;
 import com.kii.cloud.sync.KiiClientTask;
 import com.kii.cloud.sync.KiiSyncClient;
+import com.kii.demo.sync.R;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
-import com.kii.demo.sync.R;
 
 public class ProgressListActivity extends ExpandableListActivity {
     KiiFileExpandableListAdapter mAdapter = null;
@@ -159,7 +159,7 @@ public class ProgressListActivity extends ExpandableListActivity {
             Log.d(TAG, "new Adapter");
             KiiSyncClient client = KiiSyncClient.getInstance();
             mAdapter = new KiiFileExpandableListAdapter(this, client,
-                    KiiFileExpandableListAdapter.TYPE_PROGRESS);
+                    KiiFileExpandableListAdapter.TYPE_PROGRESS, null);
             setListAdapter(mAdapter);
             mNewEventListener.register();
             if (client.getDownloadManager().getDownloadList().length > 0
