@@ -3,9 +3,6 @@ package com.kii.cloud.sync.auth;
 import java.io.IOException;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,11 +13,12 @@ import com.kii.cloud.storage.manager.AuthManager;
 import com.kii.cloud.storage.response.CloudExecutionException;
 import com.kii.cloud.storage.response.UserResult;
 import com.kii.cloud.sync.Authentication;
+import com.kii.mobilesdk.bridge.AppUtil;
+import com.kii.mobilesdk.bridge.KiiUMInfo;
 import com.kii.sync.KiiClient;
-import com.kii.sync.KiiUMInfo;
 import com.kii.sync.SyncMsg;
 import com.kii.sync.SyncPref;
-import com.kii.sync.AppUtil;
+
 
 /**
  * The Authentication is using the Cloud Storage 
@@ -179,15 +177,5 @@ public class CloudStorage implements Authentication{
 		mUserMgr.logout();
 		return 0;
 	}
-	
-    private static Bundle getAppMetadata(Context ctx) {
-        try {
-            ApplicationInfo ai = ctx.getPackageManager().getApplicationInfo(
-                    ctx.getPackageName(), PackageManager.GET_META_DATA);
-            return ai.metaData;
-        } catch (NameNotFoundException e) {
-            throw new RuntimeException(" meta data can not load from Manifest");
-        }
-    }
 
 }
