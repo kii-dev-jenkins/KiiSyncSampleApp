@@ -892,17 +892,17 @@ public class KiiSyncClient {
     public int restoreFromTrash(KiiFile file) {
         try {
             // download a file
-            download(file, true);
-        } catch (IOException e) {
+            download(file, file.getResourceUrl());
+        } catch (Exception e) {
             Log.e(TAG, "restoreFromTrash download IOException", e);
             return SyncMsg.ERROR_IO;
         }
         // application specific data
-        file.setAppData("File is restore from trash");
-        // reset the category as NULL to indicate non trash
+        file.setAppData("File is restored from trash");
+        // reset the category as CATEGORY_NONE to indicate non trash
         file.setCategory(CATEGORY_NONE);
-
-        return update(file);
+        int ret = update(file);
+        return ret;
     }
 
     /**
@@ -918,17 +918,12 @@ public class KiiSyncClient {
 
     public DownloadManager downManager = null;
 
+    
     /**
      * Download the file to dnload folder
+     * @param file
+     * @param dest: if null, will use download path+file title
      */
-    public int download(KiiFile kiFile) {
-        if (downManager == null) {
-            downManager = new DownloadManager();
-        }
-        downManager.add(kiFile, null);
-        return downManager.resume();
-    }
-
     public int download(KiiFile file, String dest) {
         if (downManager == null) {
             downManager = new DownloadManager();
@@ -937,21 +932,6 @@ public class KiiSyncClient {
         return downManager.resume();
     }
 
-    /**
-     * Download the file to it original position
-     * 
-     * @param kiFile
-     * @param overwrite
-     * @throws IOException
-     */
-    public void download(KiiFile kiFile, boolean overwrite) throws IOException {
-        if (downManager == null) {
-            downManager = new DownloadManager();
-        }
-
-        downManager.downloadKiiFile(new File(kiFile.getResourceUrl()), kiFile,
-                true);
-    }
 
     public DownloadManager getDownloadManager() {
         if (downManager == null) {

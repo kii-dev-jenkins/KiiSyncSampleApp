@@ -36,15 +36,18 @@ public class ProgressListActivity extends ExpandableListActivity {
     protected void onStop() {
         // TODO Auto-generated method stub
         super.onStop();
-        unregisterReceiver(mReceiver);
+        if (mReceiver != null) {
+            unregisterReceiver(mReceiver);
+        }
         if (mNewEventListener != null) {
             mNewEventListener.unregister();
         }
     }
 
-    Receiver mReceiver = new Receiver();
+    Receiver mReceiver = null;
 
     protected void connect() {
+        mReceiver = new Receiver();
         registerReceiver(mReceiver, new IntentFilter(
                 DownloadManager.ACTION_DOWNLOAD_END));
         registerReceiver(mReceiver, new IntentFilter(
@@ -119,7 +122,8 @@ public class ProgressListActivity extends ExpandableListActivity {
             if (msg != null) {
                 if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
                     Intent apiIntent = new Intent(
-                            context.getApplicationContext(), StartActivity.class);
+                            context.getApplicationContext(),
+                            StartActivity.class);
                     apiIntent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
                     context.startActivity(apiIntent);
                 } else if (msg.sync_result == SyncMsg.ERROR_PFS_BUSY) {
@@ -245,7 +249,8 @@ public class ProgressListActivity extends ExpandableListActivity {
                     if (mAdapter != null) {
                         mAdapter.notifyDataSetChanged();
                     }
-                    break;
+                    finish();
+                    return;
             }
 
         }

@@ -566,17 +566,22 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
             int childPos = ExpandableListView
                     .getPackedPositionChild(info.packedPosition);
 
-            KiiFile kFile = (KiiFile) mAdapter.getChild((int) groupPos,
+            final KiiFile kFile = (KiiFile) mAdapter.getChild((int) groupPos,
                     (int) childPos);
             if (kFile != null && kFile.isFile()) {
-                KiiSyncClient client = KiiSyncClient.getInstance();
+                final KiiSyncClient client = KiiSyncClient.getInstance();
                 if (client == null) {
                     Log.d(TAG, "get KiiRefClient failed, return!");
                     return true;
                 }
                 switch (item.getGroupId()) {
                     case MENU_RESTORE_TRASH:
-                        client.restoreFromTrash(kFile);
+                        Runnable r = new Runnable() {
+                            public void run() {
+                                client.restoreFromTrash(kFile);
+                            }
+                        };
+                        new Thread(r).start();
                         break;
                     case MENU_MOVE_TRASH:
                         client.moveKiiFileToTrash(kFile);
@@ -597,7 +602,12 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
                                         + KiiSyncClient.getInstance()
                                                 .getDownloadFolder(),
                                 Toast.LENGTH_SHORT).show();
-                        client.download(kFile);
+                        Runnable r1 = new Runnable() {
+                            public void run() {
+                                client.download(kFile, null);
+                            }
+                        };
+                        new Thread(r1).start();
                         break;
                 }
 
