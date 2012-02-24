@@ -21,19 +21,19 @@
         </activity>
         
         <activity android:name="com.kii.demo.sync.activities.FilePickerActivity"
-        	android:label="FilePicker" android:configChanges="keyboardHidden|orientation" />   
+        	android:label="FilePicker" android:configChanges="keyboardHidden|orientation" android:screenOrientation="portrait"/>   
         	
         <activity android:name="com.kii.demo.sync.activities.KiiFilePickerActivity"
         	android:label="KiiFileViewer" 
         	android:launchMode="singleTask"
             android:configChanges="keyboardHidden|orientation"
-        	/>
+        	android:screenOrientation="portrait"/>
         
         <activity android:name="com.kii.demo.sync.activities.FileTabActivity"
             android:label="@string/hello"
             android:launchMode="singleTask"
             android:configChanges="keyboardHidden|orientation"
-            />
+            android:screenOrientation="portrait"/>
         	  	     
 		<service android:name="com.synclore.android.pfscsdk.PFSyncService">
 			<intent-filter>
