@@ -75,6 +75,4 @@ public class NotificationUtil {
         nm.cancel(DOWNLOAD_PROGRESS_NOTIFICATION);
     }
 
-    
-    
 }

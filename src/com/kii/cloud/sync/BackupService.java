@@ -13,8 +13,11 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.widget.Toast;
 
+import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.BackupPref;
+import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
 import com.kii.sync.SyncPref;
@@ -96,7 +99,6 @@ public class BackupService extends Service {
 
     private class SyncTask extends AsyncTask<Void, Void, Integer> {
         int taskId = -1;
-
         public SyncTask(int taskId) {
             this.taskId = taskId;
         }
@@ -109,8 +111,34 @@ public class BackupService extends Service {
                 return mSyncClient.refreshQuick();
             }
         }
+        
+        @Override
+        protected void onPostExecute(Integer result) {
+            switch (result) {
+                    case SyncMsg.ERROR_INTERRUPTED:
+                    case SyncMsg.ERROR_PFS_BUSY:
+                case SyncMsg.PFS_SYNCRESULT_FORCE_STOP:
+                case SyncMsg.OK:
+                    break;
+                case SyncMsg.ERROR_SETUP:
+                default:
+                    showToast(getString(R.string.sync), result);
+                    break;
+            }
+        }
+    }
+    
+    void showToast(String title, int errorCode) {
+        showToast(title, Utils.getErrorMsg(errorCode, this));
     }
 
+    void showToast(String title, CharSequence msg) {
+        showToast(title + ":" + msg);
+    }
+
+    void showToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mSyncClient != null) {

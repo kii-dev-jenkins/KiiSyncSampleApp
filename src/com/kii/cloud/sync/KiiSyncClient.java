@@ -692,6 +692,14 @@ public class KiiSyncClient {
         }
         return ret;
     }
+    
+    public int upload(KiiFile[] files) {
+        int ret = 0;
+        for(KiiFile file:files) {
+            ret = upload(file);
+        }
+        return ret;
+    }
 
     /**
      * Move the KiiFile to trash.
@@ -1123,7 +1131,7 @@ public class KiiSyncClient {
 
         Log.v(TAG, "Total kiiFiles found :" + kiiFiles.length);
         KiiFileUtil.rename2(kiiFiles, fullPathOfFolder, newName);
-        return mSyncManager.upload(kiiFiles);
+        return upload(kiiFiles);
     }
 
     class Result {

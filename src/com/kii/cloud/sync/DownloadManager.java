@@ -187,7 +187,6 @@ public class DownloadManager {
         HttpClient client = new DefaultHttpClient();
         HttpResponse response = client.execute(httpGet);
         StatusLine statusLine = response.getStatusLine();
-        Log.d(TAG, "download, statusline is "+statusLine.getStatusCode()+", "+statusLine.getReasonPhrase());
         if (statusLine.getStatusCode() != 200) {
             throw new IOException("Code: " + statusLine.getStatusCode()
                     + "; Reason:" + statusLine.getReasonPhrase());

@@ -228,9 +228,9 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
             Log.d(TAG, "get KiiRefClient failed, return!");
             return true;
         }
+        
         switch (item.getItemId()) {
             case MENU_RENAME:
-
                 final AlertDialog.Builder alert = new AlertDialog.Builder(this);
                 final EditText input = new EditText(this);
                 alert.setView(input);
