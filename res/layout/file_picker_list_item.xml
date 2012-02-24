@@ -72,6 +72,6 @@
         android:paddingLeft="5dip"
         android:paddingTop="5dip"
         android:scaleType="fitCenter"
-        android:src="@drawable/image_rearrange"
+        android:src="@drawable/image_more"
     />
 </LinearLayout>
