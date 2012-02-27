@@ -164,6 +164,8 @@ public class FilePickerActivity extends ListActivity implements
 
             Collections.sort(mFiles, new FileComparator());
         }
+        mAdapter.notifyDataSetChanged();
+
         Button b = (Button) mHeaderView.findViewById(R.id.header_up_button);
         if (isAtSdHome()) {
             // at SD card home, disable Up button
@@ -173,7 +175,6 @@ public class FilePickerActivity extends ListActivity implements
         }
         TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
         tv.setText(getString(R.string.header_text_path) + mDirectory.getPath());
-        mAdapter.notifyDataSetChanged();
     }
 
     private boolean isAtSdHome() {
@@ -198,8 +199,6 @@ public class FilePickerActivity extends ListActivity implements
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         File newFile = (File) l.getItemAtPosition(position);
-        Log.d(TAG, "onListItemClick, file is " + newFile.getAbsolutePath());
-
         if (newFile.isFile()) {
             // Set result
             // Intent extra = new Intent();
@@ -221,7 +220,7 @@ public class FilePickerActivity extends ListActivity implements
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-        File selectedFile = (File) mAdapter.getItem(info.position);
+        File selectedFile = (File) getListView().getItemAtPosition(info.position);
         if (selectedFile.exists()) {
             Log.v(TAG, "Selected File :" + selectedFile.getAbsolutePath());
             if (selectedFile.isDirectory()) {
@@ -242,7 +241,7 @@ public class FilePickerActivity extends ListActivity implements
     public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
                 .getMenuInfo();
-        File selectedFile = (File) mAdapter.getItem(info.position);
+        File selectedFile = (File) getListView().getItemAtPosition(info.position);
         final String filePath = selectedFile.getAbsolutePath();
         final KiiSyncClient client = KiiSyncClient.getInstance();
         if (client == null) {
@@ -280,7 +279,6 @@ public class FilePickerActivity extends ListActivity implements
                 break;
             case MENU_UPLOAD_FILE:
                 client.upload(filePath);
-                Log.d(TAG, "before startSync");
                 Utils.startSync(getApplicationContext(),
                         BackupService.ACTION_REFRESH);
                 break;
