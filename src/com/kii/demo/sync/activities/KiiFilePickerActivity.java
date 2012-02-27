@@ -395,7 +395,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
 
     private void adpaterSetup() {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (mHeaderView != null)
+        if (mHeaderView == null)
             mHeaderView = inflater.inflate(R.layout.cloud_header_view, null);
         getExpandableListView().addHeaderView(mHeaderView);
         setLastSyncTime();
@@ -757,8 +757,10 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     }
 
     private void setLastSyncTime() {
-        TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
-        tv.setText(Utils.getLastSyncTime(this));
+        if (mHeaderView != null) {
+            TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
+            tv.setText(Utils.getLastSyncTime(this));
+        }
     }
 
 }
