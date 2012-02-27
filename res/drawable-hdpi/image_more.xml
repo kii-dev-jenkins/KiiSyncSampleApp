@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android"> 
    <item android:state_window_focused="false" android:state_enabled="true" 
-         android:drawable="@drawable/common_more_rest" /> 
+         android:drawable="@drawable/arrow_fold_normal" /> 
     <item android:state_window_focused="false" android:state_enabled="false" 
-         android:drawable="@drawable/common_more_rest" /> 
+         android:drawable="@drawable/arrow_fold_normal" /> 
      <item android:state_pressed="true"  
-        android:drawable="@drawable/common_more_press" /> 
+        android:drawable="@drawable/arrow_fold_pressed" /> 
     <item android:state_focused="true" android:state_enabled="true" 
-         android:drawable="@drawable/common_more_selected" /> 
+         android:drawable="@drawable/arrow_fold_pressed" /> 
      <item android:state_enabled="true" 
-         android:drawable="@drawable/common_more_rest" /> 
+         android:drawable="@drawable/arrow_fold_normal" /> 
 </selector>  

@@ -263,7 +263,8 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                     setIcon(R.drawable.icon_format_unsupport, view);
                 }
             }
-            ImageView ib = (ImageView) view.findViewById(R.id.menu_button);
+            ImageView ib = (ImageView) view.findViewById(R.id.list_complex_more_button);
+            ib.setVisibility(View.VISIBLE);
             ib.setTag(view);
             if (!(mOnClickListener == null)) {
                 ib.setOnClickListener(mOnClickListener);
@@ -297,6 +298,9 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                     parent, false);
         }
 
+        // disable the view for more button
+        view.findViewById(R.id.list_complex_more_button).setVisibility(View.GONE);
+        
         KiiFileList group = (KiiFileList) getGroup(groupPosition);
 
         if (group.getParent() == null) {

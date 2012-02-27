@@ -745,7 +745,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.menu_button:
+            case R.id.list_complex_more_button:
                 View row = (View) v.getTag();
                 getExpandableListView().showContextMenuForChild(row);
                 break;

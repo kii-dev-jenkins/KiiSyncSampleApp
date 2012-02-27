@@ -313,7 +313,7 @@ public class FilePickerActivity extends ListActivity implements
         private List<File> mObjects;
 
         public FilePickerListAdapter(Context context, List<File> objects) {
-            super(context, R.layout.file_picker_list_item, android.R.id.text1,
+            super(context, R.layout.list_complex, android.R.id.text1,
                     objects);
             mObjects = objects;
         }
@@ -326,7 +326,7 @@ public class FilePickerActivity extends ListActivity implements
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) getContext()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                row = inflater.inflate(R.layout.file_picker_list_item, parent,
+                row = inflater.inflate(R.layout.list_complex, parent,
                         false);
             } else {
                 row = convertView;
@@ -335,15 +335,18 @@ public class FilePickerActivity extends ListActivity implements
             File object = mObjects.get(position);
 
             ImageView imageView = (ImageView) row
-                    .findViewById(R.id.file_picker_image);
+                    .findViewById(R.id.list_complex_icon);
             ImageView syncView = (ImageView) row
-                    .findViewById(R.id.file_picker_sync_status_icon);
+                    .findViewById(R.id.list_sync_status_icon);
             TextView textView = (TextView) row
-                    .findViewById(R.id.file_picker_text);
+                    .findViewById(R.id.list_complex_1line_title);
             // Set single line
             textView.setSingleLine(true);
             textView.setText(object.getName());
             syncView.setVisibility(View.GONE);
+            row.findViewById(R.id.list_complex_1line_text).setVisibility(View.VISIBLE);
+            row.findViewById(R.id.list_complex_2lines_text).setVisibility(View.GONE);
+            row.setPadding(5, row.getPaddingTop(), row.getPaddingRight(), row.getPaddingBottom());
 
             if (object.isFile()) {
                 // Show the file icon
@@ -364,7 +367,8 @@ public class FilePickerActivity extends ListActivity implements
 
             }
 
-            ImageView ib = (ImageView) row.findViewById(R.id.menu_button);
+            ImageView ib = (ImageView) row.findViewById(R.id.list_complex_more_button);
+            ib.setVisibility(View.VISIBLE);
             ib.setTag(row);
             ib.setOnClickListener(FilePickerActivity.this);
             return row;
@@ -471,7 +475,7 @@ public class FilePickerActivity extends ListActivity implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.menu_button:
+            case R.id.list_complex_more_button:
                 View row = (View) v.getTag();
                 getListView().showContextMenuForChild(row);
                 break;

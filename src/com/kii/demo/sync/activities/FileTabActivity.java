@@ -37,7 +37,13 @@ public class FileTabActivity extends TabActivity {
                 .setContent(intent));
         intent = new Intent(this, KiiFilePickerActivity.class);
         mTabHost.addTab(mTabHost.newTabSpec("cloud")
-                .setIndicator(getString(R.string.tab_cloud)).setContent(intent));
+                .setIndicator(getString(R.string.tab_cloud))
+                .setContent(intent));
+        mTabHost.getTabWidget().getChildAt(0).getLayoutParams().height = 
+        	60;
+        mTabHost.getTabWidget().getChildAt(1).getLayoutParams().height = 
+        	60; 
+        
     }
 
     @Override
