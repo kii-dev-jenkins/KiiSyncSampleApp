@@ -6,12 +6,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.channels.FileChannel;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.text.TextUtils;
@@ -311,5 +313,30 @@ public class Utils {
                 statusIcon.setVisibility(View.VISIBLE);
                 break;
         }
+    }
+    
+    public static Intent getLaunchFileIntent(String path, MimeInfo mime) {
+        if (TextUtils.isEmpty(path))
+            return null;
+        if (mime == null)
+            return null;
+        Intent commIntent = null;
+        Uri fileUri = Uri.fromFile(new File(path));
+        commIntent = new Intent(Intent.ACTION_VIEW);
+        commIntent.setDataAndType(fileUri, mime.getMimeType());
+        return commIntent;
+    }
+    
+    public static Intent getLaunchURLIntent(URL url, String mimeType) {
+        Intent commIntent = null;
+        commIntent = new Intent(Intent.ACTION_VIEW);
+        if (mimeType.startsWith("video")) {
+            commIntent.setDataAndType(Uri.parse(url.toString()), "video/*");
+        } else if (mimeType.startsWith("audio")) {
+            commIntent.setDataAndType(Uri.parse(url.toString()), mimeType);
+        } else {
+            commIntent.setData(Uri.parse(url.toString()));
+        }
+        return commIntent;
     }
 }

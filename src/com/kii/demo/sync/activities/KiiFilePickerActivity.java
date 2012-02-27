@@ -1,7 +1,5 @@
 package com.kii.demo.sync.activities;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
@@ -412,30 +410,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         startActivity(intent);
     }
 
-    public Intent getLaunchFileIntent(String path, MimeInfo mime) {
-        if (TextUtils.isEmpty(path))
-            return null;
-        if (mime == null)
-            return null;
-        Intent commIntent = null;
-        Uri fileUri = Uri.fromFile(new File(path));
-        commIntent = new Intent(Intent.ACTION_VIEW);
-        commIntent.setDataAndType(fileUri, mime.getMimeType());
-        return commIntent;
-    }
-
-    public Intent getLaunchURLIntent(URL url, String mimeType) {
-        Intent commIntent = null;
-        commIntent = new Intent(Intent.ACTION_VIEW);
-        if (mimeType.startsWith("video")) {
-            commIntent.setDataAndType(Uri.parse(url.toString()), "video/*");
-        } else if (mimeType.startsWith("audio")) {
-            commIntent.setDataAndType(Uri.parse(url.toString()), mimeType);
-        } else {
-            commIntent.setData(Uri.parse(url.toString()));
-        }
-        return commIntent;
-    }
+    
 
     @Override
     public boolean onChildClick(ExpandableListView parent, View v,
@@ -460,11 +435,11 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 MimeInfo mime = MimeUtil.getInfoByKiiFile(kFile);
 
                 if (KiiSyncClient.getInstance().getStatus(kFile) != KiiFile.STATUS_NO_BODY) {
-                    intent = getLaunchFileIntent(kFile.getLocalPath(), mime);
+                    intent = Utils.getLaunchFileIntent(kFile.getLocalPath(), mime);
                 }
                 if (intent == null && kFile.getAvailableURL() != null) {
                     if (mime != null) {
-                        intent = getLaunchURLIntent(kFile.getAvailableURL(),
+                        intent = Utils.getLaunchURLIntent(kFile.getAvailableURL(),
                                 mime.getMimeType());
                     }
                 }
