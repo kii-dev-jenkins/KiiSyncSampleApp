@@ -44,7 +44,8 @@ import com.kii.sync.KiiFile;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
-public class KiiFilePickerActivity extends ExpandableListActivity implements View.OnClickListener{
+public class KiiFilePickerActivity extends ExpandableListActivity implements
+        View.OnClickListener {
 
     public static final String TAG = "KiiFilePickerActivity";
     // message for the handler
@@ -69,6 +70,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
 
     KiiFileExpandableListAdapter mAdapter;
     View mHeaderView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -327,7 +329,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
     }
 
     private void doDownloadAll() {
-        Log.d(TAG, "doDownloadAll");
         Runnable r = new Runnable() {
             public void run() {
                 KiiSyncClient client = KiiSyncClient.getInstance();
@@ -393,7 +394,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
     }
 
     private void adpaterSetup() {
-        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mHeaderView = inflater.inflate(R.layout.cloud_header_view, null);
         getExpandableListView().addHeaderView(mHeaderView);
         setLastSyncTime();
@@ -696,22 +697,23 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
 
         @Override
         public void onSyncComplete(SyncMsg msg) {
-            if (msg != null) {
-                if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
-                    Intent apiIntent = new Intent(
-                            context.getApplicationContext(),
-                            StartActivity.class);
-                    apiIntent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
-                    context.startActivity(apiIntent);
-                } else if (msg.sync_result == SyncMsg.ERROR_PFS_BUSY) {
-                    return;
-                } else if(msg.sync_result == SyncMsg.OK) {
-                    setLastSyncTime();
-                    return;
-                }
-            }
             handler.sendEmptyMessageDelayed(KiiFilePickerActivity.PROGRESS_END,
                     500);
+            if (msg != null) {
+                switch (msg.sync_result) {
+                    case SyncMsg.ERROR_AUTHENTICAION_ERROR:
+                        Intent apiIntent = new Intent(
+                                context.getApplicationContext(),
+                                StartActivity.class);
+                        apiIntent
+                                .setAction(StartActivity.ACTION_ENTER_PASSWORD);
+                        context.startActivity(apiIntent);
+                        break;
+                    case SyncMsg.OK:
+                        setLastSyncTime();
+                        break;
+                }
+            }
         }
 
         @Override
@@ -738,23 +740,23 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
         }
 
     }
-    
+
     @Override
     public void onClick(View v) {
-        switch(v.getId()) {
+        switch (v.getId()) {
             case R.id.menu_button:
-                View row = (View)v.getTag();
+                View row = (View) v.getTag();
                 getExpandableListView().showContextMenuForChild(row);
                 break;
         }
     }
-    
+
     public void handleRefresh(View v) {
         syncRefresh();
     }
-    
+
     private void setLastSyncTime() {
-        TextView tv = (TextView)mHeaderView.findViewById(R.id.header_text);
+        TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
         tv.setText(Utils.getLastSyncTime(this));
     }
 
