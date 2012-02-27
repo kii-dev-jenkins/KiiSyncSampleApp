@@ -54,4 +54,5 @@
     <string name="header_btn_home">Home</string>
     <string name="header_btn_up">Up</string>
     <string name="header_text_path">Path: </string>
+    <string name="none">None</string>
 </resources>

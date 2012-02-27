@@ -15,21 +15,21 @@ import android.media.ThumbnailUtils;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
+import com.kii.demo.sync.R;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
-
+import com.kii.sync.SyncPref;
 import com.kii.sync.utils.FileUtils;
 import com.kii.sync.utils.ImageUtils;
 
-import com.kii.demo.sync.R;
-
 public class Utils {
-	
-	static final String TAG =  "Utils";
+
+    static final String TAG = "Utils";
 
     /**
      * Convert the status code to human reading language
@@ -67,7 +67,8 @@ public class Utils {
                 return "OUT DATED";
 
             default:
-                return "?(" + KiiSyncClient.getInstance().getStatus(kFile) + ")";
+                return "?(" + KiiSyncClient.getInstance().getStatus(kFile)
+                        + ")";
         }
     }
 
@@ -136,7 +137,7 @@ public class Utils {
                         context.getString(R.string.msg_ERROR_OTHERS), code);
         }
     }
-    
+
     public static String moveFile(File dest, File src) {
         FileInputStream fis = null;
         FileOutputStream fos = null;
@@ -165,7 +166,7 @@ public class Utils {
             closeSilently(fos);
         }
     }
-    
+
     public static void closeSilently(Closeable closeable) {
         if (closeable != null) {
             try {
@@ -175,7 +176,7 @@ public class Utils {
             }
         }
     }
-    
+
     /**
      * Generate the thumbnail with the given unique key and store in the temp
      * folder
@@ -184,17 +185,15 @@ public class Utils {
      * @param uniqueKey
      * @return
      */
-    public static String generateThumbnail(Context context, String pathImage, String destPath,
-            String mimeType) {
+    public static String generateThumbnail(Context context, String pathImage,
+            String destPath, String mimeType) {
 
         try {
 
             File dest = new File(destPath);
             if (!dest.getParentFile().exists()) {
                 if (dest.getParentFile().mkdirs() == false) {
-                    Log
-                            .e(TAG, "Create folder failed:"
-                                    + dest.getAbsolutePath());
+                    Log.e(TAG, "Create folder failed:" + dest.getAbsolutePath());
                     return null;
                 }
             }
@@ -223,14 +222,12 @@ public class Utils {
                 }
             }
         } catch (Exception ex) {
-            Log
-                    .e(TAG, "generateThumbnailForImage Exception:"
-                            + ex.getMessage());
+            Log.e(TAG, "generateThumbnailForImage Exception:" + ex.getMessage());
             return null;
         }
         return null;
     }
-    
+
     public static String getKiiFileDest(KiiFile file) {
         String title = file.getTitle();
         String dest = KiiSyncClient.getInstance().getDownloadFolder() + "/"
@@ -245,7 +242,8 @@ public class Utils {
                 title = title.substring(0, sufpos) + "-" + time
                         + title.substring(sufpos);
             }
-            dest = KiiSyncClient.getInstance().getDownloadFolder() + "/" + title;
+            dest = KiiSyncClient.getInstance().getDownloadFolder() + "/"
+                    + title;
         }
         return dest;
     }
@@ -256,5 +254,19 @@ public class Utils {
             service.setAction(command);
         }
         context.startService(service);
+    }
+
+    public static String getLastSyncTime(Context context) {
+        long backupTime = SyncPref.getLastSuccessfulSyncTime();
+        if (backupTime > 0) {
+            return String.format("Last successful sync is %s",
+                    (String) DateUtils.getRelativeTimeSpanString(backupTime,
+                            System.currentTimeMillis(),
+                            DateUtils.MINUTE_IN_MILLIS,
+                            DateUtils.FORMAT_ABBREV_RELATIVE
+                                    | DateUtils.FORMAT_ABBREV_ALL));
+        } else {
+            return context.getString(R.string.none);
+        }
     }
 }

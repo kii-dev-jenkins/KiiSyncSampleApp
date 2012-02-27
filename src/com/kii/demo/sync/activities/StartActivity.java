@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kii.cloud.sync.KiiSyncClient;
+import com.kii.demo.sync.R;
 import com.kii.demo.sync.tasks.ChangePwdTask;
 import com.kii.demo.sync.tasks.LoginTask;
 import com.kii.demo.sync.tasks.LogoutTask;
@@ -30,7 +30,6 @@ import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
 import com.kii.sync.SyncPref;
-import com.kii.demo.sync.R;
 
 public class StartActivity extends Activity {
     protected static final String TAG = "StartActivity";
@@ -413,16 +412,8 @@ public class StartActivity extends Activity {
         mStorage.setText("Storage Uasge is "
                 + Long.toString(kClient.getStorageUsage()) + "bytes");
 
-        long backupTime = SyncPref.getLastSuccessfulSyncTime();
-
-        String lastSyncTimeMsg = String.format("Last successful sync is %s",
-                (String) DateUtils.getRelativeTimeSpanString(backupTime, System
-                        .currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS,
-                        DateUtils.FORMAT_ABBREV_RELATIVE
-                                | DateUtils.FORMAT_ABBREV_ALL));
-
-        mLastSyncTime.setText(lastSyncTimeMsg);
-
+        mLastSyncTime.setText(Utils.getLastSyncTime(this));
+        
         // print the server location and SDK version
         mServerSite.setText("Connect to Server:" + SyncPref.getServerSite()
                 + " SDK Ver:" + SyncPref.getSDKVersion());
