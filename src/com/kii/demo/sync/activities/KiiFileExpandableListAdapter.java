@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.text.format.Formatter;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +27,7 @@ import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
+import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 
 public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
@@ -171,7 +173,9 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
 
         if (file.isDirectory()) {
             // disable the sync status
-            setSyncStatus(view, 0);
+            ImageView statusIcon = (ImageView) view
+                    .findViewById(R.id.list_sync_status_icon);
+            Utils.setSyncStatus(statusIcon, 0);
             setOneLineText(new SpannableString(file.getBucketName()), view);
             setIcon(R.drawable.icon_format_folder, view);
         } else {
@@ -186,7 +190,9 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             } else {
                 status = kiiClient.getStatusFromCache(file);
             }
-            setSyncStatus(view, status);
+            ImageView statusIcon = (ImageView) view
+                    .findViewById(R.id.list_sync_status_icon);
+            Utils.setSyncStatus(statusIcon, status);
             String title;
             String caption;
             String subCaption;
@@ -213,8 +219,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             // caption = file.getMimeType();
 
             // set the size
-            subCaption = getAsString(file.getSizeOnDB()) + "bytes";
-
+            subCaption = Formatter.formatFileSize(mActivity, file.getSizeOnDB());
             setTwoLinesText(new SpannableString(title), new SpannableString(
                     caption), subCaption, R.drawable.icon_format_text, view);
 
@@ -306,7 +311,9 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         if (group.getParent() == null) {
             // disable the sync status
             String title = group.getTitle();
-            setSyncStatus(view, 0);
+            ImageView statusIcon = (ImageView) view
+                    .findViewById(R.id.list_sync_status_icon);
+            Utils.setSyncStatus(statusIcon, 0);
             setOneLineText(new SpannableString(title), view);
 
             if (title.startsWith("Backup")) {
@@ -326,7 +333,9 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             KiiFile file = group.getParent();
             if (file.isDirectory()) {
                 // disable the sync status
-                setSyncStatus(view, 0);
+                ImageView statusIcon = (ImageView) view
+                        .findViewById(R.id.list_sync_status_icon);
+                Utils.setSyncStatus(statusIcon, 0);
                 setOneLineText(new SpannableString(group.getTitle()), view);
                 setIcon(R.drawable.icon_others, view);
                 view.setTag(file);
@@ -488,62 +497,6 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         return curView;
-    }
-
-    private void setSyncStatus(View view, int status) {
-        ImageView statusIcon = (ImageView) view
-                .findViewById(R.id.list_sync_status_icon);
-        statusIcon.setVisibility(View.GONE);
-
-        switch (status) {
-            case 0:
-                // disable
-                return;
-            case KiiFile.STATUS_NO_BODY:
-                // "Server Only";
-                statusIcon.setImageResource(R.drawable.sync_cloud);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_SYNCED:
-            case KiiFile.STATUS_REQUEST_BODY:
-            case KiiFile.STATUS_DOWNLOADING_BODY:
-                statusIcon.setImageResource(R.drawable.sync_sync);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_PREPARE_TO_SYNC:
-            case KiiFile.STATUS_SYNC_IN_QUEUE:
-            case KiiFile.STATUS_UPLOADING_BODY:
-                statusIcon.setImageResource(R.drawable.syncing);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_BODY_OUTDATED:
-                statusIcon.setImageResource(R.drawable.sync_outdated);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_DELETE_REQUEST:
-            case KiiFile.STATUS_DELETE_REQUEST_INCLUDEBODY:
-            case KiiFile.STATUS_SERVER_DELETE_REQUEST:
-                statusIcon.setImageResource(R.drawable.sync_trashcan);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_UNKNOWN:
-            default:
-                statusIcon.setImageResource(R.drawable.syncing_error);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-        }
-    }
-
-    private static final String[] Q = new String[] { "", "K", "M", "G", "T",
-            "P", "E" };
-
-    public String getAsString(long bytes) {
-        for (int i = 6; i > 0; i--) {
-            double step = Math.pow(1024, i);
-            if (bytes > step)
-                return String.format("%3.1f %s", bytes / step, Q[i]);
-        }
-        return Long.toString(bytes);
     }
 
 }

@@ -17,6 +17,8 @@ import android.provider.MediaStore.Video;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
@@ -267,6 +269,47 @@ public class Utils {
                                     | DateUtils.FORMAT_ABBREV_ALL));
         } else {
             return context.getString(R.string.none);
+        }
+    }
+    
+    public static void setSyncStatus(ImageView statusIcon, int status) {
+        statusIcon.setVisibility(View.GONE);
+        switch (status) {
+            case 0:
+                // disable
+                return;
+            case KiiFile.STATUS_NO_BODY:
+                // "Server Only";
+                statusIcon.setImageResource(R.drawable.sync_cloud);
+                statusIcon.setVisibility(View.VISIBLE);
+                break;
+            case KiiFile.STATUS_SYNCED:
+            case KiiFile.STATUS_REQUEST_BODY:
+            case KiiFile.STATUS_DOWNLOADING_BODY:
+                statusIcon.setImageResource(R.drawable.sync_sync);
+                statusIcon.setVisibility(View.VISIBLE);
+                break;
+            case KiiFile.STATUS_PREPARE_TO_SYNC:
+            case KiiFile.STATUS_SYNC_IN_QUEUE:
+            case KiiFile.STATUS_UPLOADING_BODY:
+                statusIcon.setImageResource(R.drawable.syncing);
+                statusIcon.setVisibility(View.VISIBLE);
+                break;
+            case KiiFile.STATUS_BODY_OUTDATED:
+                statusIcon.setImageResource(R.drawable.sync_outdated);
+                statusIcon.setVisibility(View.VISIBLE);
+                break;
+            case KiiFile.STATUS_DELETE_REQUEST:
+            case KiiFile.STATUS_DELETE_REQUEST_INCLUDEBODY:
+            case KiiFile.STATUS_SERVER_DELETE_REQUEST:
+                statusIcon.setImageResource(R.drawable.sync_trashcan);
+                statusIcon.setVisibility(View.VISIBLE);
+                break;
+            case KiiFile.STATUS_UNKNOWN:
+            default:
+                statusIcon.setImageResource(R.drawable.syncing_error);
+                statusIcon.setVisibility(View.VISIBLE);
+                break;
         }
     }
 }
