@@ -46,7 +46,8 @@ import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 
-public class FilePickerActivity extends ListActivity implements View.OnClickListener{
+public class FilePickerActivity extends ListActivity implements
+        View.OnClickListener {
 
     /**
      * The file path
@@ -123,7 +124,7 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
             acceptedFileExtensions = (String[]) collection
                     .toArray(new String[collection.size()]);
         }
-        
+
     }
 
     @Override
@@ -163,20 +164,21 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
 
             Collections.sort(mFiles, new FileComparator());
         }
-        Button b = (Button)mHeaderView.findViewById(R.id.header_up_button);
-        if(isAtSdHome()) {
-            //at SD card home, disable Up button
+        Button b = (Button) mHeaderView.findViewById(R.id.header_up_button);
+        if (isAtSdHome()) {
+            // at SD card home, disable Up button
             b.setEnabled(false);
         } else {
             b.setEnabled(true);
         }
-        TextView tv = (TextView)mHeaderView.findViewById(R.id.header_text);
-        tv.setText(getString(R.string.header_text_path)+mDirectory.getPath());
+        TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
+        tv.setText(getString(R.string.header_text_path) + mDirectory.getPath());
         mAdapter.notifyDataSetChanged();
     }
 
     private boolean isAtSdHome() {
-        return mDirectory.compareTo(Environment.getExternalStorageDirectory().getAbsoluteFile())==0;
+        return mDirectory.compareTo(Environment.getExternalStorageDirectory()
+                .getAbsoluteFile()) == 0;
     }
 
     @Override
@@ -196,7 +198,7 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         File newFile = (File) l.getItemAtPosition(position);
-        Log.d(TAG, "onListItemClick, file is "+newFile.getAbsolutePath());
+        Log.d(TAG, "onListItemClick, file is " + newFile.getAbsolutePath());
 
         if (newFile.isFile()) {
             // Set result
@@ -247,7 +249,7 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
             Log.d(TAG, "get KiiRefClient failed, return!");
             return true;
         }
-        
+
         switch (item.getItemId()) {
             case MENU_RENAME:
                 final AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -363,8 +365,8 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
                 imageView.setImageResource(R.drawable.folder);
 
             }
-            
-            ImageView ib = (ImageView)row.findViewById(R.id.menu_button);
+
+            ImageView ib = (ImageView) row.findViewById(R.id.menu_button);
             ib.setTag(row);
             ib.setOnClickListener(FilePickerActivity.this);
             return row;
@@ -470,20 +472,21 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()) {
+        switch (v.getId()) {
             case R.id.menu_button:
-                View row = (View)v.getTag();
+                View row = (View) v.getTag();
                 getListView().showContextMenuForChild(row);
                 break;
         }
     }
-    
+
     public void handleHome(View v) {
-        mDirectory = Environment.getExternalStorageDirectory().getAbsoluteFile();
+        mDirectory = Environment.getExternalStorageDirectory()
+                .getAbsoluteFile();
         refreshFilesList();
         return;
     }
-    
+
     public void handleUp(View v) {
         if (!isAtSdHome()) {
             // Go to parent directory

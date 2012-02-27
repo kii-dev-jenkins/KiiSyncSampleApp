@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/header_background"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/header_refresh_button"
+        android:layout_width="fill_parent"
+        android:layout_height="45dip"
+        android:background="@drawable/detail_btn_bg"
+        android:onClick="handleRefresh"
+        android:text="@string/button_refresh" />
+
+    <TextView
+        android:id="@+id/header_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

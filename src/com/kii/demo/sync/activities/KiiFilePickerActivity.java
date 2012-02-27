@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,6 +29,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kii.cloud.sync.BackupService;
@@ -66,7 +68,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
     private boolean needDownload = false;
 
     KiiFileExpandableListAdapter mAdapter;
-
+    View mHeaderView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -391,6 +393,10 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
     }
 
     private void adpaterSetup() {
+        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mHeaderView = inflater.inflate(R.layout.cloud_header_view, null);
+        getExpandableListView().addHeaderView(mHeaderView);
+        setLastSyncTime();
         mAdapter = new KiiFileExpandableListAdapter(this,
                 KiiSyncClient.getInstance(),
                 KiiFileExpandableListAdapter.TYPE_DATA, this);
@@ -699,6 +705,9 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
                     context.startActivity(apiIntent);
                 } else if (msg.sync_result == SyncMsg.ERROR_PFS_BUSY) {
                     return;
+                } else if(msg.sync_result == SyncMsg.OK) {
+                    setLastSyncTime();
+                    return;
                 }
             }
             handler.sendEmptyMessageDelayed(KiiFilePickerActivity.PROGRESS_END,
@@ -738,6 +747,15 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements Vie
                 getExpandableListView().showContextMenuForChild(row);
                 break;
         }
+    }
+    
+    public void handleRefresh(View v) {
+        syncRefresh();
+    }
+    
+    private void setLastSyncTime() {
+        TextView tv = (TextView)mHeaderView.findViewById(R.id.header_text);
+        tv.setText(Utils.getLastSyncTime(this));
     }
 
 }

@@ -55,4 +55,5 @@
     <string name="header_btn_up">Up</string>
     <string name="header_text_path">Path: </string>
     <string name="none">None</string>
+    <string name="button_refresh">Refresh</string>
 </resources>
