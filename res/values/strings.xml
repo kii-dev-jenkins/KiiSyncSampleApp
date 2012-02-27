@@ -51,4 +51,7 @@
 	<string name="menu_item_move_to_trash">Move to Trash</string>
 	<string name="menu_item_download_all">Download All</string>
     <string name="sync">Sync</string>
+    <string name="header_btn_home">Home</string>
+    <string name="header_btn_up">Up</string>
+    <string name="header_text_path">Path: </string>
 </resources>

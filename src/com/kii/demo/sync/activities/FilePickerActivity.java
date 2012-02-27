@@ -23,6 +23,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -33,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -79,6 +81,7 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
     protected FilePickerListAdapter mAdapter;
     protected boolean mShowHiddenFiles = false;
     protected String[] acceptedFileExtensions;
+    View mHeaderView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +93,8 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
                 .inflate(R.layout.file_picker_empty_view, null);
         ((ViewGroup) getListView().getParent()).addView(emptyView);
         getListView().setEmptyView(emptyView);
-
+        mHeaderView = inflator.inflate(R.layout.home_header_view, null);
+        getListView().addHeaderView(mHeaderView);
         // Set initial directory
         mDirectory = new File(DEFAULT_INITIAL_DIRECTORY);
 
@@ -159,15 +163,30 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
 
             Collections.sort(mFiles, new FileComparator());
         }
+        Button b = (Button)mHeaderView.findViewById(R.id.header_up_button);
+        if(isAtSdHome()) {
+            //at SD card home, disable Up button
+            b.setEnabled(false);
+        } else {
+            b.setEnabled(true);
+        }
+        TextView tv = (TextView)mHeaderView.findViewById(R.id.header_text);
+        tv.setText(getString(R.string.header_text_path)+mDirectory.getPath());
         mAdapter.notifyDataSetChanged();
+    }
+
+    private boolean isAtSdHome() {
+        return mDirectory.compareTo(Environment.getExternalStorageDirectory().getAbsoluteFile())==0;
     }
 
     @Override
     public void onBackPressed() {
         if (mDirectory.getParentFile() != null) {
-            // Go to parent directory
-            mDirectory = mDirectory.getParentFile();
-            refreshFilesList();
+            if (!isAtSdHome()) {
+                // Go to parent directory
+                mDirectory = mDirectory.getParentFile();
+                refreshFilesList();
+            }
             return;
         }
 
@@ -456,6 +475,21 @@ public class FilePickerActivity extends ListActivity implements View.OnClickList
                 View row = (View)v.getTag();
                 getListView().showContextMenuForChild(row);
                 break;
+        }
+    }
+    
+    public void handleHome(View v) {
+        mDirectory = Environment.getExternalStorageDirectory().getAbsoluteFile();
+        refreshFilesList();
+        return;
+    }
+    
+    public void handleUp(View v) {
+        if (!isAtSdHome()) {
+            // Go to parent directory
+            mDirectory = mDirectory.getParentFile();
+            refreshFilesList();
+            return;
         }
     }
 
