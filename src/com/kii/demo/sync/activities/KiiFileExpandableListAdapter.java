@@ -148,16 +148,52 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition,
             boolean isLastChild, View convertView, ViewGroup parent) {
         KiiFile file = (KiiFile) getChild(groupPosition, childPosition);
+        Drawable icon = getKiiFileMainIcon(file);
         if (convertView == null) {
-            return new KiiListItemView(mActivity, file, kiiClient, mActivity
-                    .getResources().getDrawable(R.drawable.file),
+            return new KiiListItemView(mActivity, file, kiiClient, icon,
                     mOnClickListener);
         } else {
             KiiListItemView view = (KiiListItemView) convertView;
-            view.refreshWithNewKiiFile(file, mActivity.getResources()
-                    .getDrawable(R.drawable.file));
+            view.refreshWithNewKiiFile(file, icon);
             return view;
         }
+    }
+    
+    private static Drawable getKiiFileMainIcon(KiiFile file) {
+        Drawable icon = null;
+        MimeInfo mime = MimeUtil.getInfoByKiiFile(file);
+        String sThumbnail = null;
+        if (mime != null) {
+            sThumbnail = file.getThumbnail();
+        }
+        try {
+            if (!TextUtils.isEmpty(sThumbnail)) {
+
+                if (ICON_CACHE.containsKey(sThumbnail)) {
+                    icon = ICON_CACHE.get(sThumbnail);
+                } else {
+                    File fThumbnail = new File(sThumbnail);
+                    if (fThumbnail.exists() && fThumbnail.isFile()) {
+                        Bitmap bitmap = BitmapFactory
+                                .decodeFile(sThumbnail);
+
+                        if (bitmap.getHeight() > 120) {
+                            // resize the bitmap if too big, save memory
+                            bitmap = Bitmap.createScaledBitmap(
+                                    bitmap,
+                                    (bitmap.getWidth() * 120)
+                                            / bitmap.getHeight(), 120,
+                                    false);
+                        }
+                        icon = new BitmapDrawable(bitmap);
+                    }
+                    ICON_CACHE.put(sThumbnail, icon);
+                    return icon;
+                }
+            }
+        } catch (Exception ex) {
+        }
+        return null;
     }
 
     /**

@@ -16,12 +16,14 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -318,19 +320,24 @@ public class FilePickerActivity extends ListActivity implements
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            File file = mObjects.get(position);
             if (convertView == null) {
                 return new KiiListItemView(FilePickerActivity.this,
-                        mObjects.get(position), KiiSyncClient.getInstance(),
-                        getResources().getDrawable(R.drawable.file),
+                        file, KiiSyncClient.getInstance(),
+                        null,
                         FilePickerActivity.this);
             } else {
                 KiiListItemView v = (KiiListItemView) convertView;
-                v.refreshWithNewFile(mObjects.get(position), getResources()
-                        .getDrawable(R.drawable.file));
+                v.refreshWithNewFile(file, null);
                 return v;
             }
         }
 
+    }
+    private static HashMap<String, Drawable> ICON_CACHE = new HashMap<String, Drawable>();
+
+    private static Drawable getFileMainIcon(File file) {
+        return null;
     }
 
     private class FileComparator implements Comparator<File> {
