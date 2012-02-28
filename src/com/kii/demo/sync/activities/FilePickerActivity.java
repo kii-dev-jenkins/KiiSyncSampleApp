@@ -321,24 +321,27 @@ public class FilePickerActivity extends ListActivity implements
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             File file = mObjects.get(position);
+            Drawable icon = null;
+            if(ICON_CACHE.containsKey(file.getAbsolutePath())) {
+                icon = ICON_CACHE.get(file.getAbsolutePath());
+            } else {
+                icon = Utils.getThumbnailDrawableByFilename(file.getAbsolutePath(), FilePickerActivity.this);
+                ICON_CACHE.put(file.getAbsolutePath(), icon);
+            }
             if (convertView == null) {
                 return new KiiListItemView(FilePickerActivity.this,
                         file, KiiSyncClient.getInstance(),
-                        null,
+                        icon,
                         FilePickerActivity.this);
             } else {
                 KiiListItemView v = (KiiListItemView) convertView;
-                v.refreshWithNewFile(file, null);
+                v.refreshWithNewFile(file, icon);
                 return v;
             }
         }
 
     }
     private static HashMap<String, Drawable> ICON_CACHE = new HashMap<String, Drawable>();
-
-    private static Drawable getFileMainIcon(File file) {
-        return null;
-    }
 
     private class FileComparator implements Comparator<File> {
         @Override

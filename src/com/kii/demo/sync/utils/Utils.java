@@ -10,7 +10,11 @@ import java.nio.channels.FileChannel;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
@@ -252,5 +256,31 @@ public class Utils {
             service.setAction(command);
         }
         context.startService(service);
+    }
+
+    public static Drawable getThumbnailDrawableByFilename(String filename,
+            Context context) {
+        Drawable ret = null;
+        Cursor c = Images.Media.query(context.getContentResolver(),
+                Images.Media.EXTERNAL_CONTENT_URI,
+                new String[] { Images.Media._ID }, Images.Media.DATA + "=?",
+                new String[] { filename }, null);
+        try {
+            if (c != null && c.moveToFirst()) {
+                long id = c.getLong(0);
+                Bitmap b = Images.Thumbnails.getThumbnail(
+                        context.getContentResolver(), id,
+                        Images.Thumbnails.MICRO_KIND,
+                        new BitmapFactory.Options());
+                if (b != null) {
+                    ret = new BitmapDrawable(b);
+                }
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return ret;
     }
 }
