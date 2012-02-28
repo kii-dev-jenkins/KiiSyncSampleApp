@@ -14,20 +14,18 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.kii.cloud.sync.DownloadManager;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
-import com.kii.demo.sync.utils.Utils;
+import com.kii.demo.sync.utils.UiUtils;
 import com.kii.sync.KiiFile;
 
 public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
@@ -149,15 +147,17 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
 
     public View getChildView(int groupPosition, int childPosition,
             boolean isLastChild, View convertView, ViewGroup parent) {
-
-        View view = convertView;
-
-        if (view == null) {
-            view = mActivity.getLayoutInflater().inflate(R.layout.list_complex,
-                    parent, false);
-        }
         KiiFile file = (KiiFile) getChild(groupPosition, childPosition);
-        return getKiiFileView(file, view);
+        if (convertView == null) {
+            return new KiiListItemView(mActivity, file, kiiClient, mActivity
+                    .getResources().getDrawable(R.drawable.file),
+                    mOnClickListener);
+        } else {
+            KiiListItemView view = (KiiListItemView) convertView;
+            view.refreshWithNewKiiFile(file, mActivity.getResources()
+                    .getDrawable(R.drawable.file));
+            return view;
+        }
     }
 
     /**
@@ -175,9 +175,10 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             // disable the sync status
             ImageView statusIcon = (ImageView) view
                     .findViewById(R.id.list_sync_status_icon);
-            Utils.setSyncStatus(statusIcon, 0);
-            setOneLineText(new SpannableString(file.getBucketName()), view);
-            setIcon(R.drawable.icon_format_folder, view);
+            UiUtils.setSyncStatus(statusIcon, 0);
+            UiUtils.setOneLineText(new SpannableString(file.getBucketName()),
+                    view);
+            UiUtils.setIcon(R.drawable.icon_format_folder, view);
         } else {
             String category = file.getCategory();
             int status;
@@ -192,7 +193,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             }
             ImageView statusIcon = (ImageView) view
                     .findViewById(R.id.list_sync_status_icon);
-            Utils.setSyncStatus(statusIcon, status);
+            UiUtils.setSyncStatus(statusIcon, status);
             String title;
             String caption;
             String subCaption;
@@ -219,9 +220,11 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             // caption = file.getMimeType();
 
             // set the size
-            subCaption = Formatter.formatFileSize(mActivity, file.getSizeOnDB());
-            setTwoLinesText(new SpannableString(title), new SpannableString(
-                    caption), subCaption, R.drawable.icon_format_text, view);
+            subCaption = Formatter
+                    .formatFileSize(mActivity, file.getSizeOnDB());
+            UiUtils.setTwoLinesText(new SpannableString(title),
+                    new SpannableString(caption), subCaption,
+                    R.drawable.icon_format_text, view);
 
             String sThumbnail = null;
             Drawable icon = null;
@@ -260,15 +263,16 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             }
 
             if (icon != null) {
-                setIcon(icon, view);
+                UiUtils.setIcon(icon, view);
             } else {
                 if (mime != null) {
-                    setIcon(mime.getIconID(), view);
+                    UiUtils.setIcon(mime.getIconID(), view);
                 } else {
-                    setIcon(R.drawable.icon_format_unsupport, view);
+                    UiUtils.setIcon(R.drawable.icon_format_unsupport, view);
                 }
             }
-            ImageView ib = (ImageView) view.findViewById(R.id.list_complex_more_button);
+            ImageView ib = (ImageView) view
+                    .findViewById(R.id.list_complex_more_button);
             ib.setVisibility(View.VISIBLE);
             ib.setTag(view);
             if (!(mOnClickListener == null)) {
@@ -304,8 +308,9 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         // disable the view for more button
-        view.findViewById(R.id.list_complex_more_button).setVisibility(View.GONE);
-        
+        view.findViewById(R.id.list_complex_more_button).setVisibility(
+                View.GONE);
+
         KiiFileList group = (KiiFileList) getGroup(groupPosition);
 
         if (group.getParent() == null) {
@@ -313,19 +318,19 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             String title = group.getTitle();
             ImageView statusIcon = (ImageView) view
                     .findViewById(R.id.list_sync_status_icon);
-            Utils.setSyncStatus(statusIcon, 0);
-            setOneLineText(new SpannableString(title), view);
+            UiUtils.setSyncStatus(statusIcon, 0);
+            UiUtils.setOneLineText(new SpannableString(title), view);
 
             if (title.startsWith("Backup")) {
-                setIcon(R.drawable.icon_kiisync, view);
+                UiUtils.setIcon(R.drawable.icon_kiisync, view);
             } else if (title.startsWith("Error")) {
-                setIcon(R.drawable.icon_format_error, view);
+                UiUtils.setIcon(R.drawable.icon_format_error, view);
             } else if (title.startsWith("Trash")) {
-                setIcon(R.drawable.icon_format_trashcan, view);
+                UiUtils.setIcon(R.drawable.icon_format_trashcan, view);
             } else if (title.startsWith("Progress")) {
-                setIcon(R.drawable.icon_format_progress, view);
+                UiUtils.setIcon(R.drawable.icon_format_progress, view);
             } else {
-                setIcon(R.drawable.icon_format_folder, view);
+                UiUtils.setIcon(R.drawable.icon_format_folder, view);
             }
             view.setTag(null);
         } else {
@@ -335,9 +340,10 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                 // disable the sync status
                 ImageView statusIcon = (ImageView) view
                         .findViewById(R.id.list_sync_status_icon);
-                Utils.setSyncStatus(statusIcon, 0);
-                setOneLineText(new SpannableString(group.getTitle()), view);
-                setIcon(R.drawable.icon_others, view);
+                UiUtils.setSyncStatus(statusIcon, 0);
+                UiUtils.setOneLineText(new SpannableString(group.getTitle()),
+                        view);
+                UiUtils.setIcon(R.drawable.icon_others, view);
                 view.setTag(file);
             } else {
                 getKiiFileView(group.getParent(), view);
@@ -352,151 +358,6 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
 
     public boolean hasStableIds() {
         return true;
-    }
-
-    /**
-     * Default is 2 lines text, change to single line text
-     * 
-     * @param text
-     * @param curView
-     * @return
-     */
-    public View setOneLineText(String text, boolean alighCenter, View curView) {
-        TextView textView = (TextView) curView
-                .findViewById(R.id.list_complex_1line_title);
-        textView.setText(text);
-        if (alighCenter) {
-            textView.setGravity(Gravity.CENTER);
-        }
-        curView.findViewById(R.id.list_complex_1line_text).setVisibility(
-                View.VISIBLE);
-        curView.findViewById(R.id.list_complex_2lines_text).setVisibility(
-                View.GONE);
-        return curView;
-    }
-
-    public View setOneLineText(SpannableString title, View curView) {
-        TextView textView = (TextView) curView
-                .findViewById(R.id.list_complex_1line_title);
-        textView.setText(title);
-        curView.findViewById(R.id.list_complex_1line_text).setVisibility(
-                View.VISIBLE);
-        curView.findViewById(R.id.list_complex_2lines_text).setVisibility(
-                View.GONE);
-        return curView;
-    }
-
-    /**
-     * Set 2 lines text, title and caption
-     * 
-     * @param title
-     * @param caption
-     * @param curView
-     * @return
-     */
-    public View setTwoLinesText(SpannableString title, SpannableString caption,
-            View curView) {
-
-        TextView titleView = (TextView) curView
-                .findViewById(R.id.list_complex_title);
-        TextView captionView = (TextView) curView
-                .findViewById(R.id.list_complex_caption);
-        titleView.setText(title);
-
-        if (caption != null)
-            captionView.setText(caption);
-        else
-            captionView.setText("");
-
-        captionView
-                .setPadding(captionView.getPaddingLeft(),
-                        captionView.getPaddingTop(), 50,
-                        captionView.getPaddingBottom());
-
-        curView.findViewById(R.id.list_complex_1line_text).setVisibility(
-                View.GONE);
-        curView.findViewById(R.id.list_complex_2lines_text).setVisibility(
-                View.VISIBLE);
-        curView.findViewById(R.id.list_complex_sub_caption).setVisibility(
-                View.GONE);
-        return curView;
-    }
-
-    public View setTwoLinesText(SpannableString title, SpannableString caption,
-            String subCaption, int iconId, View curView) {
-        TextView titleView = (TextView) curView
-                .findViewById(R.id.list_complex_title);
-        TextView captionView = (TextView) curView
-                .findViewById(R.id.list_complex_caption);
-        titleView.setText(title);
-        if (caption != null)
-            captionView.setText(caption);
-        else
-            captionView.setText("");
-
-        // text on the bottom right
-        TextView subCaptionView = (TextView) curView
-                .findViewById(R.id.list_complex_sub_caption);
-
-        if (subCaption != null) {
-            subCaptionView.setText(subCaption);
-        } else {
-            subCaptionView.setText("");
-        }
-
-        curView.findViewById(R.id.list_complex_1line_text).setVisibility(
-                View.GONE);
-        curView.findViewById(R.id.list_complex_2lines_text).setVisibility(
-                View.VISIBLE);
-        curView.findViewById(R.id.list_complex_sub_caption).setVisibility(
-                View.VISIBLE);
-        return curView;
-    }
-
-    /**
-     * Set the icon
-     * 
-     * @param iconID
-     *            is -1, the imageView will be gone.
-     * @param curView
-     * @return curView
-     */
-    public View setIcon(int iconID, View curView) {
-        ImageView imageView = (ImageView) curView
-                .findViewById(R.id.list_complex_icon);
-        if (iconID < 0) {
-            imageView.setVisibility(View.GONE);
-        } else {
-            imageView.setImageResource(iconID);
-        }
-
-        return curView;
-    }
-
-    /**
-     * Set the icon
-     * 
-     * @param icon
-     *            if null, ignore
-     * @param curView
-     * @return curView
-     */
-    public View setIcon(Drawable icon, View curView) {
-        ImageView imageView = (ImageView) curView
-                .findViewById(R.id.list_complex_icon);
-
-        if (icon != null) {
-            imageView.setImageDrawable(icon);
-            curView.findViewById(R.id.list_complex_icon_main).setVisibility(
-                    View.VISIBLE);
-            imageView.setVisibility(View.VISIBLE);
-        } else {
-            imageView.setVisibility(View.GONE);
-            curView.findViewById(R.id.list_complex_icon_main).setVisibility(
-                    View.GONE);
-        }
-
-        return curView;
     }
 
 }

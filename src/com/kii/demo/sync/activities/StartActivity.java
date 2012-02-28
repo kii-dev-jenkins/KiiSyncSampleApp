@@ -26,6 +26,7 @@ import com.kii.demo.sync.tasks.ChangePwdTask;
 import com.kii.demo.sync.tasks.LoginTask;
 import com.kii.demo.sync.tasks.LogoutTask;
 import com.kii.demo.sync.tasks.RegisterTask;
+import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
@@ -412,7 +413,7 @@ public class StartActivity extends Activity {
         mStorage.setText("Storage Uasge is "
                 + Long.toString(kClient.getStorageUsage()) + "bytes");
 
-        mLastSyncTime.setText(Utils.getLastSyncTime(this));
+        mLastSyncTime.setText(UiUtils.getLastSyncTime(this));
         
         // print the server location and SDK version
         mServerSite.setText("Connect to Server:" + SyncPref.getServerSite()

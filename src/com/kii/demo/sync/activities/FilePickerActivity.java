@@ -24,7 +24,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -36,7 +35,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -44,7 +42,6 @@ import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.Utils;
-import com.kii.sync.KiiFile;
 
 public class FilePickerActivity extends ListActivity implements
         View.OnClickListener {
@@ -220,7 +217,8 @@ public class FilePickerActivity extends ListActivity implements
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-        File selectedFile = (File) getListView().getItemAtPosition(info.position);
+        File selectedFile = (File) getListView().getItemAtPosition(
+                info.position);
         if (selectedFile.exists()) {
             Log.v(TAG, "Selected File :" + selectedFile.getAbsolutePath());
             if (selectedFile.isDirectory()) {
@@ -241,7 +239,8 @@ public class FilePickerActivity extends ListActivity implements
     public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
                 .getMenuInfo();
-        File selectedFile = (File) getListView().getItemAtPosition(info.position);
+        File selectedFile = (File) getListView().getItemAtPosition(
+                info.position);
         final String filePath = selectedFile.getAbsolutePath();
         final KiiSyncClient client = KiiSyncClient.getInstance();
         if (client == null) {
@@ -313,115 +312,25 @@ public class FilePickerActivity extends ListActivity implements
         private List<File> mObjects;
 
         public FilePickerListAdapter(Context context, List<File> objects) {
-            super(context, R.layout.list_complex, android.R.id.text1,
-                    objects);
+            super(context, android.R.id.text1, objects);
             mObjects = objects;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
-            View row = null;
-
             if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) getContext()
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                row = inflater.inflate(R.layout.list_complex, parent,
-                        false);
+                return new KiiListItemView(FilePickerActivity.this,
+                        mObjects.get(position), KiiSyncClient.getInstance(),
+                        getResources().getDrawable(R.drawable.file),
+                        FilePickerActivity.this);
             } else {
-                row = convertView;
+                KiiListItemView v = (KiiListItemView) convertView;
+                v.refreshWithNewFile(mObjects.get(position), getResources()
+                        .getDrawable(R.drawable.file));
+                return v;
             }
-
-            File object = mObjects.get(position);
-
-            ImageView imageView = (ImageView) row
-                    .findViewById(R.id.list_complex_icon);
-            ImageView syncView = (ImageView) row
-                    .findViewById(R.id.list_sync_status_icon);
-            TextView textView = (TextView) row
-                    .findViewById(R.id.list_complex_1line_title);
-            // Set single line
-            textView.setSingleLine(true);
-            textView.setText(object.getName());
-            syncView.setVisibility(View.GONE);
-            row.findViewById(R.id.list_complex_1line_text).setVisibility(View.VISIBLE);
-            row.findViewById(R.id.list_complex_2lines_text).setVisibility(View.GONE);
-            row.setPadding(5, row.getPaddingTop(), row.getPaddingRight(), row.getPaddingBottom());
-
-            if (object.isFile()) {
-                // Show the file icon
-                imageView.setImageResource(R.drawable.file);
-                KiiSyncClient kiiClient = KiiSyncClient.getInstance();
-                if (kiiClient != null) {
-                    String path = object.getAbsolutePath();
-                    if (!TextUtils.isEmpty(path)) {
-                        int status = kiiClient.getStatusFromCache(path);
-                        if (status != 0) {
-                            setSyncStatus(syncView, status);
-                        }
-                    }
-                }
-            } else {
-                // Show the folder icon
-                imageView.setImageResource(R.drawable.folder);
-
-            }
-
-            ImageView ib = (ImageView) row.findViewById(R.id.list_complex_more_button);
-            ib.setVisibility(View.VISIBLE);
-            ib.setTag(row);
-            ib.setOnClickListener(FilePickerActivity.this);
-            return row;
         }
 
-    }
-
-    private void setSyncStatus(ImageView statusIcon, int status) {
-        switch (status) {
-            case 0:
-                // disable
-                return;
-            case 3:
-                // "Server Only";
-                statusIcon.setImageResource(R.drawable.sync_cloud);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-
-            case 1:
-                // "SYNCED";
-            case 4:
-                // "REQUEST_BODY";
-            case 5:
-                // "DOWNLOADING_BODY";
-                statusIcon.setImageResource(R.drawable.sync_sync);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case 6:
-                // "UPLOADING_BODY";
-            case 7:
-                // "SYNC_IN_QUEUE";
-            case 8:
-                // "SYNC_NOT_SYNCED";
-            case 10:
-                // "PREPARE_TO_SYNC";
-            case 2:
-                // "DELETE_REQUEST";
-            case 9:
-                // "SERVER_DELETE_REQUEST";
-                statusIcon.setImageResource(R.drawable.syncing);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_BODY_OUTDATED:
-                statusIcon.setImageResource(R.drawable.sync_outdated);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case -1:
-                // "UNKNOWN";
-            default:
-                statusIcon.setImageResource(R.drawable.syncing_error);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-        }
     }
 
     private class FileComparator implements Comparator<File> {

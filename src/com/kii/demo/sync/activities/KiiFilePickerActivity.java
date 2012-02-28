@@ -37,6 +37,7 @@ import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
+import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 import com.kii.sync.KiiNewEventListener;
@@ -435,11 +436,11 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 MimeInfo mime = MimeUtil.getInfoByKiiFile(kFile);
 
                 if (KiiSyncClient.getInstance().getStatus(kFile) != KiiFile.STATUS_NO_BODY) {
-                    intent = Utils.getLaunchFileIntent(kFile.getLocalPath(), mime);
+                    intent = UiUtils.getLaunchFileIntent(kFile.getLocalPath(), mime);
                 }
                 if (intent == null && kFile.getAvailableURL() != null) {
                     if (mime != null) {
-                        intent = Utils.getLaunchURLIntent(kFile.getAvailableURL(),
+                        intent = UiUtils.getLaunchURLIntent(kFile.getAvailableURL(),
                                 mime.getMimeType());
                     }
                 }
@@ -734,7 +735,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     private void setLastSyncTime() {
         if (mHeaderView != null) {
             TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
-            tv.setText(Utils.getLastSyncTime(this));
+            tv.setText(UiUtils.getLastSyncTime(this));
         }
     }
 

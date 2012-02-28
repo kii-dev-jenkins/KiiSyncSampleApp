@@ -6,28 +6,22 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.channels.FileChannel;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
-import com.kii.sync.SyncPref;
 import com.kii.sync.utils.FileUtils;
 import com.kii.sync.utils.ImageUtils;
 
@@ -258,85 +252,5 @@ public class Utils {
             service.setAction(command);
         }
         context.startService(service);
-    }
-
-    public static String getLastSyncTime(Context context) {
-        long backupTime = SyncPref.getLastSuccessfulSyncTime();
-        if (backupTime > 0) {
-            return String.format("Last successful sync is %s",
-                    (String) DateUtils.getRelativeTimeSpanString(backupTime,
-                            System.currentTimeMillis(),
-                            DateUtils.MINUTE_IN_MILLIS,
-                            DateUtils.FORMAT_ABBREV_RELATIVE
-                                    | DateUtils.FORMAT_ABBREV_ALL));
-        } else {
-            return context.getString(R.string.none);
-        }
-    }
-    
-    public static void setSyncStatus(ImageView statusIcon, int status) {
-        statusIcon.setVisibility(View.GONE);
-        switch (status) {
-            case 0:
-                // disable
-                return;
-            case KiiFile.STATUS_NO_BODY:
-                // "Server Only";
-                statusIcon.setImageResource(R.drawable.sync_cloud);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_SYNCED:
-            case KiiFile.STATUS_REQUEST_BODY:
-            case KiiFile.STATUS_DOWNLOADING_BODY:
-                statusIcon.setImageResource(R.drawable.sync_sync);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_PREPARE_TO_SYNC:
-            case KiiFile.STATUS_SYNC_IN_QUEUE:
-            case KiiFile.STATUS_UPLOADING_BODY:
-                statusIcon.setImageResource(R.drawable.syncing);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_BODY_OUTDATED:
-                statusIcon.setImageResource(R.drawable.sync_outdated);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_DELETE_REQUEST:
-            case KiiFile.STATUS_DELETE_REQUEST_INCLUDEBODY:
-            case KiiFile.STATUS_SERVER_DELETE_REQUEST:
-                statusIcon.setImageResource(R.drawable.sync_trashcan);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-            case KiiFile.STATUS_UNKNOWN:
-            default:
-                statusIcon.setImageResource(R.drawable.syncing_error);
-                statusIcon.setVisibility(View.VISIBLE);
-                break;
-        }
-    }
-    
-    public static Intent getLaunchFileIntent(String path, MimeInfo mime) {
-        if (TextUtils.isEmpty(path))
-            return null;
-        if (mime == null)
-            return null;
-        Intent commIntent = null;
-        Uri fileUri = Uri.fromFile(new File(path));
-        commIntent = new Intent(Intent.ACTION_VIEW);
-        commIntent.setDataAndType(fileUri, mime.getMimeType());
-        return commIntent;
-    }
-    
-    public static Intent getLaunchURLIntent(URL url, String mimeType) {
-        Intent commIntent = null;
-        commIntent = new Intent(Intent.ACTION_VIEW);
-        if (mimeType.startsWith("video")) {
-            commIntent.setDataAndType(Uri.parse(url.toString()), "video/*");
-        } else if (mimeType.startsWith("audio")) {
-            commIntent.setDataAndType(Uri.parse(url.toString()), mimeType);
-        } else {
-            commIntent.setData(Uri.parse(url.toString()));
-        }
-        return commIntent;
     }
 }
