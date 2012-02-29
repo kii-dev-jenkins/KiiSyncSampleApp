@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -381,7 +382,11 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     private void adpaterSetup() {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (mHeaderView == null)
-            mHeaderView = inflater.inflate(R.layout.cloud_header_view, null);
+            mHeaderView = inflater.inflate(R.layout.header_view, null);
+        Button b = (Button)mHeaderView.findViewById(R.id.button_left);
+        b.setText(getString(R.string.button_refresh));
+        b = (Button)mHeaderView.findViewById(R.id.button_right);
+        b.setText(getString(R.string.header_upload));
         getExpandableListView().addHeaderView(mHeaderView);
         setLastSyncTime();
         mAdapter = new KiiFileExpandableListAdapter(this, KiiSyncClient
@@ -714,11 +719,11 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         }
     }
 
-    public void handleRefresh(View v) {
+    public void handleButtonLeft(View v) {
         syncRefresh();
     }
 
-    public void handleUpload(View v) {
+    public void handleButtonRight(View v) {
         Intent i = new Intent(this, ProgressListActivity.class);
         this.startActivity(i);
 

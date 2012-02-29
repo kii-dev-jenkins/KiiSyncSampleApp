@@ -28,7 +28,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -50,7 +49,6 @@ import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
-import com.kii.sync.KiiFile;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
@@ -104,7 +102,11 @@ public class FilePickerActivity extends ListActivity implements
                 .inflate(R.layout.file_picker_empty_view, null);
         ((ViewGroup) getListView().getParent()).addView(emptyView);
         getListView().setEmptyView(emptyView);
-        mHeaderView = inflator.inflate(R.layout.home_header_view, null);
+        mHeaderView = inflator.inflate(R.layout.header_view, null);
+        Button b = (Button)mHeaderView.findViewById(R.id.button_left);
+        b.setText(getString(R.string.header_btn_home));
+        b = (Button)mHeaderView.findViewById(R.id.button_right);
+        b.setText(getString(R.string.header_btn_up));
         getListView().addHeaderView(mHeaderView);
         // Set initial directory
         mDirectory = new File(DEFAULT_INITIAL_DIRECTORY);
@@ -181,7 +183,7 @@ public class FilePickerActivity extends ListActivity implements
         }
         mAdapter.notifyDataSetChanged();
 
-        Button b = (Button) mHeaderView.findViewById(R.id.header_up_button);
+        Button b = (Button) mHeaderView.findViewById(R.id.button_right);
         if (isAtSdHome()) {
             // at SD card home, disable Up button
             b.setEnabled(false);
@@ -430,14 +432,14 @@ public class FilePickerActivity extends ListActivity implements
         }
     }
 
-    public void handleHome(View v) {
+    public void handleButtonLeft(View v) {
         mDirectory = Environment.getExternalStorageDirectory()
                 .getAbsoluteFile();
         refreshFilesList();
         return;
     }
 
-    public void handleUp(View v) {
+    public void handleButtonRight(View v) {
         if (!isAtSdHome()) {
             // Go to parent directory
             mDirectory = mDirectory.getParentFile();

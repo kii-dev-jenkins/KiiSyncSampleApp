@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
 import com.kii.cloud.sync.BackupService;
@@ -52,8 +54,13 @@ public class ProgressListActivity extends ExpandableListActivity implements
         mNewEventListener = new NewEventListener(this);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (mHeaderView == null) {
-            mHeaderView = inflater.inflate(R.layout.progress_header_view, null);
+            mHeaderView = inflater.inflate(R.layout.header_view, null);
         }
+        Button b = (Button)mHeaderView.findViewById(R.id.button_left);
+        b.setText(getString(R.string.pause));
+        b = (Button)mHeaderView.findViewById(R.id.button_right);
+        b.setText(getString(R.string.resume));
+        setHeaderText();
         getExpandableListView().addHeaderView(mHeaderView);
         connect();
         registerForContextMenu(getExpandableListView());
@@ -140,6 +147,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
 
         @Override
         public void onSyncComplete(SyncMsg msg) {
+            setHeaderText();
             if (msg != null) {
                 if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
                     Intent apiIntent = new Intent(context
@@ -347,14 +355,21 @@ public class ProgressListActivity extends ExpandableListActivity implements
         }
     }
     
-    public void handlePause(View v) {
+    public void handleButtonLeft(View v) {
         KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
         if (kiiClient != null) {
             kiiClient.suspend();
         }
     }
     
-    public void handleResume(View v) {
+    public void handleButtonRight(View v) {
         Utils.startSync(this, BackupService.ACTION_REFRESH);
+    }
+    
+    private void setHeaderText() {
+        if(mHeaderView != null) {
+            TextView tv = (TextView)mHeaderView.findViewById(R.id.header_text);
+            tv.setText(UiUtils.getLastSyncTime(this));
+        }
     }
 }
