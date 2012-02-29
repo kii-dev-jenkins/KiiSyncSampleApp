@@ -65,7 +65,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     final static int MENU_CANCEL = 6;
 
     NewEventListener mNewEventListener = null;
-    private boolean needDownload = false;
 
     KiiFileExpandableListAdapter mAdapter;
     View mHeaderView = null;
@@ -210,10 +209,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     if (mAdapter != null) {
                         mAdapter.notifyDataSetChanged();
                     }
-                    if (needDownload) {
-                        needDownload = false;
-                        doDownloadAll();
-                    }
                     break;
             }
 
@@ -240,14 +235,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
             case R.id.suspend:
                 syncStop();
                 break;
-            case R.id.setting:
-                setting();
-                break;
             case R.id.scan_change:
                 scanFileChange();
-                break;
-            case R.id.download_all:
-                prepareDownloadAll();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -307,37 +296,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         }).start();
     }
 
-    /*
-     * download all the files from cloud
-     */
-    private void prepareDownloadAll() {
-        needDownload = true;
-        syncRefresh();
-    }
-
-    private void doDownloadAll() {
-        Runnable r = new Runnable() {
-            public void run() {
-                KiiSyncClient client = KiiSyncClient.getInstance(mContext);
-                if (client != null) {
-                    KiiFile[] files = client.getBackupFiles();
-                    if (files != null) {
-                        for (KiiFile file : files) {
-                            int status = client.getStatus(file);
-                            if (!KiiSyncClient.isFileInTrash(file)
-                                    && (status == KiiFile.STATUS_BODY_OUTDATED || status == KiiFile.STATUS_NO_BODY)) {
-                                client.download(file, Utils.getKiiFileDest(
-                                        file, mContext));
-                            }
-                        }
-                        handler
-                                .sendEmptyMessage(KiiFilePickerActivity.PROGRESS_END);
-                    }
-                }
-            }
-        };
-        new Thread(r).start();
-    }
 
     /*
      * update the backup files which have changed must call scanFileChange
@@ -394,12 +352,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 this);
         setListAdapter(mAdapter);
         mNewEventListener.register();
-    }
-
-    private void setting() {
-        Intent intent = new Intent(this, StartActivity.class);
-        intent.setAction(Intent.ACTION_CONFIGURATION_CHANGED);
-        startActivity(intent);
     }
 
     @Override
