@@ -10,20 +10,32 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
+import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.DownloadManager;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
+import com.kii.demo.sync.utils.UiUtils;
+import com.kii.demo.sync.utils.Utils;
+import com.kii.sync.KiiFile;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
-public class ProgressListActivity extends ExpandableListActivity {
+public class ProgressListActivity extends ExpandableListActivity implements
+        View.OnClickListener {
     KiiFileExpandableListAdapter mAdapter = null;
     NewEventListener mNewEventListener = null;
+    private static final int MENU_ITEM_CANCEL = 2;
+    private View mHeaderView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,13 +44,19 @@ public class ProgressListActivity extends ExpandableListActivity {
         requestWindowFeature(Window.FEATURE_PROGRESS);
         // set the view when it is empty
         LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View emptyView = inflator
-                .inflate(R.layout.uploads_empty_view, null);
-        ((ViewGroup) this.getExpandableListView().getParent()).addView(emptyView);
+        View emptyView = inflator.inflate(R.layout.uploads_empty_view, null);
+        ((ViewGroup) this.getExpandableListView().getParent())
+                .addView(emptyView);
         getExpandableListView().setEmptyView(emptyView);
 
         mNewEventListener = new NewEventListener(this);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (mHeaderView == null) {
+            mHeaderView = inflater.inflate(R.layout.progress_header_view, null);
+        }
+        getExpandableListView().addHeaderView(mHeaderView);
         connect();
+        registerForContextMenu(getExpandableListView());
     }
 
     @Override
@@ -124,9 +142,8 @@ public class ProgressListActivity extends ExpandableListActivity {
         public void onSyncComplete(SyncMsg msg) {
             if (msg != null) {
                 if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
-                    Intent apiIntent = new Intent(
-                            context.getApplicationContext(),
-                            StartActivity.class);
+                    Intent apiIntent = new Intent(context
+                            .getApplicationContext(), StartActivity.class);
                     apiIntent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
                     context.startActivity(apiIntent);
                 } else if (msg.sync_result == SyncMsg.ERROR_PFS_BUSY) {
@@ -153,7 +170,7 @@ public class ProgressListActivity extends ExpandableListActivity {
         }
 
         public void onConnectComplete() {
-            
+
         }
 
     }
@@ -166,7 +183,7 @@ public class ProgressListActivity extends ExpandableListActivity {
             Log.d(TAG, "new Adapter");
             KiiSyncClient client = KiiSyncClient.getInstance(this);
             mAdapter = new KiiFileExpandableListAdapter(this, client,
-                    KiiFileExpandableListAdapter.TYPE_PROGRESS, null);
+                    KiiFileExpandableListAdapter.TYPE_PROGRESS, this);
             setListAdapter(mAdapter);
             mNewEventListener.register();
             if (client.getDownloadManager().getDownloadList().length > 0
@@ -236,7 +253,6 @@ public class ProgressListActivity extends ExpandableListActivity {
                     newMsg.copyFrom(msg);
                     handler.sendMessageDelayed(newMsg, 500);
                     break;
-
                 case PROGRESS_UPDATE:
                     mAdapter.notifyDataSetChanged();
                     break;
@@ -245,7 +261,6 @@ public class ProgressListActivity extends ExpandableListActivity {
                     handler.removeMessages(PROGRESS_AUTO);
                     handler.removeMessages(PROGRESS_CHECK);
                     handler.removeMessages(PROGRESS_END);
-
                     setProgressBarIndeterminateVisibility(false);
                     setProgressBarVisibility(false);
                     setTitle(R.string.app_name);
@@ -259,4 +274,87 @@ public class ProgressListActivity extends ExpandableListActivity {
         }
     };
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+        int type = ExpandableListView
+                .getPackedPositionType(info.packedPosition);
+        int group = ExpandableListView
+                .getPackedPositionGroup(info.packedPosition);
+        int child = ExpandableListView
+                .getPackedPositionChild(info.packedPosition);
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            KiiFile kFile = (KiiFile) mAdapter.getChild((int) group,
+                    (int) child);
+            if (kFile != null && kFile.isFile()) {
+                menu.setHeaderTitle(kFile.getTitle());
+                KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
+                if (kiiClient == null) {
+                    UiUtils.showToast(this, "Not ready.");
+                    return;
+                }
+                int status = kiiClient.getStatus(kFile);
+                Log.d(TAG, "onCreateContextMenu, status is "+status);
+                switch (status) {
+                    case KiiFile.STATUS_PREPARE_TO_SYNC:
+                    case KiiFile.STATUS_UPLOADING_BODY:
+                    case KiiFile.STATUS_DOWNLOADING_BODY:
+                    case KiiFile.STATUS_SYNC_IN_QUEUE:
+                        menu.add(MENU_ITEM_CANCEL, 0, 0,
+                                getString(R.string.cancel));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item
+                .getMenuInfo();
+        int type = ExpandableListView
+                .getPackedPositionType(info.packedPosition);
+        KiiSyncClient client = KiiSyncClient.getInstance(this);
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            int groupPos = ExpandableListView
+                    .getPackedPositionGroup(info.packedPosition);
+            int childPos = ExpandableListView
+                    .getPackedPositionChild(info.packedPosition);
+            final KiiFile kFile = (KiiFile) mAdapter.getChild((int) groupPos,
+                    (int) childPos);
+            if (kFile != null && kFile.isFile()) {
+                switch (item.getGroupId()) {
+                    case MENU_ITEM_CANCEL:
+                        client.cancel(kFile);
+                        break;
+                }
+            }
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.list_complex_more_button:
+                View row = (View) v.getTag();
+                getExpandableListView().showContextMenuForChild(row);
+                break;
+        }
+    }
+    
+    public void handlePause(View v) {
+        KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
+        if (kiiClient != null) {
+            kiiClient.suspend();
+        }
+    }
+    
+    public void handleResume(View v) {
+        Utils.startSync(this, BackupService.ACTION_REFRESH);
+    }
 }
