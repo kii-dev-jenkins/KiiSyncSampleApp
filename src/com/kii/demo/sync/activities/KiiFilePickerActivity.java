@@ -731,6 +731,13 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     public void handleRefresh(View v) {
         syncRefresh();
     }
+    
+    public void handleUpload(View v) {
+    	Intent i = new Intent(this,
+                ProgressListActivity.class);
+    	this.startActivity(i);
+    	
+    }
 
     private void setLastSyncTime() {
         if (mHeaderView != null) {

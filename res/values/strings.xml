@@ -54,6 +54,9 @@
     <string name="header_btn_home">Home</string>
     <string name="header_btn_up">Up</string>
     <string name="header_text_path">Path: </string>
+    <string name="header_upload">Dn/Uploads</string>
     <string name="none">None</string>
     <string name="button_refresh">Refresh</string>
+    <string name="msg_empty_upload_view">Completed all upload and download</string>
+    <string name="msg_empty_file_pciker_view">No files or directories</string>
 </resources>

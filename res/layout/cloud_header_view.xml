@@ -21,6 +21,14 @@
             android:layout_height="40dip"
         	android:onClick="handleRefresh"
         	android:text="@string/button_refresh" />
+        
+        <Button
+            android:id="@+id/header_upload_button"
+            android:layout_width="120dip"
+            android:layout_height="40dip"
+            android:gravity="center"
+            android:onClick="handleUpload"
+            android:text="@string/header_upload" />        
 
     </LinearLayout>
     

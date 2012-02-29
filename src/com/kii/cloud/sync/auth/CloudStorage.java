@@ -2,6 +2,8 @@ package com.kii.cloud.sync.auth;
 
 import java.io.IOException;
 
+import org.json.JSONException;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -28,14 +30,22 @@ public class CloudStorage implements Authentication{
 	static final String TAG = "CloudStorageAuthentication";
     
     static final String PROPERTY_COUNTRY = "country";
+    
+    static final String URL_PFS = "/app/sync/pfs";
+    static final String URL_RESOURCE = "/app/resource";
+    static final String URL_USERGRID = ":12110";
+    
+    final String mBaseURL;
     	
 	KiiClient mSyncClient = null;
 	AuthManager mUserMgr = null;
 	Context mContext;
 
-	public CloudStorage(Context context, KiiClient client){
+	public CloudStorage(Context context, KiiClient client, String baseURL){
 		mSyncClient = client;
 		mContext = context;
+		
+		mBaseURL = baseURL; 
 		
 		Bundle data = AppUtil.getAppInfo(context);
         String appId = data.getString(AppUtil.PREF_UM_APP_ID);
@@ -48,6 +58,7 @@ public class CloudStorage implements Authentication{
         }
 		
         EasyClient.start(context, appId, appKey);
+        EasyClient.getInstance().setBaseURL(baseURL+URL_USERGRID);
         mUserMgr = EasyClient.getUserManager();
 		
 	}
@@ -112,7 +123,7 @@ public class CloudStorage implements Authentication{
 			user.setEmail(email);
 			
 			if(!TextUtils.isEmpty(country)){
-				user.setStringProperty(PROPERTY_COUNTRY, country);
+				user.put(PROPERTY_COUNTRY, country);
 			}
 			if(!TextUtils.isEmpty(nickName)){
 				user.setName(nickName);
@@ -123,6 +134,9 @@ public class CloudStorage implements Authentication{
 		}catch(IllegalArgumentException e){
 			Log.e(TAG,"IllegalArgumentException:"+e.getMessage());
 			return SyncMsg.ERROR_INVALID_INPUT;
+		} catch (JSONException e) {
+			Log.e(TAG,"JSONException:"+e.getMessage());
+			return SyncMsg.ERROR_INVALID_INPUT;
 		}
 		
 		UserResult result;
@@ -132,6 +146,12 @@ public class CloudStorage implements Authentication{
 			return SyncMsg.ERROR_INVALID_INPUT;
 		} catch (IOException e) {
 			return SyncMsg.ERROR_IO;
+		} catch (IllegalArgumentException e) {
+			Log.e(TAG,"JSONException:"+e.getMessage());
+			return SyncMsg.ERROR_INVALID_INPUT;
+		} catch (JSONException e) {
+			Log.e(TAG,"JSONException:"+e.getMessage());
+			return SyncMsg.ERROR_INVALID_INPUT;
 		}
 		user = result.getKiiUser();
 		
@@ -161,13 +181,13 @@ public class CloudStorage implements Authentication{
 			KiiUMInfo info = new KiiUMInfo(mContext,
 					email, 
 					password,  
-					"http://dev-usergrid.kii.com/app/sync/pfs",
+					mBaseURL + URL_PFS,
 					accType,
 					email);
 			mSyncClient.setKiiUMInfo(info);
 			
-			SyncPref.setShareUrl("http://dev-usergrid.kii.com/app/resource");
-			SyncPref.setResourceUrl("http://dev-usergrid.kii.com/app/resource");
+			SyncPref.setShareUrl(mBaseURL + URL_RESOURCE);
+			SyncPref.setResourceUrl(mBaseURL + URL_RESOURCE);
 		}
 		return 0;
 	}

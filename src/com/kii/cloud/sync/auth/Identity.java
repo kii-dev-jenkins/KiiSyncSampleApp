@@ -12,13 +12,17 @@ public class Identity implements Authentication{
 	
 	private KiiClient mSyncManager = null;
 	
+	String URL_IDENTITY = "/app/identity/";
+	final String mBaseURL;
+	
 	/**
 	 * Create an instance of Authentication Manager based on Identity Server
 	 * @param syncManager reference to KiiClient
 	 */
-	public Identity(KiiClient syncManager, String URL){
+	public Identity(KiiClient syncManager, String baseURL){
 		mSyncManager = syncManager;
-		SyncPref.setIdentityUrl(URL);
+		mBaseURL = baseURL;
+		SyncPref.setIdentityUrl(baseURL+URL_IDENTITY);
 	}
 	
 	@Override

@@ -176,41 +176,7 @@ public class KiiFileListener implements KiiNewEventListener {
 
     @Override
     public void onLocalChangeSyncedEvent(Uri[] uris) {
-        // cleanUpTrashFile(uris);
         updateCache(false);
     }
 
-    // /**
-    // * Delete the temp file which are created when uploading the trash file
-    // * @param uris is an array of Uri to indicate the list of KiiFiles that
-    // have updated the status
-    // */
-    // void cleanUpTrashFile(Uri[] uris){
-    // if(uris!=null && uris.length!=0){
-    // for(int ct=0; ct<uris.length; ct++){
-    // // get KiiFile from given Uri
-    // KiiFile kFile = KiiFileUtil.createKiiFileFromUri(context, uris[ct]);
-    // if(kFile!=null){
-    // // check if the file is trash and local path must not be empty
-    // if(kFile.getCategory().compareTo(KiiSyncClient.CATEGORY_TRASH)==0 &&
-    // !TextUtils.isEmpty(kFile.getLocalPath())){
-    // // check if the file has already been synced successful
-    // if( kFile.getStatus() == KiiFile.STATUS_SYNCED ||
-    // kFile.getStatus() == KiiFile.STATUS_NO_BODY ){
-    // // get the file path
-    // File file = new File(kFile.getLocalPath());
-    // // check the file exist and isFile
-    // if(file!=null &&
-    // file.exists() &&
-    // file.isFile()){
-    // file.delete();
-    // Log.d(TAG,"Delete a local trash file:"+file.getAbsolutePath());
-    // }
-    // }
-    // }
-    // }
-    // }
-    // }
-    //
-    // }
 }

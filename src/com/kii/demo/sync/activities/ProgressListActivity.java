@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 
 import com.kii.cloud.sync.DownloadManager;
@@ -28,6 +31,13 @@ public class ProgressListActivity extends ExpandableListActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         requestWindowFeature(Window.FEATURE_PROGRESS);
+        // set the view when it is empty
+        LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View emptyView = inflator
+                .inflate(R.layout.uploads_empty_view, null);
+        ((ViewGroup) this.getExpandableListView().getParent()).addView(emptyView);
+        getExpandableListView().setEmptyView(emptyView);
+
         mNewEventListener = new NewEventListener(this);
         connect();
     }
