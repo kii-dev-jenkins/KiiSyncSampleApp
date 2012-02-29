@@ -221,6 +221,7 @@ public class FilePickerActivity extends ListActivity implements
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
         File selectedFile = (File) getListView().getItemAtPosition(
                 info.position);
+        menu.setHeaderTitle(selectedFile.getName());
         if (selectedFile.exists()) {
             Log.v(TAG, "Selected File :" + selectedFile.getAbsolutePath());
             if (selectedFile.isDirectory()) {
