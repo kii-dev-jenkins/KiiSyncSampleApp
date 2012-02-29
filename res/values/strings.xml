@@ -62,4 +62,6 @@
     <string name="cancel">Cancel</string>
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
+    <string name="scan_change">Scan</string>
+    <string name="settings">Settings</string>
 </resources>

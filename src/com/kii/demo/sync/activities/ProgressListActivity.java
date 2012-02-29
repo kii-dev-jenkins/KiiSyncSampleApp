@@ -12,6 +12,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,8 @@ public class ProgressListActivity extends ExpandableListActivity implements
     KiiFileExpandableListAdapter mAdapter = null;
     NewEventListener mNewEventListener = null;
     private static final int MENU_ITEM_CANCEL = 2;
+    
+    private static final int OPTION_MENU_SETTING = 0;
     private View mHeaderView = null;
 
     @Override
@@ -372,4 +375,24 @@ public class ProgressListActivity extends ExpandableListActivity implements
             tv.setText(UiUtils.getLastSyncTime(this));
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, OPTION_MENU_SETTING, 0, getString(R.string.settings));
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case OPTION_MENU_SETTING:
+                Intent intent = new Intent(this, StartActivity.class);
+                intent.setAction(Intent.ACTION_CONFIGURATION_CHANGED);
+                startActivity(intent);
+                break;
+        }
+        return true;
+    }
+    
+    
 }
