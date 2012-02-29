@@ -197,12 +197,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     KiiFileExpandableListAdapter.TYPE_PROGRESS, this);
             setListAdapter(mAdapter);
             mNewEventListener.register();
-            Log.d(TAG, "progress is "+client.getProgress());
-            if (client.getDownloadManager().getDownloadList().length > 0
-                    || client.getListInProgress().length > 0) {
-                handler.sendEmptyMessageDelayed(PROGRESS_START, 500);
-                handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 500);
-            }
+            handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 500);
         }
     }
 
@@ -217,7 +212,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
         KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
         if (kiiClient != null) {
             int progress = kiiClient.getProgress();
-            if (progress > 0) {
+            if (progress > 0 && progress!=SyncMsg.SYNC_NOT_RUNNING) {
                 setProgress(progress * 100);
                 mAdapter.notifyDataSetChanged();
                 return true;

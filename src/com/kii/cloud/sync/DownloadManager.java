@@ -104,7 +104,7 @@ public class DownloadManager {
      */
     private int download(KiiFile kiFile, String dest) {
         try {
-            downloadTotalSize = kiFile.getSize();
+            downloadTotalSize = kiFile.getSizeOnDB();
             downloadCurrentSize = 0;
             if (TextUtils.isEmpty(dest)) {
                 destPath = KiiSyncClient.getInstance(mContext).getDownloadFolder()
@@ -112,7 +112,7 @@ public class DownloadManager {
             } else {
                 destPath = dest;
             }
-            downloadKiiFile(new File(destPath), kiFile, false);
+            downloadKiiFile(new File(destPath), kiFile, true);
             destPath = null;
             return SyncMsg.OK;
         } catch (Exception ex) {
@@ -138,101 +138,164 @@ public class DownloadManager {
      *            - specifiy if overwrite the destination file.
      * @throws IOException
      */
-    private void downloadKiiFile(File destFile, KiiFile srcFile,
-            boolean overwrite) throws IOException {
+	private void downloadKiiFile(File destFile, KiiFile srcFile,
+			boolean overwrite) throws IOException {
 
-        boolean result = false;
+		boolean result = true;
+		InputStream input = null;
+		FileOutputStream fos = null;
+		BufferedOutputStream bos = null;
+		File tempDest = null;
 
-        if (mContext != null) {
-            Intent intent = new Intent();
-            intent.setAction(ACTION_DOWNLOAD_START);
-            intent.putExtra(DOWNLOAD_DEST_PATH, destFile.getAbsolutePath());
-            mContext.sendBroadcast(intent);
+		try {
 
-            Intent progressIntent = new Intent(mContext.getApplicationContext(),
-                    ProgressListActivity.class);
-            NotificationUtil.showDownloadProgressNotification(mContext
-                    .getApplicationContext(), progressIntent, destFile
-                    .getAbsolutePath());
+			// check for valid URL
+			String remotePath = srcFile.getRemotePath();
+			if (remotePath == null) {
+				Log.e(TAG, "remotePath is empty");
+				throw new IllegalArgumentException("HTTP download URL is empty");
+			}
 
-        }
+			// check if the destinated file exist
+			// if yes, check if overwrite permitted
+			if (destFile.exists()) {
+				if (!overwrite) {
+					throw new IllegalArgumentException("File already exist:"
+							+ destFile.getAbsolutePath());
+				}
+			}
 
-        String remotePath = srcFile.getRemotePath();
-        if (remotePath == null) {
-            Log.e(TAG, "remotePath is empty");
-            throw new IllegalArgumentException("remotePath is empty");
-        }
+			// check if the destinated folder exist
+			// if not, create the folder
+			File destFolder = destFile.getParentFile();
+			if (destFolder == null) {
+				throw new IllegalArgumentException(
+						"Cannot create folder for file: " + destFile);
+			}
+			if (!destFolder.exists()) {
+				destFolder.mkdirs();
+			}
 
-        Log.d(TAG, "URL:" + remotePath);
+			// send notification that download in progress
+			if (mContext != null) {
+				Intent intent = new Intent();
+				intent.setAction(ACTION_DOWNLOAD_START);
+				intent.putExtra(DOWNLOAD_DEST_PATH, destFile.getAbsolutePath());
+				mContext.sendBroadcast(intent);
 
-        if (destFile.exists()) {
-            if (!overwrite) {
-                throw new IOException("File already exist:"
-                        + destFile.getAbsolutePath());
-            }
-        }
+				Intent progressIntent = new Intent(
+						mContext.getApplicationContext(),
+						ProgressListActivity.class);
+				NotificationUtil.showDownloadProgressNotification(
+						mContext.getApplicationContext(), progressIntent,
+						destFile.getAbsolutePath());
 
-        File destFolder = destFile.getParentFile();
-        if (destFolder == null) {
-            throw new IOException("Cannot create folder for file: " + destFile);
-        }
-        if (!destFolder.exists()) {
-            destFolder.mkdirs();
-        }
+			}
 
-        // create a temp file for download the file
-        File tempDest = new File(destFile.getAbsoluteFile() + "."
-                + Long.toString(System.currentTimeMillis()));
+			// create a temp file for download the file
+			tempDest = new File(destFile.getAbsoluteFile()+"."+Long.toString(System.currentTimeMillis()));
+			HttpGet httpGet = new HttpGet(remotePath);
+			HttpClient client = new DefaultHttpClient();
+			HttpResponse response = client.execute(httpGet);
+			StatusLine statusLine = response.getStatusLine();
+			if (statusLine.getStatusCode() != 200) {
+				throw new IOException("Code: " + statusLine.getStatusCode()
+						+ "; Reason:" + statusLine.getReasonPhrase());
+			}
 
-        HttpGet httpGet = new HttpGet(remotePath);
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse response = client.execute(httpGet);
-        StatusLine statusLine = response.getStatusLine();
-        if (statusLine.getStatusCode() != 200) {
-            throw new IOException("Code: " + statusLine.getStatusCode()
-                    + "; Reason:" + statusLine.getReasonPhrase());
-        }
+			HttpEntity entity = response.getEntity();
+			if (entity == null) {
+				throw new IOException("Cannot read file content.");
+			}
 
-        HttpEntity entity = response.getEntity();
-        if (entity == null) {
-            throw new IOException("Cannot read file content.");
-        }
-        InputStream input = null;
-        FileOutputStream fos = null;
-        BufferedOutputStream bos = null;
-        try {
-            input = entity.getContent();
-            fos = new FileOutputStream(tempDest);
-            bos = new BufferedOutputStream(fos);
-            int len = -1;
-            byte[] buffer = new byte[1024];
-            while ((len = input.read(buffer)) > 0) {
-                bos.write(buffer, 0, len);
-                downloadCurrentSize += len;
-            }
-            result = true;
-            if (destFile.exists()) {
-                destFile.delete();
-            }
-            tempDest.renameTo(destFile);
-            tempDest.setLastModified(srcFile.lastModified());
-        } finally {
-            close(bos);
-            close(fos);
-            close(input);
-            if (mContext != null) {
-                Intent intent = new Intent();
-                intent.setAction(ACTION_DOWNLOAD_END);
-                intent.putExtra(DOWNLOAD_DEST_PATH, destFile.getAbsolutePath());
-                intent.putExtra(DOWNLOAD_RESULT, result);
-                mContext.sendBroadcast(intent);
-                NotificationUtil.cancelDownloadProgressNotification(mContext);
-                if (tempDest.exists()) {
-                    tempDest.delete();
-                }
-            }
-        }
-    }
+			input = entity.getContent();
+			fos = new FileOutputStream(tempDest);
+			bos = new BufferedOutputStream(fos);
+			int len = -1;
+			byte[] buffer = new byte[1024];
+			// download the file by batch
+			while ((len = input.read(buffer)) > 0) {
+				bos.write(buffer, 0, len);
+				downloadCurrentSize += len;
+			}
+
+			// closed all the IO
+			close(bos);	bos = null;
+			close(fos);	fos = null;
+			close(input); input = null;
+			
+			// delete the existing if it exist
+			if (destFile.exists()) {
+				destFile.delete();
+			}
+			if(tempDest.exists()){
+				Log.d(TAG, "Download file: s="+tempDest.length()+"; d="+tempDest.lastModified());
+				// rename the download file to it original file
+				if( !tempDest.renameTo(destFile)){
+					throw new IllegalArgumentException("Failed to rename:"
+							+ tempDest.getAbsolutePath());
+				}
+				// after rename, create a new file handler
+				tempDest = new File(destFile.getAbsolutePath());
+				// check if the file exists
+				if(tempDest.exists()){
+					if (tempDest.setLastModified(srcFile.lastModified()) == false) {
+						throw new IllegalArgumentException("Failed to restore:"
+								+ tempDest.getAbsolutePath());
+					}
+				}else{
+					throw new IllegalArgumentException("Failed to restore, file not exist after rename:"
+							+ tempDest.getAbsolutePath());
+				}
+			}else{
+				throw new IllegalArgumentException("Failed to restore, file not exist after dnload:"
+						+ tempDest.getAbsolutePath());
+			}
+			
+		} catch (IllegalArgumentException ex) {
+			if (mContext != null) {
+				Intent intent = new Intent();
+				intent.setAction(ACTION_DOWNLOAD_START);
+				intent.putExtra(DOWNLOAD_DEST_PATH, destFile.getAbsolutePath());
+				mContext.sendBroadcast(intent);
+
+				Intent progressIntent = new Intent(
+						mContext.getApplicationContext(),
+						ProgressListActivity.class);
+				NotificationUtil.showDownloadProgressNotification(
+						mContext.getApplicationContext(), progressIntent,
+						ex.getMessage());
+				result = false;
+			}
+			throw new IOException("IllegalArgumentException:" + ex.getMessage());
+
+		} finally {
+			if (bos != null)
+				close(bos);
+			if (fos != null)
+				close(fos);
+			if (input != null)
+				close(input);
+			if (mContext != null) {
+				Intent intent = new Intent();
+				intent.setAction(ACTION_DOWNLOAD_END);
+				intent.putExtra(DOWNLOAD_DEST_PATH, destFile.getAbsolutePath());
+				intent.putExtra(DOWNLOAD_RESULT, result);
+				mContext.sendBroadcast(intent);
+				// cancel the notification if no error
+				if (result) {
+					NotificationUtil
+							.cancelDownloadProgressNotification(mContext);
+				}else{
+					// delete the temp file if error exist
+					if (tempDest != null && tempDest.exists()) {
+						tempDest.delete();
+					}
+				}
+				KiiSyncClient.getInstance(mContext).notifyKiiFileLocalChange();
+			}
+		}
+	}
 
     private void close(Closeable closeable) {
         if (closeable != null) {

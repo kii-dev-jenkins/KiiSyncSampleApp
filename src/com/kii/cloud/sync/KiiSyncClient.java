@@ -775,7 +775,7 @@ public class KiiSyncClient {
      * @return true if the same otherwise false
      */
     public boolean bodySameAsLocal(KiiFile file) {
-        String localPath = file.getLocalPath();
+        String localPath = file.getResourceUrl();
         if (TextUtils.isEmpty(localPath)) {
             return false;
         }
@@ -785,7 +785,7 @@ public class KiiSyncClient {
         }
         long fileUpdated = localFile.lastModified();
         Log.v(TAG, "fileUpdated: " + fileUpdated);
-        long lastUpdated = file.getUpdateTime();
+        long lastUpdated = file.lastModified();
         if (lastUpdated == -1) {
             return false;
         }
@@ -865,6 +865,17 @@ public class KiiSyncClient {
      * @return
      */
     public int restoreFromTrash(KiiFile file) {
+    	
+    	 // application specific data
+        file.setAppData("File is restored from trash");
+        // reset the category as CATEGORY_NONE to indicate non trash
+        file.setCategory(CATEGORY_NONE);
+        int ret = update(file);
+    	
+        // return error code if error with move to trash
+        if(ret!=SyncMsg.OK)
+        	return ret;
+        
         try {
             // download a file
             download(file, file.getResourceUrl());
@@ -872,12 +883,7 @@ public class KiiSyncClient {
             Log.e(TAG, "restoreFromTrash download IOException", e);
             return SyncMsg.ERROR_IO;
         }
-        // application specific data
-        file.setAppData("File is restored from trash");
-        // reset the category as CATEGORY_NONE to indicate non trash
-        file.setCategory(CATEGORY_NONE);
-        int ret = update(file);
-        return ret;
+        return SyncMsg.OK;
     }
 
     /**
@@ -930,6 +936,13 @@ public class KiiSyncClient {
         }
         return false;
     }
+    
+    /**
+     * Notify local change via {@link KiiNewEventListener#onLocalChangeSyncedEvent(Uri[])} 
+     */
+    public void notifyKiiFileLocalChange(){
+    	mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
+    }
 
     /**
      * Upload all the files in a given folder, support recursive
@@ -948,7 +961,7 @@ public class KiiSyncClient {
             ret = upload(file.getAbsoluteFile());
         }
         if (ret == SyncMsg.OK) {
-            mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
+        	notifyKiiFileLocalChange();
         }
         return SyncMsg.OK;
     }
