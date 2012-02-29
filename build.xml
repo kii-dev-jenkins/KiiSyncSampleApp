@@ -3,12 +3,25 @@
     <!-- Add by Kii -->
     <property name="svn" value="svn" />
     <property file="${sign.properties}" />
-    <property name="kii.absolute.dir" location="release" />
+    <property name="kii.absolute.dir" location="." />
 
     <target name="package-src">
         <zip destfile="KiiSyncSampleApp.zip">
-            <zipfileset prefix="KiiSyncSampleApp" dir="." excludes="gen/, bin/,  demo.zip" />
+            <zipfileset prefix="KiiSyncSampleApp"
+                dir="."
+                excludes="gen/, bin/" />
         </zip>
+    </target>
+
+    <target name="clean-old">
+        <delete dir="bin" />
+        <delete dir="gen" />
+        <delete>
+            <fileset dir=".">
+                <include name="*.apk"/>
+                <include name="*.zip"/>
+            </fileset>
+        </delete>
     </target>
 
     <target name="svnrevert">
@@ -47,16 +60,11 @@
             replace="\1&quot;${svnversion}&quot;"
             byline="true"
             encoding="UTF-8" />
-        <replaceregexp file="AndroidManifest.xml"
-            match="^(.*)(Developing)(.*)"
-            replace="\1${channel}\3"
-            byline="true"
-            encoding="UTF-8" />
     </target>
-    <target name="kii-release" depends="clean, set-version-channel, release">
+    <target name="kii-release" depends="clean, clean-old, set-version-channel, package-src, release">
         <mkdir dir="${kii.absolute.dir}" />
         <property name="kii.release.file.name"
-            value="${ant.project.name}-${channel}-r${svnversion}.apk" />
+            value="${ant.project.name}-r${svnversion}.apk" />
         <property name="kii.release.file"
             location="${kii.absolute.dir}/${kii.release.file.name}" />
         <copy overwrite="true" file="${out.final.file}" tofile="${kii.release.file}" />
