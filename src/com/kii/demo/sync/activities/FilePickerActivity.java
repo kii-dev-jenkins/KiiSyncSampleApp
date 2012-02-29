@@ -24,26 +24,29 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.Utils;
+import com.kii.sync.KiiNewEventListener;
+import com.kii.sync.SyncMsg;
 
 public class FilePickerActivity extends ListActivity implements
         View.OnClickListener {
@@ -83,6 +86,7 @@ public class FilePickerActivity extends ListActivity implements
     protected String[] acceptedFileExtensions;
     View mHeaderView;
     private Context mContext;
+    private NewEventListener mListener = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +129,8 @@ public class FilePickerActivity extends ListActivity implements
                     .toArray(new String[collection.size()]);
         }
         mContext = this;
-
+        mListener = new NewEventListener(mContext);
+        mListener.register();
     }
 
     @Override
@@ -136,6 +141,9 @@ public class FilePickerActivity extends ListActivity implements
 
     @Override
     protected void onDestroy() {
+        if(mListener != null) {
+            mListener.unregister();
+        }
         super.onDestroy();
     }
 
@@ -325,16 +333,16 @@ public class FilePickerActivity extends ListActivity implements
         public View getView(int position, View convertView, ViewGroup parent) {
             File file = mObjects.get(position);
             Drawable icon = null;
-            if(ICON_CACHE.containsKey(file.getAbsolutePath())) {
+            if (ICON_CACHE.containsKey(file.getAbsolutePath())) {
                 icon = ICON_CACHE.get(file.getAbsolutePath());
             } else {
-                icon = Utils.getThumbnailDrawableByFilename(file.getAbsolutePath(), FilePickerActivity.this);
+                icon = Utils.getThumbnailDrawableByFilename(file
+                        .getAbsolutePath(), FilePickerActivity.this);
                 ICON_CACHE.put(file.getAbsolutePath(), icon);
             }
             if (convertView == null) {
-                return new KiiListItemView(FilePickerActivity.this,
-                        file, KiiSyncClient.getInstance(mContext),
-                        icon,
+                return new KiiListItemView(FilePickerActivity.this, file,
+                        KiiSyncClient.getInstance(mContext), icon,
                         FilePickerActivity.this);
             } else {
                 KiiListItemView v = (KiiListItemView) convertView;
@@ -344,6 +352,7 @@ public class FilePickerActivity extends ListActivity implements
         }
 
     }
+
     private static HashMap<String, Drawable> ICON_CACHE = new HashMap<String, Drawable>();
 
     private class FileComparator implements Comparator<File> {
@@ -418,6 +427,68 @@ public class FilePickerActivity extends ListActivity implements
             refreshFilesList();
             return;
         }
+    }
+
+    public class NewEventListener implements KiiNewEventListener {
+
+        final static String TAG = "FilePickerNewEventListener";
+
+        KiiSyncClient client = null;
+        long id = 0;
+
+        public NewEventListener(Context context) {
+            id = System.currentTimeMillis();
+        }
+
+        public boolean register() {
+            client = KiiSyncClient.getInstance(mContext);
+            if (client == null) {
+                throw new NullPointerException();
+            }
+            return client.registerNewEventListener(id, this);
+        }
+
+        public void unregister() {
+            if (id != 0) {
+                client.unregisterNewEventListener(id);
+            }
+        }
+
+        @Override
+        public void onNewSyncDeleteEvent(Uri[] arg0) {
+        }
+
+        @Override
+        public void onNewSyncInsertEvent(Uri[] arg0) {
+        }
+
+        @Override
+        public void onNewSyncUpdateEvent(Uri[] arg0) {
+        }
+
+        @Override
+        public void onSyncComplete(SyncMsg msg) {
+            if (mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void onSyncStart(String syncMode) {
+        }
+
+        @Override
+        public void onQuotaExceeded(Uri arg0) {
+        }
+
+        @Override
+        public void onLocalChangeSyncedEvent(Uri[] uris) {
+        }
+
+        public void onConnectComplete() {
+
+        }
+
     }
 
 }
