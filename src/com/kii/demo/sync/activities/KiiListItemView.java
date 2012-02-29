@@ -164,6 +164,8 @@ public class KiiListItemView extends LinearLayout {
                 .findViewById(R.id.list_complex_more_button);
         if (type == TYPE_FILE) {
             ib.setVisibility(View.VISIBLE);
+            View padding_view = v.findViewById(R.id.padding_view);
+            padding_view.setVisibility(View.GONE);
         }
         ib.setTag(v);
         if (!(mOnClickListener == null)) {
