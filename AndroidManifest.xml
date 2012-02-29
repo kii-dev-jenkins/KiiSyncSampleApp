@@ -64,6 +64,6 @@
 				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
 			</intent-filter>
 		</receiver>
-		<activity android:name="com.kii.demo.sync.activities.ProgressListActivity" android:screenOrientation="portrait"></activity>
+		<activity android:name="com.kii.demo.sync.activities.ProgressListActivity" android:screenOrientation="portrait" android:launchMode="singleInstance"></activity>
     </application>
 </manifest>

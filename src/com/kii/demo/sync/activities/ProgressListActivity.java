@@ -67,9 +67,9 @@ public class ProgressListActivity extends ExpandableListActivity implements
     }
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         // TODO Auto-generated method stub
-        super.onStop();
+        super.onDestroy();
         if (mReceiver != null) {
             unregisterReceiver(mReceiver);
         }
