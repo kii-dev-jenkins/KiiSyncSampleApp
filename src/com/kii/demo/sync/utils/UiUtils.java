@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kii.demo.sync.R;
 import com.kii.sync.KiiFile;
@@ -236,6 +237,10 @@ public class UiUtils {
         }
     
         return curView;
+    }
+
+    public static void showToast(Context context, String msg) {
+        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
     }
 
 }

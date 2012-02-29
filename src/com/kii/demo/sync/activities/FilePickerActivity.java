@@ -23,10 +23,12 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -44,7 +46,11 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
+import com.kii.demo.sync.utils.MimeInfo;
+import com.kii.demo.sync.utils.MimeUtil;
+import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
+import com.kii.sync.KiiFile;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
@@ -141,7 +147,7 @@ public class FilePickerActivity extends ListActivity implements
 
     @Override
     protected void onDestroy() {
-        if(mListener != null) {
+        if (mListener != null) {
             mListener.unregister();
         }
         super.onDestroy();
@@ -209,12 +215,23 @@ public class FilePickerActivity extends ListActivity implements
     protected void onListItemClick(ListView l, View v, int position, long id) {
         File newFile = (File) l.getItemAtPosition(position);
         if (newFile.isFile()) {
-            // Set result
-            // Intent extra = new Intent();
-            // extra.putExtra(EXTRA_FILE_PATH, newFile.getAbsolutePath());
-            // setResult(RESULT_OK, extra);
-            // // Finish the activity
-            // finish();
+            Intent intent = null;
+            MimeInfo mime = MimeUtil.getInfoByFileName(newFile
+                    .getAbsolutePath());
+
+            intent = UiUtils.getLaunchFileIntent(newFile.getAbsolutePath(),
+                    mime);
+            if (intent == null) {
+                UiUtils.showToast(this, "Failed to launch the file - " + newFile.getName());
+            } else {
+                try {
+                    startActivity(intent);
+                } catch (Exception ex) {
+                    UiUtils.showToast(this, "Encounter error when launch file ("
+                            + newFile.getName() + "). Error(" + ex.getMessage()
+                            + ")");
+                }
+            }
         } else {
             mDirectory = newFile;
             // Update the files list
@@ -223,7 +240,7 @@ public class FilePickerActivity extends ListActivity implements
 
         super.onListItemClick(l, v, position, id);
     }
-
+    
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
             ContextMenuInfo menuInfo) {

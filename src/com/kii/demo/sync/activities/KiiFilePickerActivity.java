@@ -81,18 +81,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         registerForContextMenu(getExpandableListView());
     }
 
-    void showToast(String title, int errorCode) {
-        showToast(title, Utils.getErrorMsg(errorCode, this));
-    }
-
-    void showToast(String title, CharSequence msg) {
-        showToast(title + ":" + msg);
-    }
-
-    void showToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-    }
-
     private void updateScanDialog() {
         if (scanDialog == null) {
             scanDialog = ProgressDialog.show(this, "",
@@ -205,7 +193,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                         if (!scanChange.isEmpty()) {
                             showDialog(DIALOG_UPDATE);
                         } else {
-                            showToast("No update is found.");
+                            UiUtils.showToast(mContext, "No update is found.");
                         }
                     }
                     break;
@@ -337,8 +325,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                             int status = client.getStatus(file);
                             if (!KiiSyncClient.isFileInTrash(file)
                                     && (status == KiiFile.STATUS_BODY_OUTDATED || status == KiiFile.STATUS_NO_BODY)) {
-                                client.download(file, Utils
-                                        .getKiiFileDest(file, mContext));
+                                client.download(file, Utils.getKiiFileDest(
+                                        file, mContext));
                             }
                         }
                         handler
@@ -397,7 +385,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         getExpandableListView().addHeaderView(mHeaderView);
         setLastSyncTime();
         mAdapter = new KiiFileExpandableListAdapter(this, KiiSyncClient
-                .getInstance(mContext), KiiFileExpandableListAdapter.TYPE_DATA, this);
+                .getInstance(mContext), KiiFileExpandableListAdapter.TYPE_DATA,
+                this);
         setListAdapter(mAdapter);
         mNewEventListener.register();
     }
@@ -414,7 +403,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         if (true) {
             KiiFile kFile = (KiiFile) mAdapter.getChild(groupPosition,
                     childPosition);
-            Log.d(TAG, "onChildClick: kFile is "+kFile.getTitle());
+            Log.d(TAG, "onChildClick: kFile is " + kFile.getTitle());
             if (kFile.isFile()) {
 
                 String category = kFile.getCategory();
@@ -424,7 +413,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 if (!TextUtils.isEmpty(category)
                         && KiiSyncClient.CATEGORY_TRASH
                                 .equalsIgnoreCase(category)) {
-                    showToast("Please restore before view!");
+                    UiUtils.showToast(mContext, "Please restore before view!");
                     return true;
                 }
 
@@ -443,18 +432,20 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 }
 
                 if (intent == null) {
-                    showToast("Failed to launch the file - " + kFile.getTitle());
+                    UiUtils.showToast(mContext, "Failed to launch the file - "
+                            + kFile.getTitle());
                 } else {
                     try {
                         startActivity(intent);
                     } catch (Exception ex) {
-                        showToast("Encounter error when launch file ("
-                                + kFile.getTitle() + "). Error("
-                                + ex.getMessage() + ")");
+                        UiUtils.showToast(mContext,
+                                "Encounter error when launch file ("
+                                        + kFile.getTitle() + "). Error("
+                                        + ex.getMessage() + ")");
                     }
                 }
             } else {
-                showToast("Failed to launch the viewer for " + kFile.getTitle());
+                UiUtils.showToast(mContext, "Failed to launch the viewer for " + kFile.getTitle());
             }
         }
         return super.onChildClick(parent, v, groupPosition, childPosition, id);
@@ -482,7 +473,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
 
                 if (kiiClient == null) {
-                    showToast("Not ready.");
+                    UiUtils.showToast(mContext, "Not ready.");
                     return;
                 }
 
@@ -492,7 +483,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     case KiiFile.STATUS_DELETE_REQUEST:
                     case KiiFile.STATUS_DELETE_REQUEST_INCLUDEBODY:
                     case KiiFile.STATUS_SERVER_DELETE_REQUEST:
-                        showToast("No option for deleted file.");
+                        UiUtils.showToast(mContext, "No option for deleted file.");
                         break;
                     case KiiFile.STATUS_PREPARE_TO_SYNC:
                     case KiiFile.STATUS_UPLOADING_BODY:
@@ -526,7 +517,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                         break;
                 }
             } else {
-                showToast("No menu for directory.");
+                UiUtils.showToast(mContext, "No menu for directory.");
             }
         }
     }
@@ -550,7 +541,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
             final KiiFile kFile = (KiiFile) mAdapter.getChild((int) groupPos,
                     (int) childPos);
             if (kFile != null && kFile.isFile()) {
-                final KiiSyncClient client = KiiSyncClient.getInstance(mContext);
+                final KiiSyncClient client = KiiSyncClient
+                        .getInstance(mContext);
                 if (client == null) {
                     Log.d(TAG, "get KiiRefClient failed, return!");
                     return true;
@@ -707,7 +699,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         }
 
         public void onConnectComplete() {
-            
+
         }
 
     }
