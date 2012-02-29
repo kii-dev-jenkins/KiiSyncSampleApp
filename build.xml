@@ -6,7 +6,7 @@
     <property name="kii.absolute.dir" location="." />
 
     <target name="package-src">
-        <zip destfile="KiiSyncSampleApp.zip">
+        <zip destfile="KiiSyncSampleApp-src-r${svnversion}.zip">
             <zipfileset prefix="KiiSyncSampleApp"
                 dir="."
                 excludes="gen/, bin/" />
