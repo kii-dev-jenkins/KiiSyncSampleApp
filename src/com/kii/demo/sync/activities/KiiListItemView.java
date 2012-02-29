@@ -76,39 +76,6 @@ public class KiiListItemView extends LinearLayout {
                 LayoutParams.WRAP_CONTENT));
     }
     
-//    public KiiListItemView(Context context, String title) {
-//        super(context);
-//        mContext = context;
-//        mInflater = (LayoutInflater) mContext
-//                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        v = mInflater.inflate(R.layout.list_complex, this, false);
-//        refreshViewWithData(title);
-//        v.setTag(null);
-//        addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
-//                LayoutParams.WRAP_CONTENT));
-//    }
-//
-//    public void refreshViewWithData(String title) {
-//        ImageView statusIcon = (ImageView) v
-//                .findViewById(R.id.list_sync_status_icon);
-//        UiUtils.setSyncStatus(statusIcon, 0);
-//        int drawableId = R.drawable.icon_format_folder;
-//        if (!TextUtils.isEmpty(title)) {
-//            if (title.startsWith("Backup")) {
-//                drawableId = R.drawable.icon_kiisync;
-//            } else if (title.startsWith("Error")) {
-//                drawableId = R.drawable.icon_format_error;
-//            } else if (title.startsWith("Trash")) {
-//                drawableId = R.drawable.icon_format_trashcan;
-//            } else if (title.startsWith("Progress")) {
-//                drawableId = R.drawable.icon_format_progress;
-//            }
-//            UiUtils.setOneLineText(new SpannableString(title), v);
-//        }
-//        this.mainIcon = mContext.getResources().getDrawable(drawableId);
-//        UiUtils.setIcon(mainIcon, v);
-//        type = TYPE_GROUP;
-//    }
 
     public void refreshWithNewFile(File file, Drawable mainIcon) {
         this.mainIcon = mainIcon;
@@ -122,7 +89,7 @@ public class KiiListItemView extends LinearLayout {
         if(file==null)
             return;
         this.mainIcon = mainIcon;
-        type = TYPE_FILE;
+        type = TYPE_KII_FILE;
         getDataFromKiiFile(file);
         bindView();
         v.setTag(file);
