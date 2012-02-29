@@ -31,6 +31,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +82,9 @@ public class FilePickerActivity extends ListActivity implements
     private final static int MENU_UPLOAD_FILE = 2;
     private final static int MENU_UPLOAD_FOLDER = 3;
     private final static int MENU_MOVE_TO_TRASH = 4;
+    
+    private final static int OPTIONS_MENU_SCAN_CHANGE = 0;
+    private final static int OPTIONS_MENU_RESUME_UPLOAD = 1;
     private static final String TAG = "FilePickerActivity";
 
     protected File mDirectory;
@@ -140,6 +144,28 @@ public class FilePickerActivity extends ListActivity implements
         mListener = new NewEventListener(mContext);
         mListener.register();
     }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        menu.add(0, OPTIONS_MENU_RESUME_UPLOAD, 0, R.string.resume);
+//        menu.add(0, OPTIONS_MENU_SCAN_CHANGE, 1, R.string.scan_change);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch(item.getItemId()) {
+//            case OPTIONS_MENU_SCAN_CHANGE:
+//                
+//                break;
+//            case OPTIONS_MENU_RESUME_UPLOAD:
+//                Utils.startSync(this, BackupService.ACTION_REFRESH);
+//                break;
+//            default:
+//                break;
+//        }
+//        return true;
+//    }
 
     @Override
     protected void onResume() {

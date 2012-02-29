@@ -56,9 +56,9 @@ public class ProgressListActivity extends ExpandableListActivity implements
         if (mHeaderView == null) {
             mHeaderView = inflater.inflate(R.layout.header_view, null);
         }
-        Button b = (Button)mHeaderView.findViewById(R.id.button_left);
+        Button b = (Button) mHeaderView.findViewById(R.id.button_left);
         b.setText(getString(R.string.pause));
-        b = (Button)mHeaderView.findViewById(R.id.button_right);
+        b = (Button) mHeaderView.findViewById(R.id.button_right);
         b.setText(getString(R.string.resume));
         setHeaderText();
         getExpandableListView().addHeaderView(mHeaderView);
@@ -147,7 +147,6 @@ public class ProgressListActivity extends ExpandableListActivity implements
 
         @Override
         public void onSyncComplete(SyncMsg msg) {
-            setHeaderText();
             if (msg != null) {
                 if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
                     Intent apiIntent = new Intent(context
@@ -159,6 +158,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                 }
             }
             handler.sendEmptyMessageDelayed(PROGRESS_END, 500);
+            setHeaderText();
         }
 
         @Override
@@ -194,6 +194,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     KiiFileExpandableListAdapter.TYPE_PROGRESS, this);
             setListAdapter(mAdapter);
             mNewEventListener.register();
+            Log.d(TAG, "progress is "+client.getProgress());
             if (client.getDownloadManager().getDownloadList().length > 0
                     || client.getListInProgress().length > 0) {
                 handler.sendEmptyMessageDelayed(PROGRESS_START, 500);
@@ -275,7 +276,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     if (mAdapter != null) {
                         mAdapter.notifyDataSetChanged();
                     }
-                    finish();
+                    //finish();
                     return;
             }
 
@@ -304,7 +305,6 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     return;
                 }
                 int status = kiiClient.getStatus(kFile);
-                Log.d(TAG, "onCreateContextMenu, status is "+status);
                 switch (status) {
                     case KiiFile.STATUS_PREPARE_TO_SYNC:
                     case KiiFile.STATUS_UPLOADING_BODY:
@@ -354,21 +354,21 @@ public class ProgressListActivity extends ExpandableListActivity implements
                 break;
         }
     }
-    
+
     public void handleButtonLeft(View v) {
         KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
         if (kiiClient != null) {
             kiiClient.suspend();
         }
     }
-    
+
     public void handleButtonRight(View v) {
         Utils.startSync(this, BackupService.ACTION_REFRESH);
     }
-    
+
     private void setHeaderText() {
-        if(mHeaderView != null) {
-            TextView tv = (TextView)mHeaderView.findViewById(R.id.header_text);
+        if (mHeaderView != null) {
+            TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
             tv.setText(UiUtils.getLastSyncTime(this));
         }
     }
