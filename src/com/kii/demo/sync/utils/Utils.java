@@ -37,14 +37,16 @@ public class Utils {
      * Convert the status code to human reading language
      * 
      * @param kFile
+     * @param context
+     *            TODO
      * @return String
      */
-    static public String getStatus(KiiFile kFile) {
+    static public String getStatus(KiiFile kFile, Context context) {
         if (kFile == null)
             return "NULL";
         if (kFile.isDirectory())
             return "folder";
-        switch (KiiSyncClient.getInstance().getStatus(kFile)) {
+        switch (KiiSyncClient.getInstance(context).getStatus(kFile)) {
             case KiiFile.STATUS_UNKNOWN:
                 return "UNKNOWN";
             case KiiFile.STATUS_SYNCED:
@@ -69,7 +71,8 @@ public class Utils {
                 return "OUT DATED";
 
             default:
-                return "?(" + KiiSyncClient.getInstance().getStatus(kFile)
+                return "?("
+                        + KiiSyncClient.getInstance(context).getStatus(kFile)
                         + ")";
         }
     }
@@ -135,8 +138,8 @@ public class Utils {
             case SyncMsg.ERROR_FILE_NULL:
                 return context.getString(R.string.msg_ERROR_UPLOAD_FILES);
             default:
-                return String.format(
-                        context.getString(R.string.msg_ERROR_OTHERS), code);
+                return String.format(context
+                        .getString(R.string.msg_ERROR_OTHERS), code);
         }
     }
 
@@ -195,7 +198,9 @@ public class Utils {
             File dest = new File(destPath);
             if (!dest.getParentFile().exists()) {
                 if (dest.getParentFile().mkdirs() == false) {
-                    Log.e(TAG, "Create folder failed:" + dest.getAbsolutePath());
+                    Log
+                            .e(TAG, "Create folder failed:"
+                                    + dest.getAbsolutePath());
                     return null;
                 }
             }
@@ -224,16 +229,19 @@ public class Utils {
                 }
             }
         } catch (Exception ex) {
-            Log.e(TAG, "generateThumbnailForImage Exception:" + ex.getMessage());
+            Log
+                    .e(TAG, "generateThumbnailForImage Exception:"
+                            + ex.getMessage());
             return null;
         }
         return null;
     }
 
-    public static String getKiiFileDest(KiiFile file) {
+    public static String getKiiFileDest(KiiFile file, Context context) {
         String title = file.getTitle();
-        String dest = KiiSyncClient.getInstance().getDownloadFolder() + "/"
-                + title;
+        String downloadFolder = KiiSyncClient.getInstance(context)
+                .getDownloadFolder();
+        String dest = downloadFolder + "/" + title;
         File f = new File(dest);
         if (f.exists()) {
             int sufpos = title.lastIndexOf(".");
@@ -244,8 +252,7 @@ public class Utils {
                 title = title.substring(0, sufpos) + "-" + time
                         + title.substring(sufpos);
             }
-            dest = KiiSyncClient.getInstance().getDownloadFolder() + "/"
-                    + title;
+            dest = downloadFolder + "/" + title;
         }
         return dest;
     }
@@ -268,8 +275,8 @@ public class Utils {
         try {
             if (c != null && c.moveToFirst()) {
                 long id = c.getLong(0);
-                Bitmap b = Images.Thumbnails.getThumbnail(
-                        context.getContentResolver(), id,
+                Bitmap b = Images.Thumbnails.getThumbnail(context
+                        .getContentResolver(), id,
                         Images.Thumbnails.MICRO_KIND,
                         new BitmapFactory.Options());
                 if (b != null) {

@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 
 import com.kii.cloud.sync.DownloadManager;
-import com.kii.cloud.sync.KiiClientTask;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.sync.KiiNewEventListener;
@@ -62,13 +61,7 @@ public class ProgressListActivity extends ExpandableListActivity {
                 DownloadManager.ACTION_DOWNLOAD_END));
         registerReceiver(mReceiver, new IntentFilter(
                 DownloadManager.ACTION_DOWNLOAD_START));
-        if (KiiSyncClient.getInstance() == null) {
-            KiiClientTask task = new KiiClientTask(getApplicationContext(),
-                    "Connect", KiiClientTask.SYNC_CONNECT, mNewEventListener);
-            task.execute();
-        } else {
-            adpterSetup();
-        }
+        adpterSetup();
     }
 
     class Receiver extends BroadcastReceiver {
@@ -99,7 +92,7 @@ public class ProgressListActivity extends ExpandableListActivity {
         }
 
         public boolean register() {
-            client = KiiSyncClient.getInstance();
+            client = KiiSyncClient.getInstance(context);
             if (client == null) {
                 throw new NullPointerException();
             }
@@ -160,7 +153,7 @@ public class ProgressListActivity extends ExpandableListActivity {
         }
 
         public void onConnectComplete() {
-            adpterSetup();
+            
         }
 
     }
@@ -171,7 +164,7 @@ public class ProgressListActivity extends ExpandableListActivity {
         Log.d(TAG, "adapterSetup");
         if (mAdapter == null) {
             Log.d(TAG, "new Adapter");
-            KiiSyncClient client = KiiSyncClient.getInstance();
+            KiiSyncClient client = KiiSyncClient.getInstance(this);
             mAdapter = new KiiFileExpandableListAdapter(this, client,
                     KiiFileExpandableListAdapter.TYPE_PROGRESS, null);
             setListAdapter(mAdapter);
@@ -192,7 +185,7 @@ public class ProgressListActivity extends ExpandableListActivity {
     public final static int PROGRESS_UPDATE = 6;
 
     private boolean updateProgress() {
-        KiiSyncClient kiiClient = KiiSyncClient.getInstance();
+        KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
         if (kiiClient != null) {
             int progress = kiiClient.getProgress();
             if (progress > 0) {

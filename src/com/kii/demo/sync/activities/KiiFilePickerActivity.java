@@ -18,21 +18,20 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.DownloadManager;
-import com.kii.cloud.sync.KiiClientTask;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.utils.MimeInfo;
@@ -69,10 +68,12 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
 
     KiiFileExpandableListAdapter mAdapter;
     View mHeaderView = null;
+    private static Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         requestWindowFeature(Window.FEATURE_PROGRESS);
         mNewEventListener = new NewEventListener(this);
@@ -105,7 +106,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     }
 
     private boolean updateProgress() {
-        KiiSyncClient kiiClient = KiiSyncClient.getInstance();
+        KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
         if (kiiClient != null) {
             int progress = kiiClient.getProgress();
             if (progress > 0) {
@@ -134,15 +135,13 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(scanChange.size() + " file(s) has changed.")
-                        .setCancelable(false)
-                        .setPositiveButton("Update Now",
+                        .setCancelable(false).setPositiveButton("Update Now",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,
                                             int id) {
                                         updateFileChange();
                                     }
-                                })
-                        .setNegativeButton("Cancel",
+                                }).setNegativeButton("Cancel",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,
                                             int id) {
@@ -281,7 +280,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
      * suspend the existing sync if there is any
      */
     private void syncStop() {
-        KiiSyncClient kiiClient = KiiSyncClient.getInstance();
+        KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
         if (kiiClient != null) {
             kiiClient.suspend();
         }
@@ -303,7 +302,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         new Thread(new Runnable() {
             public void run() {
                 handler.sendEmptyMessage(PROGRESS_SCAN_FILES);
-                KiiSyncClient kiiClient = KiiSyncClient.getInstance();
+                KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
                 KiiFile[] files = kiiClient.getBackupFiles();
                 scanTotalCount = files.length;
                 scanCurCount = 0;
@@ -330,7 +329,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     private void doDownloadAll() {
         Runnable r = new Runnable() {
             public void run() {
-                KiiSyncClient client = KiiSyncClient.getInstance();
+                KiiSyncClient client = KiiSyncClient.getInstance(mContext);
                 if (client != null) {
                     KiiFile[] files = client.getBackupFiles();
                     if (files != null) {
@@ -338,11 +337,12 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                             int status = client.getStatus(file);
                             if (!KiiSyncClient.isFileInTrash(file)
                                     && (status == KiiFile.STATUS_BODY_OUTDATED || status == KiiFile.STATUS_NO_BODY)) {
-                                client.download(file,
-                                        Utils.getKiiFileDest(file));
+                                client.download(file, Utils
+                                        .getKiiFileDest(file, mContext));
                             }
                         }
-                        handler.sendEmptyMessage(KiiFilePickerActivity.PROGRESS_END);
+                        handler
+                                .sendEmptyMessage(KiiFilePickerActivity.PROGRESS_END);
                     }
                 }
             }
@@ -355,7 +355,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
      * before this
      */
     private void updateFileChange() {
-        KiiSyncClient client = KiiSyncClient.getInstance();
+        KiiSyncClient client = KiiSyncClient.getInstance(mContext);
         client.updateBody(scanChange);
         Utils.startSync(getApplicationContext(), BackupService.ACTION_REFRESH);
     }
@@ -387,9 +387,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 DownloadManager.ACTION_DOWNLOAD_END));
         registerReceiver(receiver, new IntentFilter(
                 DownloadManager.ACTION_DOWNLOAD_START));
-        KiiClientTask task = new KiiClientTask(getApplicationContext(),
-                "Connect", KiiClientTask.SYNC_CONNECT, mNewEventListener);
-        task.execute();
+        adpaterSetup();
     }
 
     private void adpaterSetup() {
@@ -398,9 +396,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
             mHeaderView = inflater.inflate(R.layout.cloud_header_view, null);
         getExpandableListView().addHeaderView(mHeaderView);
         setLastSyncTime();
-        mAdapter = new KiiFileExpandableListAdapter(this,
-                KiiSyncClient.getInstance(),
-                KiiFileExpandableListAdapter.TYPE_DATA, this);
+        mAdapter = new KiiFileExpandableListAdapter(this, KiiSyncClient
+                .getInstance(mContext), KiiFileExpandableListAdapter.TYPE_DATA, this);
         setListAdapter(mAdapter);
         mNewEventListener.register();
     }
@@ -411,14 +408,13 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         startActivity(intent);
     }
 
-    
-
     @Override
     public boolean onChildClick(ExpandableListView parent, View v,
             int groupPosition, int childPosition, long id) {
-        Object o = v.getTag();
-        if (o instanceof KiiFile) {
-            KiiFile kFile = (KiiFile) o;
+        if (true) {
+            KiiFile kFile = (KiiFile) mAdapter.getChild(groupPosition,
+                    childPosition);
+            Log.d(TAG, "onChildClick: kFile is "+kFile.getTitle());
             if (kFile.isFile()) {
 
                 String category = kFile.getCategory();
@@ -435,13 +431,14 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 Intent intent = null;
                 MimeInfo mime = MimeUtil.getInfoByKiiFile(kFile);
 
-                if (KiiSyncClient.getInstance().getStatus(kFile) != KiiFile.STATUS_NO_BODY) {
-                    intent = UiUtils.getLaunchFileIntent(kFile.getLocalPath(), mime);
+                if (KiiSyncClient.getInstance(mContext).getStatus(kFile) != KiiFile.STATUS_NO_BODY) {
+                    intent = UiUtils.getLaunchFileIntent(kFile.getLocalPath(),
+                            mime);
                 }
                 if (intent == null && kFile.getAvailableURL() != null) {
                     if (mime != null) {
-                        intent = UiUtils.getLaunchURLIntent(kFile.getAvailableURL(),
-                                mime.getMimeType());
+                        intent = UiUtils.getLaunchURLIntent(kFile
+                                .getAvailableURL(), mime.getMimeType());
                     }
                 }
 
@@ -482,7 +479,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
             if (kFile != null && kFile.isFile()) {
                 menu.setHeaderTitle(kFile.getTitle());
 
-                KiiSyncClient kiiClient = KiiSyncClient.getInstance();
+                KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
 
                 if (kiiClient == null) {
                     showToast("Not ready.");
@@ -553,7 +550,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
             final KiiFile kFile = (KiiFile) mAdapter.getChild((int) groupPos,
                     (int) childPos);
             if (kFile != null && kFile.isFile()) {
-                final KiiSyncClient client = KiiSyncClient.getInstance();
+                final KiiSyncClient client = KiiSyncClient.getInstance(mContext);
                 if (client == null) {
                     Log.d(TAG, "get KiiRefClient failed, return!");
                     return true;
@@ -583,7 +580,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                         Toast.makeText(
                                 this,
                                 "Download at folder:"
-                                        + KiiSyncClient.getInstance()
+                                        + KiiSyncClient.getInstance(mContext)
                                                 .getDownloadFolder(),
                                 Toast.LENGTH_SHORT).show();
                         Runnable r1 = new Runnable() {
@@ -633,15 +630,13 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
 
         KiiSyncClient client = null;
         long id = 0;
-        Context context = null;
 
         public NewEventListener(Context context) {
-            this.context = context;
             id = System.currentTimeMillis();
         }
 
         public boolean register() {
-            client = KiiSyncClient.getInstance();
+            client = KiiSyncClient.getInstance(mContext);
             if (client == null) {
                 throw new NullPointerException();
             }
@@ -679,12 +674,11 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
             if (msg != null) {
                 switch (msg.sync_result) {
                     case SyncMsg.ERROR_AUTHENTICAION_ERROR:
-                        Intent apiIntent = new Intent(
-                                context.getApplicationContext(),
-                                StartActivity.class);
+                        Intent apiIntent = new Intent(mContext
+                                .getApplicationContext(), StartActivity.class);
                         apiIntent
                                 .setAction(StartActivity.ACTION_ENTER_PASSWORD);
-                        context.startActivity(apiIntent);
+                        mContext.startActivity(apiIntent);
                         break;
                     case SyncMsg.OK:
                         setLastSyncTime();
@@ -713,7 +707,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         }
 
         public void onConnectComplete() {
-            adpaterSetup();
+            
         }
 
     }
@@ -731,12 +725,11 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     public void handleRefresh(View v) {
         syncRefresh();
     }
-    
+
     public void handleUpload(View v) {
-    	Intent i = new Intent(this,
-                ProgressListActivity.class);
-    	this.startActivity(i);
-    	
+        Intent i = new Intent(this, ProgressListActivity.class);
+        this.startActivity(i);
+
     }
 
     private void setLastSyncTime() {

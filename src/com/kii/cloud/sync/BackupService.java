@@ -29,6 +29,7 @@ public class BackupService extends Service {
     private KiiSyncClient mSyncClient = null;
     private AlarmManager mAlarmManager = null;
     private PendingIntent mPi = null;
+    private boolean syncInited = false;
 
     public static final String ACTION_DATA_CONNECTION_CHANGED = "data_connection_changed";
     public static final String ACTION_TIMER_CHANGED = "timer_changed";
@@ -76,10 +77,10 @@ public class BackupService extends Service {
             int ret = SyncMsg.OK;
             Context context = BackupService.this;
             BackupPref.init(context);
-            try {
-                mSyncClient = KiiSyncClient.getInstance(context);
-            } catch (InstantiationException e) {
-                e.printStackTrace();
+            mSyncClient = KiiSyncClient.getInstance(context);
+            if (!syncInited) {
+                mSyncClient.initSync();
+                syncInited = true;
             }
             mAlarmManager = (AlarmManager) context
                     .getSystemService(Context.ALARM_SERVICE);
@@ -99,24 +100,29 @@ public class BackupService extends Service {
 
     private class SyncTask extends AsyncTask<Void, Void, Integer> {
         int taskId = -1;
+
         public SyncTask(int taskId) {
             this.taskId = taskId;
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
+            if (!syncInited) {
+                mSyncClient.initSync();
+                syncInited = true;
+            }
             if (taskId == SYNC_REFRESH) {
                 return mSyncClient.refresh();
             } else {
                 return mSyncClient.refreshQuick();
             }
         }
-        
+
         @Override
         protected void onPostExecute(Integer result) {
             switch (result) {
-                    case SyncMsg.ERROR_INTERRUPTED:
-                    case SyncMsg.ERROR_PFS_BUSY:
+                case SyncMsg.ERROR_INTERRUPTED:
+                case SyncMsg.ERROR_PFS_BUSY:
                 case SyncMsg.PFS_SYNCRESULT_FORCE_STOP:
                 case SyncMsg.OK:
                     break;
@@ -127,7 +133,7 @@ public class BackupService extends Service {
             }
         }
     }
-    
+
     void showToast(String title, int errorCode) {
         showToast(title, Utils.getErrorMsg(errorCode, this));
     }
@@ -139,6 +145,7 @@ public class BackupService extends Service {
     void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mSyncClient != null) {
@@ -148,8 +155,9 @@ public class BackupService extends Service {
     }
 
     private void handleCommand(Intent intent) {
-        if (mSyncClient == null)
-            return;
+        if (mSyncClient == null) {
+            mSyncClient = KiiSyncClient.getInstance(this);
+        }
         if (intent == null || intent.getAction() == null)
             return;
         String action = intent.getAction();
@@ -200,7 +208,8 @@ public class BackupService extends Service {
 
     private void startSync(int mode) {
         if (SyncPref.isLoggedIn()) {
-            if (mSyncClient.getProgress() == SyncMsg.SYNC_NOT_RUNNING) {
+            if (mSyncClient.getProgress() == SyncMsg.SYNC_NOT_RUNNING
+                    || mSyncClient.getProgress() == SyncMsg.ERROR_SETUP) {
                 new SyncTask(mode).execute();
             }
         }
@@ -258,8 +267,9 @@ public class BackupService extends Service {
         int time = BackupPref.getUserIntentionTime();
         if (time > 0) {
             long interval = time * 60 * 60;
-            mAlarmManager.setRepeating(AlarmManager.RTC,
-                    System.currentTimeMillis() + interval, interval, mPi);
+            mAlarmManager.setRepeating(AlarmManager.RTC, System
+                    .currentTimeMillis()
+                    + interval, interval, mPi);
         }
     }
 

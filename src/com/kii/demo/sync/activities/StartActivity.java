@@ -123,7 +123,7 @@ public class StartActivity extends Activity {
         mViewer.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (KiiSyncClient.getInstance() != null) {
+                if (KiiSyncClient.getInstance(mContext) != null) {
 
                     Intent intent = new Intent(mContext, FileTabActivity.class);
                     intent.putExtra(FileTabActivity.TAB_INDEX_EXTRA,
@@ -338,7 +338,7 @@ public class StartActivity extends Activity {
         if (files != null && files.length > 0) {
             for (KiiFile file : files) {
                 Log.e(StartActivity.TAG + " ALL", "" + file);
-                msg.append(ct + ":  " + Utils.getStatus(file) + ":"
+                msg.append(ct + ":  " + Utils.getStatus(file, mContext) + ":"
                         + getKiiFilePath(file) + "\n");
                 ct++;
             }
@@ -351,7 +351,7 @@ public class StartActivity extends Activity {
                 Log.e(StartActivity.TAG, file.getAppData() + "; remotePath: "
                         + file.getRemotePath());
                 msg
-                        .append(ct + ":  " + Utils.getStatus(file) + ":"
+                        .append(ct + ":  " + Utils.getStatus(file, mContext) + ":"
                                 + file.getAppData() + ":"
                                 + getKiiFilePath(file) + "\n");
                 ct++;
@@ -385,7 +385,7 @@ public class StartActivity extends Activity {
      */
     private void updateSyncStatus() {
 
-        KiiSyncClient kClient = KiiSyncClient.getInstance();
+        KiiSyncClient kClient = KiiSyncClient.getInstance(mContext);
 
         if (kClient == null)
             return;
@@ -510,7 +510,7 @@ public class StartActivity extends Activity {
             dialog.setCancelable(false);
             dialog.setButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    KiiSyncClient kiiClient = KiiSyncClient.getInstance();
+                    KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
                     if (kiiClient != null) {
                         kiiClient.suspend();
                     }
@@ -528,7 +528,7 @@ public class StartActivity extends Activity {
             public void handleMessage(Message msg) {
 
                 if (dialog != null && dialog.isShowing()) {
-                    KiiSyncClient kiiClient = KiiSyncClient.getInstance();
+                    KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
                     if (kiiClient != null) {
                         int progress = kiiClient.getProgress();
                         String progressMsg = null;

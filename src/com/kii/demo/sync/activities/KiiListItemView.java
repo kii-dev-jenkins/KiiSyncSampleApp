@@ -37,7 +37,6 @@ public class KiiListItemView extends LinearLayout {
     private int type = -1;
     private static final int TYPE_FILE = 1;
     private static final int TYPE_KII_FILE = 2;
-    private static final int TYPE_GROUP = 3;
 
     public KiiListItemView(Context context, File file, KiiSyncClient client,
             Drawable mainIcon, View.OnClickListener listener) {

@@ -82,6 +82,7 @@ public class FilePickerActivity extends ListActivity implements
     protected boolean mShowHiddenFiles = false;
     protected String[] acceptedFileExtensions;
     View mHeaderView;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +124,7 @@ public class FilePickerActivity extends ListActivity implements
             acceptedFileExtensions = (String[]) collection
                     .toArray(new String[collection.size()]);
         }
+        mContext = this;
 
     }
 
@@ -245,7 +247,7 @@ public class FilePickerActivity extends ListActivity implements
         File selectedFile = (File) getListView().getItemAtPosition(
                 info.position);
         final String filePath = selectedFile.getAbsolutePath();
-        final KiiSyncClient client = KiiSyncClient.getInstance();
+        final KiiSyncClient client = KiiSyncClient.getInstance(mContext);
         if (client == null) {
             Log.d(TAG, "get KiiRefClient failed, return!");
             return true;
@@ -331,7 +333,7 @@ public class FilePickerActivity extends ListActivity implements
             }
             if (convertView == null) {
                 return new KiiListItemView(FilePickerActivity.this,
-                        file, KiiSyncClient.getInstance(),
+                        file, KiiSyncClient.getInstance(mContext),
                         icon,
                         FilePickerActivity.this);
             } else {

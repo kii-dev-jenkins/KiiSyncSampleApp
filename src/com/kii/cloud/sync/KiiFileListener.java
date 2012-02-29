@@ -28,7 +28,7 @@ public class KiiFileListener implements KiiNewEventListener {
 
     public KiiFileListener(Context context) {
         this.context = context;
-        client = KiiSyncClient.getInstance();
+        client = KiiSyncClient.getInstance(context);
         if (client == null) {
             throw new NullPointerException();
         }

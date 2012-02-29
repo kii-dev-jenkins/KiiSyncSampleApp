@@ -37,6 +37,11 @@ public class DownloadManager {
     public AtomicBoolean downloadPorgress = new AtomicBoolean(false);
     public String destPath = null;
     private ArrayList<Pair<KiiFile, String>> dnList = new ArrayList<Pair<KiiFile, String>>();
+    private Context mContext;
+
+    DownloadManager(Context context) {
+        mContext = context;
+    }
 
     public double getDownloadProgress() {
         if (destPath == null)
@@ -52,7 +57,7 @@ public class DownloadManager {
     }
 
     public synchronized int add(KiiFile file, String dest) {
-        Log.d(TAG, "add: "+dest);
+        Log.d(TAG, "add: " + dest);
         if (file != null && file.hasServerRecord()) {
             for (Pair<KiiFile, String> dn : dnList) {
                 if (dn.first.getId() == file.getId())
@@ -97,13 +102,13 @@ public class DownloadManager {
     /**
      * Download a given KiiFile to a specific folder
      */
-    public int download(KiiFile kiFile, String dest) {
+    private int download(KiiFile kiFile, String dest) {
         try {
             downloadTotalSize = kiFile.getSize();
             downloadCurrentSize = 0;
             if (TextUtils.isEmpty(dest)) {
-                destPath = KiiSyncClient.getInstance().getDownloadFolder() + "/"
-                        + kiFile.getTitle();
+                destPath = KiiSyncClient.getInstance(mContext).getDownloadFolder()
+                        + "/" + kiFile.getTitle();
             } else {
                 destPath = dest;
             }
@@ -133,27 +138,22 @@ public class DownloadManager {
      *            - specifiy if overwrite the destination file.
      * @throws IOException
      */
-    public void downloadKiiFile(File destFile, KiiFile srcFile,
+    private void downloadKiiFile(File destFile, KiiFile srcFile,
             boolean overwrite) throws IOException {
 
         boolean result = false;
-        Context context = null;
 
-        if (KiiSyncClient.getInstance() != null) {
-            context = KiiSyncClient.getInstance().mContext;
-        }
-
-        if (context != null) {
+        if (mContext != null) {
             Intent intent = new Intent();
             intent.setAction(ACTION_DOWNLOAD_START);
             intent.putExtra(DOWNLOAD_DEST_PATH, destFile.getAbsolutePath());
-            context.sendBroadcast(intent);
+            mContext.sendBroadcast(intent);
 
-            Intent progressIntent = new Intent(context.getApplicationContext(),
+            Intent progressIntent = new Intent(mContext.getApplicationContext(),
                     ProgressListActivity.class);
-            NotificationUtil.showDownloadProgressNotification(
-                    context.getApplicationContext(), progressIntent,
-                    destFile.getAbsolutePath());
+            NotificationUtil.showDownloadProgressNotification(mContext
+                    .getApplicationContext(), progressIntent, destFile
+                    .getAbsolutePath());
 
         }
 
@@ -179,9 +179,10 @@ public class DownloadManager {
         if (!destFolder.exists()) {
             destFolder.mkdirs();
         }
-        
+
         // create a temp file for download the file
-        File tempDest = new File(destFile.getAbsoluteFile()+"."+Long.toString(System.currentTimeMillis()));
+        File tempDest = new File(destFile.getAbsoluteFile() + "."
+                + Long.toString(System.currentTimeMillis()));
 
         HttpGet httpGet = new HttpGet(remotePath);
         HttpClient client = new DefaultHttpClient();
@@ -219,15 +220,15 @@ public class DownloadManager {
             close(bos);
             close(fos);
             close(input);
-            if (context != null) {
+            if (mContext != null) {
                 Intent intent = new Intent();
                 intent.setAction(ACTION_DOWNLOAD_END);
                 intent.putExtra(DOWNLOAD_DEST_PATH, destFile.getAbsolutePath());
                 intent.putExtra(DOWNLOAD_RESULT, result);
-                context.sendBroadcast(intent);
-                NotificationUtil.cancelDownloadProgressNotification(context);
+                mContext.sendBroadcast(intent);
+                NotificationUtil.cancelDownloadProgressNotification(mContext);
                 if (tempDest.exists()) {
-                	tempDest.delete();
+                    tempDest.delete();
                 }
             }
         }
@@ -244,9 +245,9 @@ public class DownloadManager {
     }
 
     public KiiFile[] getDownloadList() {
-        List<KiiFile>files = new ArrayList<KiiFile>();
-        for(Pair<KiiFile, String>p:dnList) {
-            if(p.first!=null) {
+        List<KiiFile> files = new ArrayList<KiiFile>();
+        for (Pair<KiiFile, String> p : dnList) {
+            if (p.first != null) {
                 files.add(p.first);
             }
         }
