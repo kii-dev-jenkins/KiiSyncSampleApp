@@ -251,7 +251,7 @@ public class KiiSyncClient {
      */
     public String getTrashTempFolder() {
         if (mContext != null) {
-            String cacheDir = this.mContext.getCacheDir().getAbsolutePath()
+            String cacheDir = mContext.getCacheDir().getAbsolutePath()
                     + "/trash/";
             File directory = new File(cacheDir);
             if (!directory.exists()) {
@@ -271,7 +271,7 @@ public class KiiSyncClient {
      */
     public String getTempThumbnailFolder() {
         if (mContext != null) {
-            String cacheDir = this.mContext.getCacheDir().getAbsolutePath();
+            String cacheDir = mContext.getCacheDir().getAbsolutePath();
             return cacheDir + "/thumbnail/";
         } else {
             return null;

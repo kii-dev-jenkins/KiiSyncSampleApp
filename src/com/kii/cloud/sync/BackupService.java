@@ -125,12 +125,11 @@ public class BackupService extends Service {
                 case SyncMsg.ERROR_PFS_BUSY:
                 case SyncMsg.PFS_SYNCRESULT_FORCE_STOP:
                 case SyncMsg.OK:
-                    break;
                 case SyncMsg.ERROR_SETUP:
                 default:
-                    showToast(getString(R.string.sync), result);
                     break;
             }
+            showToast(getString(R.string.sync), result);
         }
     }
 

@@ -94,7 +94,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
 
     final static int DIALOG_UPDATE = 2;
 
-
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -200,9 +199,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         }
     }
 
-
-
-
     /**
      * resume upload
      */
@@ -237,9 +233,9 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (mHeaderView == null)
             mHeaderView = inflater.inflate(R.layout.header_view, null);
-        Button b = (Button)mHeaderView.findViewById(R.id.button_left);
+        Button b = (Button) mHeaderView.findViewById(R.id.button_left);
         b.setText(getString(R.string.button_refresh));
-        b = (Button)mHeaderView.findViewById(R.id.button_right);
+        b = (Button) mHeaderView.findViewById(R.id.button_right);
         b.setText(getString(R.string.header_upload));
         getExpandableListView().addHeaderView(mHeaderView);
         setLastSyncTime();
@@ -298,7 +294,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     }
                 }
             } else {
-                UiUtils.showToast(mContext, "Failed to launch the viewer for " + kFile.getTitle());
+                UiUtils.showToast(mContext, "Failed to launch the viewer for "
+                        + kFile.getTitle());
             }
         }
         return super.onChildClick(parent, v, groupPosition, childPosition, id);
@@ -336,7 +333,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     case KiiFile.STATUS_DELETE_REQUEST:
                     case KiiFile.STATUS_DELETE_REQUEST_INCLUDEBODY:
                     case KiiFile.STATUS_SERVER_DELETE_REQUEST:
-                        UiUtils.showToast(mContext, "No option for deleted file.");
+                        UiUtils.showToast(mContext,
+                                "No option for deleted file.");
                         break;
                     case KiiFile.STATUS_PREPARE_TO_SYNC:
                     case KiiFile.STATUS_UPLOADING_BODY:
@@ -410,7 +408,11 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                         new Thread(r).start();
                         break;
                     case MENU_MOVE_TRASH:
-                        client.moveKiiFileToTrash(kFile);
+                        int ret = client.moveKiiFileToTrash(kFile);
+                        if (ret == SyncMsg.ERROR_RECORD_NOT_FOUND) {
+                            showToast(getString(R.string.error_cannot_trash_server_file));
+                            return true;
+                        }
                         break;
                     case MENU_DELETE:
                         client.delete(kFile, false);
@@ -452,6 +454,10 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         }
 
         return false;
+    }
+
+    private static void showToast(String msg) {
+        Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show();
     }
 
     class Receiver extends BroadcastReceiver {
