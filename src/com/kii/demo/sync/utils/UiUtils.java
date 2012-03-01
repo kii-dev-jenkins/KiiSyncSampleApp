@@ -89,7 +89,12 @@ public class UiUtils {
     }
 
     public static String getLastSyncTime(Context context) {
-        long backupTime = SyncPref.getLastSuccessfulSyncTime();
+        long backupTime = 0;
+        
+        try{
+        	backupTime = SyncPref.getLastSuccessfulSyncTime();
+        }catch(Exception ex){}
+        
         if (backupTime > 0) {
             return String.format("Last successful sync is %s",
                     (String) DateUtils.getRelativeTimeSpanString(backupTime,
