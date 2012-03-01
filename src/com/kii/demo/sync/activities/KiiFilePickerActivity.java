@@ -171,7 +171,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 syncStop();
                 break;
             case R.id.settings:
-                //TODO: porting the setting UI here
+                Intent intent = new Intent(this, Settings.class);
+                startActivity(intent);
                 break;
             default:
                 return super.onOptionsItemSelected(item);
