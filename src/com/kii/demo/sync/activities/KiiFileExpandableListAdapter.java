@@ -307,15 +307,17 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                     UiUtils.setIcon(R.drawable.icon_format_unsupport, view);
                 }
             }
-            ImageView ib = (ImageView) view
+            ImageView iv = (ImageView) view
                     .findViewById(R.id.list_complex_more_button);
-            ib.setVisibility(View.VISIBLE);
-            ib.setTag(view);
+            iv.setVisibility(View.VISIBLE);
+            iv.setTag(view);
             if (!(mOnClickListener == null)) {
-                ib.setOnClickListener(mOnClickListener);
+                iv.setOnClickListener(mOnClickListener);
             } else {
-                ib.setVisibility(View.GONE);
+                iv.setVisibility(View.GONE);
             }
+            iv.setFocusable(false);
+            iv.setFocusableInTouchMode(false);
         }
 
         view.setTag(file);

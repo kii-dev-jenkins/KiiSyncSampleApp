@@ -74,8 +74,8 @@ public class KiiListItemView extends LinearLayout {
         addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
                 LayoutParams.WRAP_CONTENT));
     }
-    
 
+    public static final String TAG = "KiiListItemView";
     public void refreshWithNewFile(File file, Drawable mainIcon) {
         this.mainIcon = mainIcon;
         type = TYPE_FILE;
@@ -85,7 +85,7 @@ public class KiiListItemView extends LinearLayout {
     }
 
     public void refreshWithNewKiiFile(KiiFile file, Drawable mainIcon) {
-        if(file==null)
+        if (file == null)
             return;
         this.mainIcon = mainIcon;
         type = TYPE_KII_FILE;
@@ -102,7 +102,6 @@ public class KiiListItemView extends LinearLayout {
         syncstatus = client.getStatusFromCache(file.getAbsolutePath());
         mime = MimeUtil.getInfoByFileName(filename);
     }
-
 
     private void getDataFromKiiFile(KiiFile kfile) {
         if (kfile.isDirectory()) {
@@ -124,23 +123,23 @@ public class KiiListItemView extends LinearLayout {
         }
         mime = MimeUtil.getInfoByKiiFile(kfile);
     }
-    
+
     private void bindView() {
-        ImageView ib = (ImageView) v
+        ImageView iv = (ImageView) v
                 .findViewById(R.id.list_complex_more_button);
         if (type == TYPE_FILE) {
-            ib.setVisibility(View.VISIBLE);
+            iv.setVisibility(View.VISIBLE);
             View padding_view = v.findViewById(R.id.padding_view);
             padding_view.setVisibility(View.GONE);
         }
-        ib.setTag(v);
-        if (!(mOnClickListener == null)) {
-            ib.setOnClickListener(mOnClickListener);
-            ib.setFocusable(false);
-            ib.setFocusableInTouchMode(false);
+        iv.setTag(v);
+        if (mOnClickListener != null) {
+            iv.setOnClickListener(mOnClickListener);
         } else {
-            ib.setVisibility(View.GONE);
+            iv.setVisibility(View.GONE);
         }
+        iv.setFocusable(false);
+        iv.setFocusableInTouchMode(false);
         if (isDirectory) {
             ImageView statusIcon = (ImageView) v
                     .findViewById(R.id.list_sync_status_icon);
@@ -158,7 +157,7 @@ public class KiiListItemView extends LinearLayout {
             UiUtils.setTwoLinesText(new SpannableString(filename),
                     new SpannableString(caption), subCaption,
                     R.drawable.icon_format_text, v);
-            ib.setVisibility(View.VISIBLE);
+            iv.setVisibility(View.VISIBLE);
             if (mainIcon != null) {
                 UiUtils.setIcon(mainIcon, v);
             } else {

@@ -39,7 +39,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -293,6 +293,7 @@ public class FilePickerActivity extends ListActivity implements
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         File newFile = (File) l.getItemAtPosition(position);
+        Log.d(TAG, "onListItemClick: newFile is "+newFile.getName());
         if (newFile.isFile()) {
             Intent intent = null;
             MimeInfo mime = MimeUtil.getInfoByFileName(newFile
@@ -417,12 +418,12 @@ public class FilePickerActivity extends ListActivity implements
         return true;
     }
 
-    private class FilePickerListAdapter extends ArrayAdapter<File> {
+    private class FilePickerListAdapter extends BaseAdapter {
 
         private List<File> mObjects;
 
         public FilePickerListAdapter(Context context, List<File> objects) {
-            super(context, android.R.id.text1, objects);
+            super();
             mObjects = objects;
         }
 
@@ -448,6 +449,21 @@ public class FilePickerActivity extends ListActivity implements
                 v.refreshWithNewFile(file, icon);
                 return v;
             }
+        }
+
+        @Override
+        public int getCount() {
+            return mObjects.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mObjects.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
         }
 
     }
@@ -571,9 +587,12 @@ public class FilePickerActivity extends ListActivity implements
                 new DownloadAllTask().execute();
                 needDownload = false;
             }
-            if(mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
-            }
+            FilePickerActivity.this.getListView().post(new Runnable() {
+               @Override
+               public void run() {
+                   mAdapter.notifyDataSetChanged();
+               }
+            });
         }
 
         @Override
