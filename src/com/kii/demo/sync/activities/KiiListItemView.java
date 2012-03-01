@@ -136,6 +136,8 @@ public class KiiListItemView extends LinearLayout {
         ib.setTag(v);
         if (!(mOnClickListener == null)) {
             ib.setOnClickListener(mOnClickListener);
+            ib.setFocusable(false);
+            ib.setFocusableInTouchMode(false);
         } else {
             ib.setVisibility(View.GONE);
         }
