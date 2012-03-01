@@ -59,7 +59,7 @@ import com.kii.sync.SyncMsg;
 
 public class FilePickerActivity extends ListActivity implements
         View.OnClickListener {
-    
+
     private boolean needDownload = false;
 
     public class DownloadAllTask extends AsyncTask<Void, Void, Void> {
@@ -73,20 +73,16 @@ public class FilePickerActivity extends ListActivity implements
                         int status = client.getStatus(file);
                         if (!KiiSyncClient.isFileInTrash(file)
                                 && (status == KiiFile.STATUS_BODY_OUTDATED || status == KiiFile.STATUS_NO_BODY)) {
-                            client.download(file,
-                                    Utils.getKiiFileDest(file, mContext));
+                            client.download(file, Utils.getKiiFileDest(file,
+                                    mContext));
                         }
                     }
                 }
             }
             return null;
         }
-        
-        
 
     }
-
-
 
     ProgressDialog scanDialog = null;
 
@@ -125,8 +121,6 @@ public class FilePickerActivity extends ListActivity implements
         }
 
     }
-    
-    
 
     /**
      * The file path
@@ -219,7 +213,7 @@ public class FilePickerActivity extends ListActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         menu.add(0, OPTIONS_MENU_SCAN_CHANGE, 0, R.string.scan_change);
         menu.add(0, OPTIONS_MENU_DOWNLOAD_ALL, 1, R.string.download_all);
         return true;
@@ -273,7 +267,6 @@ public class FilePickerActivity extends ListActivity implements
                     // Don't add the file
                     continue;
                 }
-
                 // Add the file the ArrayAdapter
                 mFiles.add(f);
             }
@@ -281,7 +274,6 @@ public class FilePickerActivity extends ListActivity implements
             Collections.sort(mFiles, new FileComparator());
         }
         mAdapter.notifyDataSetChanged();
-
         Button b = (Button) mHeaderView.findViewById(R.id.button_right);
         if (isAtSdHome()) {
             // at SD card home, disable Up button
@@ -363,7 +355,6 @@ public class FilePickerActivity extends ListActivity implements
         final String filePath = selectedFile.getAbsolutePath();
         final KiiSyncClient client = KiiSyncClient.getInstance(mContext);
         if (client == null) {
-            Log.d(TAG, "get KiiRefClient failed, return!");
             return true;
         }
 
@@ -446,12 +437,14 @@ public class FilePickerActivity extends ListActivity implements
                         .getAbsolutePath(), FilePickerActivity.this);
                 ICON_CACHE.put(file.getAbsolutePath(), icon);
             }
+            KiiListItemView v;
             if (convertView == null) {
-                return new KiiListItemView(FilePickerActivity.this, file,
+                v = new KiiListItemView(FilePickerActivity.this, file,
                         KiiSyncClient.getInstance(mContext), icon,
                         FilePickerActivity.this);
+                return v;
             } else {
-                KiiListItemView v = (KiiListItemView) convertView;
+                v = (KiiListItemView) convertView;
                 v.refreshWithNewFile(file, icon);
                 return v;
             }
@@ -574,10 +567,11 @@ public class FilePickerActivity extends ListActivity implements
 
         @Override
         public void onSyncComplete(SyncMsg msg) {
-            if(needDownload) {
+            if (needDownload) {
                 new DownloadAllTask().execute();
+                needDownload = false;
             }
-            if (mAdapter != null) {
+            if(mAdapter != null) {
                 mAdapter.notifyDataSetChanged();
             }
         }
@@ -655,7 +649,7 @@ public class FilePickerActivity extends ListActivity implements
         client.updateBody(scanChange);
         Utils.startSync(getApplicationContext(), BackupService.ACTION_REFRESH);
     }
-    
+
     @Override
     public void onBackPressed() {
         if (mDirectory.getParentFile() != null) {
@@ -669,6 +663,5 @@ public class FilePickerActivity extends ListActivity implements
 
         super.onBackPressed();
     }
-
 
 }
