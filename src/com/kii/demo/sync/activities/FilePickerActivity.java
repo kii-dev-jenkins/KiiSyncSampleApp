@@ -655,4 +655,20 @@ public class FilePickerActivity extends ListActivity implements
         client.updateBody(scanChange);
         Utils.startSync(getApplicationContext(), BackupService.ACTION_REFRESH);
     }
+    
+    @Override
+    public void onBackPressed() {
+        if (mDirectory.getParentFile() != null) {
+            if (!isAtSdHome()) {
+                // Go to parent directory
+                mDirectory = mDirectory.getParentFile();
+                refreshFilesList();
+                return;
+            }
+        }
+
+        super.onBackPressed();
+    }
+
+
 }
