@@ -20,12 +20,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -50,11 +53,80 @@ import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
+import com.kii.sync.KiiFile;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
 public class FilePickerActivity extends ListActivity implements
         View.OnClickListener {
+    
+    private boolean needDownload = false;
+
+    public class DownloadAllTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            KiiSyncClient client = KiiSyncClient.getInstance(mContext);
+            if (client != null) {
+                KiiFile[] files = client.getBackupFiles();
+                if (files != null) {
+                    for (KiiFile file : files) {
+                        int status = client.getStatus(file);
+                        if (!KiiSyncClient.isFileInTrash(file)
+                                && (status == KiiFile.STATUS_BODY_OUTDATED || status == KiiFile.STATUS_NO_BODY)) {
+                            client.download(file,
+                                    Utils.getKiiFileDest(file, mContext));
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        
+        
+
+    }
+
+
+
+    ProgressDialog scanDialog = null;
+
+    public class ScanTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if (scanDialog != null) {
+                scanDialog.dismiss();
+                scanDialog = null;
+            }
+            if (!scanChange.isEmpty()) {
+                showDialog(DIALOG_UPDATE);
+            } else {
+                UiUtils.showToast(mContext, "No update is found.");
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            if (scanDialog == null) {
+                scanDialog = ProgressDialog.show(mContext, "",
+                        "Scanning for update. Please wait...", true);
+            } else {
+                if (scanTotalCount > 0) {
+                    scanDialog.setMessage(String.format("Scan %d out of %d",
+                            scanCurCount, scanTotalCount));
+                }
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            scanFileChange();
+            return null;
+        }
+
+    }
+    
+    
 
     /**
      * The file path
@@ -82,9 +154,9 @@ public class FilePickerActivity extends ListActivity implements
     private final static int MENU_UPLOAD_FILE = 2;
     private final static int MENU_UPLOAD_FOLDER = 3;
     private final static int MENU_MOVE_TO_TRASH = 4;
-    
+
     private final static int OPTIONS_MENU_SCAN_CHANGE = 0;
-    private final static int OPTIONS_MENU_RESUME_UPLOAD = 1;
+    private final static int OPTIONS_MENU_DOWNLOAD_ALL = 1;
     private static final String TAG = "FilePickerActivity";
 
     protected File mDirectory;
@@ -107,9 +179,9 @@ public class FilePickerActivity extends ListActivity implements
         ((ViewGroup) getListView().getParent()).addView(emptyView);
         getListView().setEmptyView(emptyView);
         mHeaderView = inflator.inflate(R.layout.header_view, null);
-        Button b = (Button)mHeaderView.findViewById(R.id.button_left);
+        Button b = (Button) mHeaderView.findViewById(R.id.button_left);
         b.setText(getString(R.string.header_btn_home));
-        b = (Button)mHeaderView.findViewById(R.id.button_right);
+        b = (Button) mHeaderView.findViewById(R.id.button_right);
         b.setText(getString(R.string.header_btn_up));
         getListView().addHeaderView(mHeaderView);
         // Set initial directory
@@ -145,27 +217,28 @@ public class FilePickerActivity extends ListActivity implements
         mListener.register();
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        menu.add(0, OPTIONS_MENU_RESUME_UPLOAD, 0, R.string.resume);
-//        menu.add(0, OPTIONS_MENU_SCAN_CHANGE, 1, R.string.scan_change);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch(item.getItemId()) {
-//            case OPTIONS_MENU_SCAN_CHANGE:
-//                
-//                break;
-//            case OPTIONS_MENU_RESUME_UPLOAD:
-//                Utils.startSync(this, BackupService.ACTION_REFRESH);
-//                break;
-//            default:
-//                break;
-//        }
-//        return true;
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        
+        menu.add(0, OPTIONS_MENU_SCAN_CHANGE, 0, R.string.scan_change);
+        menu.add(0, OPTIONS_MENU_DOWNLOAD_ALL, 1, R.string.download_all);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case OPTIONS_MENU_SCAN_CHANGE:
+                new ScanTask().execute();
+                break;
+            case OPTIONS_MENU_DOWNLOAD_ALL:
+                Utils.startSync(mContext, BackupService.ACTION_REFRESH_QUICK);
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
 
     @Override
     protected void onResume() {
@@ -226,20 +299,6 @@ public class FilePickerActivity extends ListActivity implements
     }
 
     @Override
-    public void onBackPressed() {
-        if (mDirectory.getParentFile() != null) {
-            if (!isAtSdHome()) {
-                // Go to parent directory
-                mDirectory = mDirectory.getParentFile();
-                refreshFilesList();
-            }
-            return;
-        }
-
-        super.onBackPressed();
-    }
-
-    @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         File newFile = (File) l.getItemAtPosition(position);
         if (newFile.isFile()) {
@@ -250,14 +309,16 @@ public class FilePickerActivity extends ListActivity implements
             intent = UiUtils.getLaunchFileIntent(newFile.getAbsolutePath(),
                     mime);
             if (intent == null) {
-                UiUtils.showToast(this, "Failed to launch the file - " + newFile.getName());
+                UiUtils.showToast(this, "Failed to launch the file - "
+                        + newFile.getName());
             } else {
                 try {
                     startActivity(intent);
                 } catch (Exception ex) {
-                    UiUtils.showToast(this, "Encounter error when launch file ("
-                            + newFile.getName() + "). Error(" + ex.getMessage()
-                            + ")");
+                    UiUtils.showToast(this,
+                            "Encounter error when launch file ("
+                                    + newFile.getName() + "). Error("
+                                    + ex.getMessage() + ")");
                 }
             }
         } else {
@@ -268,7 +329,7 @@ public class FilePickerActivity extends ListActivity implements
 
         super.onListItemClick(l, v, position, id);
     }
-    
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
             ContextMenuInfo menuInfo) {
@@ -513,6 +574,9 @@ public class FilePickerActivity extends ListActivity implements
 
         @Override
         public void onSyncComplete(SyncMsg msg) {
+            if(needDownload) {
+                new DownloadAllTask().execute();
+            }
             if (mAdapter != null) {
                 mAdapter.notifyDataSetChanged();
             }
@@ -536,4 +600,59 @@ public class FilePickerActivity extends ListActivity implements
 
     }
 
+    ArrayList<KiiFile> scanChange = null;
+    int scanTotalCount = -1;
+    int scanCurCount = 0;
+
+    private void scanFileChange() {
+        scanChange = new ArrayList<KiiFile>();
+        scanTotalCount = -1;
+        scanCurCount = 0;
+        KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
+        KiiFile[] files = kiiClient.getBackupFiles();
+        scanTotalCount = files.length;
+        scanCurCount = 0;
+        for (; scanCurCount < files.length; scanCurCount++) {
+            if (files[scanCurCount].isFile()) {
+                if (kiiClient.bodySameAsLocal(files[scanCurCount])) {
+                    scanChange.add(files[scanCurCount]);
+                }
+            }
+        }
+    }
+
+    private static final int DIALOG_UPDATE = 0;
+
+    protected Dialog onCreateDialog(int id) {
+        Dialog dialog;
+        switch (id) {
+            case DIALOG_UPDATE:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(scanChange.size() + " file(s) has changed.")
+                        .setCancelable(false).setPositiveButton("Update Now",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,
+                                            int id) {
+                                        updateFileChange();
+                                    }
+                                }).setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,
+                                            int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                dialog = builder.create();
+                break;
+            default:
+                dialog = null;
+        }
+        return dialog;
+    }
+
+    private void updateFileChange() {
+        KiiSyncClient client = KiiSyncClient.getInstance(mContext);
+        client.updateBody(scanChange);
+        Utils.startSync(getApplicationContext(), BackupService.ACTION_REFRESH);
+    }
 }

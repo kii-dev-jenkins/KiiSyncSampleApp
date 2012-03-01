@@ -1,14 +1,8 @@
 package com.kii.demo.sync.activities;
 
-import java.util.ArrayList;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ExpandableListActivity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -54,8 +48,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     public final static int PROGRESS_AUTO = 4;
     public final static int SETUP_ADPTOR = 5;
     public final static int PROGRESS_UPDATE = 6;
-    public final static int PROGRESS_SCAN_FILES = 7;
-    public final static int PROGRESS_SCAN_FILES_FINISH = 8;
 
     final static int MENU_RESTORE_TRASH = 1;
     final static int MENU_MOVE_TRASH = 2;
@@ -81,18 +73,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         registerForContextMenu(getExpandableListView());
     }
 
-    private void updateScanDialog() {
-        if (scanDialog == null) {
-            scanDialog = ProgressDialog.show(this, "",
-                    "Scanning for update. Please wait...", true);
-        } else {
-            if (scanTotalCount > 0) {
-                scanDialog.setMessage(String.format("Scan %d out of %d",
-                        scanCurCount, scanTotalCount));
-            }
-        }
-    }
-
     private boolean updateProgress() {
         KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
         if (kiiClient != null) {
@@ -114,35 +94,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
 
     final static int DIALOG_UPDATE = 2;
 
-    ProgressDialog scanDialog = null;
-
-    protected Dialog onCreateDialog(int id) {
-        Dialog dialog;
-        switch (id) {
-            case DIALOG_UPDATE:
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(scanChange.size() + " file(s) has changed.")
-                        .setCancelable(false).setPositiveButton("Update Now",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,
-                                            int id) {
-                                        updateFileChange();
-                                    }
-                                }).setNegativeButton("Cancel",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,
-                                            int id) {
-                                        dialog.cancel();
-                                    }
-                                });
-                dialog = builder.create();
-                break;
-            default:
-                dialog = null;
-        }
-        return dialog;
-    }
 
     public Handler handler = new Handler() {
         @Override
@@ -180,22 +131,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
 
                 case PROGRESS_UPDATE:
                     mAdapter.notifyDataSetChanged();
-                    break;
-                case PROGRESS_SCAN_FILES:
-                    updateScanDialog();
-                    handler.sendEmptyMessageDelayed(PROGRESS_SCAN_FILES, 500);
-                    break;
-                case PROGRESS_SCAN_FILES_FINISH:
-                    handler.removeMessages(PROGRESS_SCAN_FILES);
-                    if (scanDialog != null) {
-                        scanDialog.dismiss();
-                        scanDialog = null;
-                        if (!scanChange.isEmpty()) {
-                            showDialog(DIALOG_UPDATE);
-                        } else {
-                            UiUtils.showToast(mContext, "No update is found.");
-                        }
-                    }
                     break;
                 case PROGRESS_END:
                 default:
@@ -235,8 +170,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
             case R.id.suspend:
                 syncStop();
                 break;
-            case R.id.scan_change:
-                scanFileChange();
+            case R.id.settings:
+                //TODO: porting the setting UI here
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -264,48 +199,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         }
     }
 
-    ArrayList<KiiFile> scanChange = null;
-    int scanTotalCount = -1;
-    int scanCurCount = 0;
-
-    /*
-     * Check the existing backup files for changes
-     */
-    private void scanFileChange() {
-
-        scanChange = new ArrayList<KiiFile>();
-        scanTotalCount = -1;
-        scanCurCount = 0;
-
-        new Thread(new Runnable() {
-            public void run() {
-                handler.sendEmptyMessage(PROGRESS_SCAN_FILES);
-                KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
-                KiiFile[] files = kiiClient.getBackupFiles();
-                scanTotalCount = files.length;
-                scanCurCount = 0;
-                for (; scanCurCount < files.length; scanCurCount++) {
-                    if (files[scanCurCount].isFile()) {
-                        if (kiiClient.bodySameAsLocal(files[scanCurCount])) {
-                            scanChange.add(files[scanCurCount]);
-                        }
-                    }
-                }
-                handler.sendEmptyMessage(PROGRESS_SCAN_FILES_FINISH);
-            }
-        }).start();
-    }
 
 
-    /*
-     * update the backup files which have changed must call scanFileChange
-     * before this
-     */
-    private void updateFileChange() {
-        KiiSyncClient client = KiiSyncClient.getInstance(mContext);
-        client.updateBody(scanChange);
-        Utils.startSync(getApplicationContext(), BackupService.ACTION_REFRESH);
-    }
 
     /**
      * resume upload
