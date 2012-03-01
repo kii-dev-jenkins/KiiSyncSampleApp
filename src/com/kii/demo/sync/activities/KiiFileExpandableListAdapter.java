@@ -119,12 +119,12 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             if (backupFiles != null && backupFiles.length > 0) {
                 itemsList.add(new KiiFileList("Backup", backupFiles));
 
-                KiiFile[] root = kiiClient.getBackupFolders();
-                if (root != null && root.length > 0) {
-                    for (int ct = 0; ct < root.length; ct++) {
-                        itemsList.add(new KiiFileList(root[ct]));
-                    }
-                }
+//                KiiFile[] root = kiiClient.getBackupFolders();
+//                if (root != null && root.length > 0) {
+//                    for (int ct = 0; ct < root.length; ct++) {
+//                        itemsList.add(new KiiFileList(root[ct]));
+//                    }
+//                }
             } else {
                 itemsList.add(new KiiFileList("Backup"));
             }
