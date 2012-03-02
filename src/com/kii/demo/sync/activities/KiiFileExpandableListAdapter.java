@@ -119,12 +119,12 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             if (backupFiles != null && backupFiles.length > 0) {
                 itemsList.add(new KiiFileList("Backup", backupFiles));
 
-//                KiiFile[] root = kiiClient.getBackupFolders();
-//                if (root != null && root.length > 0) {
-//                    for (int ct = 0; ct < root.length; ct++) {
-//                        itemsList.add(new KiiFileList(root[ct]));
-//                    }
-//                }
+                // KiiFile[] root = kiiClient.getBackupFolders();
+                // if (root != null && root.length > 0) {
+                // for (int ct = 0; ct < root.length; ct++) {
+                // itemsList.add(new KiiFileList(root[ct]));
+                // }
+                // }
             } else {
                 itemsList.add(new KiiFileList("Backup"));
             }
@@ -149,16 +149,22 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             boolean isLastChild, View convertView, ViewGroup parent) {
         KiiFile file = (KiiFile) getChild(groupPosition, childPosition);
         Drawable icon = getKiiFileMainIcon(file);
+        KiiListItemView view;
         if (convertView == null) {
-            return new KiiListItemView(mActivity, file, kiiClient, icon,
+            view = new KiiListItemView(mActivity, file, kiiClient, icon,
                     mOnClickListener);
         } else {
-            KiiListItemView view = (KiiListItemView) convertView;
+            view = (KiiListItemView) convertView;
             view.refreshWithNewKiiFile(file, icon);
-            return view;
         }
+        int status = kiiClient.getKiiFileStatus(file);
+        String caption = getKiiFileCaption(file, status, mType);
+        String subCaption = Formatter.formatFileSize(mActivity,
+                file.getSizeOnDB());
+        view.setCaption(caption, subCaption);
+        return view;
     }
-    
+
     private static Drawable getKiiFileMainIcon(KiiFile file) {
         Drawable icon = null;
         MimeInfo mime = MimeUtil.getInfoByKiiFile(file);
@@ -174,16 +180,14 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                 } else {
                     File fThumbnail = new File(sThumbnail);
                     if (fThumbnail.exists() && fThumbnail.isFile()) {
-                        Bitmap bitmap = BitmapFactory
-                                .decodeFile(sThumbnail);
+                        Bitmap bitmap = BitmapFactory.decodeFile(sThumbnail);
 
                         if (bitmap.getHeight() > 120) {
                             // resize the bitmap if too big, save memory
                             bitmap = Bitmap.createScaledBitmap(
                                     bitmap,
                                     (bitmap.getWidth() * 120)
-                                            / bitmap.getHeight(), 120,
-                                    false);
+                                            / bitmap.getHeight(), 120, false);
                         }
                         icon = new BitmapDrawable(bitmap);
                     }
@@ -216,17 +220,10 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                     view);
             UiUtils.setIcon(R.drawable.icon_format_folder, view);
         } else {
-            String category = file.getCategory();
-            int status;
 
             // if the file is not belong to TRASH
             // it will use the cache as much
-            if (!TextUtils.isEmpty(category)
-                    && KiiSyncClient.CATEGORY_TRASH.equalsIgnoreCase(category)) {
-                status = kiiClient.getStatus(file);
-            } else {
-                status = kiiClient.getStatusFromCache(file);
-            }
+            int status = kiiClient.getKiiFileStatus(file);
             ImageView statusIcon = (ImageView) view
                     .findViewById(R.id.list_sync_status_icon);
             UiUtils.setSyncStatus(statusIcon, status);
@@ -239,21 +236,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             title = file.getTitle();
 
             // if the file is uploading, show the progress
-            if (mType == TYPE_PROGRESS
-                    && (status == KiiFile.STATUS_SYNC_IN_QUEUE
-                            || status == KiiFile.STATUS_UPLOADING_BODY || status == KiiFile.STATUS_PREPARE_TO_SYNC)) {
-                int progress = file.getUploadProgress();
-                if (progress < 0)
-                    progress = 0;
-                caption = Integer.toString(progress) + " %";
-            } else {
-                // set the creation date
-                caption = (String) DateUtils.formatSameDayTime(
-                        file.getUpdateTime(), System.currentTimeMillis(),
-                        DateFormat.SHORT, DateFormat.SHORT);
-            }
-
-            // caption = file.getMimeType();
+            caption = getKiiFileCaption(file, status, mType);
 
             // set the size
             subCaption = Formatter
@@ -322,6 +305,24 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
 
         view.setTag(file);
         return view;
+    }
+
+    public static String getKiiFileCaption(KiiFile file, int status, int type) {
+        String caption;
+        if (type == TYPE_PROGRESS
+                && (status == KiiFile.STATUS_SYNC_IN_QUEUE
+                        || status == KiiFile.STATUS_UPLOADING_BODY || status == KiiFile.STATUS_PREPARE_TO_SYNC)) {
+            int progress = file.getUploadProgress();
+            if (progress < 0)
+                progress = 0;
+            caption = Integer.toString(progress) + " %";
+        } else {
+            // set the creation date
+            caption = (String) DateUtils.formatSameDayTime(
+                    file.getUpdateTime(), System.currentTimeMillis(),
+                    DateFormat.SHORT, DateFormat.SHORT);
+        }
+        return caption;
     }
 
     public Object getGroup(int groupPosition) {

@@ -697,6 +697,17 @@ public class KiiSyncClient {
         return ret;
     }
 
+    public int getKiiFileStatus(KiiFile file) {
+        int status;
+        String category = file.getCategory();
+        if (!TextUtils.isEmpty(category)
+                && KiiSyncClient.CATEGORY_TRASH.equalsIgnoreCase(category)) {
+            status = getStatus(file);
+        } else {
+            status = getStatusFromCache(file);
+        }
+        return status;
+    }
     /**
      * Return the status of an KiiFile from Cache Non Blocking Call
      * 

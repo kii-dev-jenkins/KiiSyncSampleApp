@@ -168,6 +168,11 @@ public class KiiListItemView extends LinearLayout {
                 }
             }
         }
-
+    }
+    
+    public void setCaption(String caption, String subCaption) {
+        UiUtils.setTwoLinesText(new SpannableString(filename),
+                new SpannableString(caption), subCaption,
+                R.drawable.icon_format_text, v);
     }
 }
