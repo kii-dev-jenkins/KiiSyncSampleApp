@@ -105,7 +105,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     if (updateProgress()) {
                         setProgressBarIndeterminateVisibility(true);
                         setProgressBarVisibility(true);
-                        handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 500);
                     } else {
                         setProgressBarIndeterminateVisibility(false);
                         setProgressBarVisibility(false);
@@ -122,10 +121,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     }
                 case PROGRESS_CHECK:
                     updateProgress();
-                    msg.what = PROGRESS_CHECK;
-                    Message newMsg = new Message();
-                    newMsg.copyFrom(msg);
-                    handler.sendMessageDelayed(newMsg, 500);
                     break;
 
                 case PROGRESS_UPDATE:

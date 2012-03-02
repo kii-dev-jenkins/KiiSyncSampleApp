@@ -68,8 +68,24 @@ public class ProgressListActivity extends ExpandableListActivity implements
         connect();
         registerForContextMenu(getExpandableListView());
     }
+    
+    
 
     @Override
+	protected void onPause() {
+        handler.removeMessages(PROGRESS_AUTO);
+        handler.removeMessages(PROGRESS_CHECK);
+        handler.removeMessages(PROGRESS_END);
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 500);
+		super.onResume();
+	}
+
+	@Override
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
@@ -230,6 +246,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+       	
             switch (msg.what) {
                 case SETUP_ADPTOR:
                     adpterSetup();
