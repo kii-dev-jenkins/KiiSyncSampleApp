@@ -11,17 +11,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
+import android.widget.TextView;
 
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.DownloadManager;
@@ -38,7 +38,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
     KiiFileExpandableListAdapter mAdapter = null;
     NewEventListener mNewEventListener = null;
     private static final int MENU_ITEM_CANCEL = 2;
-    
+
     private static final int OPTION_MENU_SETTING = 0;
     private View mHeaderView = null;
 
@@ -68,24 +68,21 @@ public class ProgressListActivity extends ExpandableListActivity implements
         connect();
         registerForContextMenu(getExpandableListView());
     }
-    
-    
 
     @Override
-	protected void onPause() {
+    protected void onPause() {
         handler.removeMessages(PROGRESS_AUTO);
-        handler.removeMessages(PROGRESS_CHECK);
         handler.removeMessages(PROGRESS_END);
-		super.onPause();
-	}
+        super.onPause();
+    }
 
-	@Override
-	protected void onResume() {
-		handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 500);
-		super.onResume();
-	}
+    @Override
+    protected void onResume() {
+        handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 500);
+        super.onResume();
+    }
 
-	@Override
+    @Override
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
@@ -168,8 +165,9 @@ public class ProgressListActivity extends ExpandableListActivity implements
         public void onSyncComplete(SyncMsg msg) {
             if (msg != null) {
                 if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
-                    Intent apiIntent = new Intent(context
-                            .getApplicationContext(), StartActivity.class);
+                    Intent apiIntent = new Intent(
+                            context.getApplicationContext(),
+                            StartActivity.class);
                     apiIntent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
                     context.startActivity(apiIntent);
                 } else if (msg.sync_result == SyncMsg.ERROR_PFS_BUSY) {
@@ -214,48 +212,55 @@ public class ProgressListActivity extends ExpandableListActivity implements
             setListAdapter(mAdapter);
             mNewEventListener.register();
             handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 500);
+            updateProgress();
         }
     }
 
     public final static int PROGRESS_START = 1;
-    public final static int PROGRESS_CHECK = 2;
     public final static int PROGRESS_END = 3;
     public final static int PROGRESS_AUTO = 4;
     public final static int SETUP_ADPTOR = 5;
     public final static int PROGRESS_UPDATE = 6;
 
-    private boolean updateProgress() {
+    private int updateProgress() {
         KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
         if (kiiClient != null) {
             int progress = kiiClient.getProgress();
-            if (progress > 0 && progress!=SyncMsg.SYNC_NOT_RUNNING) {
-                setProgress(progress * 100);
+            if (progress > 0 && progress != SyncMsg.SYNC_NOT_RUNNING) {
+                setProgress(progress);
                 mAdapter.notifyDataSetChanged();
-                return true;
+                return progress;
             }
 
             DownloadManager downManager = kiiClient.downManager;
-            if (downManager != null && downManager.getDownloadProgress() >= 0) {
-                setProgress((int) (downManager.getDownloadProgress() * 100));
-                return true;
+            if (downManager != null) {
+                double downloadProgress = downManager.getDownloadProgress();
+                if (downloadProgress > 0) {
+                    progress = (int) (downManager.getDownloadProgress() * 100);
+                    setProgress(progress);
+                    return progress;
+                }
             }
         }
-        return false;
+        return 0;
     }
 
+    private int mProgress = 0;
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-       	
+
             switch (msg.what) {
                 case SETUP_ADPTOR:
                     adpterSetup();
                     break;
                 case PROGRESS_AUTO:
-                    if (updateProgress()) {
+                    mProgress = updateProgress();
+                    if (mProgress > 0) {
                         setProgressBarIndeterminateVisibility(true);
                         setProgressBarVisibility(true);
                         handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 500);
+                        setHeaderText();
                     } else {
                         setProgressBarIndeterminateVisibility(false);
                         setProgressBarVisibility(false);
@@ -263,27 +268,25 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     break;
                 case PROGRESS_START:
                     handler.removeMessages(PROGRESS_AUTO);
-                    handler.removeMessages(PROGRESS_CHECK);
                     handler.removeMessages(PROGRESS_END);
+                    handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 5000);
                     setProgressBarIndeterminateVisibility(true);
                     setProgressBarVisibility(true);
                     if (msg.obj != null && msg.obj instanceof String) {
                         setTitle((String) msg.obj);
                     }
-                case PROGRESS_CHECK:
-                    updateProgress();
-                    msg.what = PROGRESS_CHECK;
-                    Message newMsg = new Message();
-                    newMsg.copyFrom(msg);
-                    handler.sendMessageDelayed(newMsg, 500);
-                    break;
                 case PROGRESS_UPDATE:
+                    mProgress = updateProgress();
+                    if (mProgress > 0) {
+                        setHeaderText();
+                    }
+                    setProgressBarIndeterminateVisibility(true);
+                    setProgressBarVisibility(true);
                     mAdapter.notifyDataSetChanged();
                     break;
                 case PROGRESS_END:
                 default:
                     handler.removeMessages(PROGRESS_AUTO);
-                    handler.removeMessages(PROGRESS_CHECK);
                     handler.removeMessages(PROGRESS_END);
                     setProgressBarIndeterminateVisibility(false);
                     setProgressBarVisibility(false);
@@ -291,7 +294,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     if (mAdapter != null) {
                         mAdapter.notifyDataSetChanged();
                     }
-                    //finish();
+                    // finish();
                     return;
             }
 
@@ -384,7 +387,12 @@ public class ProgressListActivity extends ExpandableListActivity implements
     private void setHeaderText() {
         if (mHeaderView != null) {
             TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
-            tv.setText(UiUtils.getLastSyncTime(this));
+            if (mProgress > 0) {
+                tv.setText("Progress: " + mProgress + "%");
+            } else {
+                tv.setText(UiUtils.getLastSyncTime(this));
+            }
+
         }
     }
 
@@ -396,7 +404,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case OPTION_MENU_SETTING:
                 Intent intent = new Intent(this, StartActivity.class);
                 intent.setAction(Intent.ACTION_CONFIGURATION_CHANGED);
@@ -405,6 +413,5 @@ public class ProgressListActivity extends ExpandableListActivity implements
         }
         return true;
     }
-    
-    
+
 }

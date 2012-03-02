@@ -2,6 +2,7 @@ package com.kii.demo.sync.utils;
 
 import java.io.File;
 import java.net.URL;
+import java.text.DateFormat;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kii.demo.sync.R;
+import com.kii.demo.sync.activities.KiiFileExpandableListAdapter;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncPref;
 
@@ -246,6 +248,24 @@ public class UiUtils {
 
     public static void showToast(Context context, String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+    }
+
+    public static String getKiiFileCaption(KiiFile file, int status, int type) {
+        String caption;
+        if (type == KiiFileExpandableListAdapter.TYPE_PROGRESS
+                && (status == KiiFile.STATUS_SYNC_IN_QUEUE
+                        || status == KiiFile.STATUS_UPLOADING_BODY || status == KiiFile.STATUS_PREPARE_TO_SYNC)) {
+            int progress = file.getUploadProgress();
+            if (progress < 0)
+                progress = 0;
+            caption = Integer.toString(progress) + " %";
+        } else {
+            // set the creation date
+            caption = (String) DateUtils.formatSameDayTime(
+                    file.getUpdateTime(), System.currentTimeMillis(),
+                    DateFormat.SHORT, DateFormat.SHORT);
+        }
+        return caption;
     }
 
 }

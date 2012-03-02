@@ -1,7 +1,6 @@
 package com.kii.demo.sync.activities;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -12,7 +11,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.text.format.Formatter;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -158,7 +156,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             view.refreshWithNewKiiFile(file, icon);
         }
         int status = kiiClient.getKiiFileStatus(file);
-        String caption = getKiiFileCaption(file, status, mType);
+        String caption = UiUtils.getKiiFileCaption(file, status, mType);
         String subCaption = Formatter.formatFileSize(mActivity,
                 file.getSizeOnDB());
         view.setCaption(caption, subCaption);
@@ -236,7 +234,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             title = file.getTitle();
 
             // if the file is uploading, show the progress
-            caption = getKiiFileCaption(file, status, mType);
+            caption = UiUtils.getKiiFileCaption(file, status, mType);
 
             // set the size
             subCaption = Formatter
@@ -305,24 +303,6 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
 
         view.setTag(file);
         return view;
-    }
-
-    public static String getKiiFileCaption(KiiFile file, int status, int type) {
-        String caption;
-        if (type == TYPE_PROGRESS
-                && (status == KiiFile.STATUS_SYNC_IN_QUEUE
-                        || status == KiiFile.STATUS_UPLOADING_BODY || status == KiiFile.STATUS_PREPARE_TO_SYNC)) {
-            int progress = file.getUploadProgress();
-            if (progress < 0)
-                progress = 0;
-            caption = Integer.toString(progress) + " %";
-        } else {
-            // set the creation date
-            caption = (String) DateUtils.formatSameDayTime(
-                    file.getUpdateTime(), System.currentTimeMillis(),
-                    DateFormat.SHORT, DateFormat.SHORT);
-        }
-        return caption;
     }
 
     public Object getGroup(int groupPosition) {

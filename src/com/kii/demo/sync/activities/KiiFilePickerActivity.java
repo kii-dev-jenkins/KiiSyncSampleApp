@@ -12,18 +12,17 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.DownloadManager;
@@ -66,8 +65,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        requestWindowFeature(Window.FEATURE_PROGRESS);
         mNewEventListener = new NewEventListener(this);
         connect();
         registerForContextMenu(getExpandableListView());
@@ -102,20 +99,11 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     adpaterSetup();
                     break;
                 case PROGRESS_AUTO:
-                    if (updateProgress()) {
-                        setProgressBarIndeterminateVisibility(true);
-                        setProgressBarVisibility(true);
-                    } else {
-                        setProgressBarIndeterminateVisibility(false);
-                        setProgressBarVisibility(false);
-                    }
                     break;
                 case PROGRESS_START:
                     handler.removeMessages(PROGRESS_AUTO);
                     handler.removeMessages(PROGRESS_CHECK);
                     handler.removeMessages(PROGRESS_END);
-                    setProgressBarIndeterminateVisibility(true);
-                    setProgressBarVisibility(true);
                     if (msg.obj != null && msg.obj instanceof String) {
                         setTitle((String) msg.obj);
                     }
@@ -132,8 +120,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     handler.removeMessages(PROGRESS_CHECK);
                     handler.removeMessages(PROGRESS_END);
 
-                    setProgressBarIndeterminateVisibility(false);
-                    setProgressBarVisibility(false);
                     setTitle(R.string.app_name);
                     if (mAdapter != null) {
                         mAdapter.notifyDataSetChanged();
