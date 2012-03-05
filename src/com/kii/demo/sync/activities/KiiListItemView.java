@@ -113,7 +113,7 @@ public class KiiListItemView extends LinearLayout {
         filesize = kfile.getSizeOnDB();
         isDirectory = kfile.isDirectory();
         String category = kfile.getCategory();
-        // if the file is not belong to TRASH
+        // if the file is not in TRASH
         // it will use the cache as much
         if (!TextUtils.isEmpty(category)
                 && KiiSyncClient.CATEGORY_TRASH.equalsIgnoreCase(category)) {

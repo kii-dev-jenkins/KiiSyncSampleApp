@@ -73,16 +73,10 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     private boolean updateProgress() {
         KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
         if (kiiClient != null) {
-            int progress = kiiClient.getProgress();
+            int progress = kiiClient.getOverallProgress();
             if (progress > 0) {
                 setProgress(progress * 100);
                 mAdapter.notifyDataSetChanged();
-                return true;
-            }
-
-            DownloadManager downManager = kiiClient.downManager;
-            if (downManager != null && downManager.getDownloadProgress() >= 0) {
-                setProgress((int) (downManager.getDownloadProgress() * 100));
                 return true;
             }
         }

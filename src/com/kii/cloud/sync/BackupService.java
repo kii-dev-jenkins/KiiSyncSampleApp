@@ -207,8 +207,7 @@ public class BackupService extends Service {
 
     private void startSync(int mode) {
         if (SyncPref.isLoggedIn()) {
-            if (mSyncClient.getProgress() == SyncMsg.SYNC_NOT_RUNNING
-                    || mSyncClient.getProgress() == SyncMsg.ERROR_SETUP) {
+            if (!mSyncClient.isSyncRunning()) {
                 new SyncTask(mode).execute();
             }
         }
@@ -266,9 +265,8 @@ public class BackupService extends Service {
         int time = BackupPref.getUserIntentionTime();
         if (time > 0) {
             long interval = time * 60 * 60;
-            mAlarmManager.setRepeating(AlarmManager.RTC, System
-                    .currentTimeMillis()
-                    + interval, interval, mPi);
+            mAlarmManager.setRepeating(AlarmManager.RTC,
+                    System.currentTimeMillis() + interval, interval, mPi);
         }
     }
 

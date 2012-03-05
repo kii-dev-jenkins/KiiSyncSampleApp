@@ -81,10 +81,12 @@ public class KiiSyncClient {
      * @return {@link SyncMsg#OK } Registration successful.<br>
      *         {@link SyncMsg#ERROR_INVALID_INPUT} Input is invalid.<br>
      *         {@link SyncMsg#ERROR_ALREADY_KII_USER} User is already
-     *         registered.<br> {@link SyncMsg#ERROR_PROTOCOL} Protocol error.<br>
-     *         {@link SyncMsg#ERROR_IO} IO error.<br> {@link SyncMsg#ERROR_JSON}
-     *         Json format is invalid.<br> {@link SyncMsg#ERROR_UNKNOWN_STATUSCODE}
-     *         Unknown HTTP status code.<br>
+     *         registered.<br>
+     *         {@link SyncMsg#ERROR_PROTOCOL} Protocol error.<br>
+     *         {@link SyncMsg#ERROR_IO} IO error.<br>
+     *         {@link SyncMsg#ERROR_JSON} Json format is invalid.<br>
+     *         {@link SyncMsg#ERROR_UNKNOWN_STATUSCODE} Unknown HTTP status
+     *         code.<br>
      */
     public int register(String email, String password, String country,
             String nickName, String mobile) {
@@ -149,13 +151,14 @@ public class KiiSyncClient {
     /**
      * suspend the existing sync session.
      * 
-     * @return {@link SyncMsg#OK} Successful.<br> {@link SyncMsg#ERROR_SETUP}
-     *         SyncManager is not instantiated.<br>
+     * @return {@link SyncMsg#OK} Successful.<br>
+     *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
      *         {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Remote method
-     *         invocation failed.<br> {@link SyncMsg#ERROR_PFS_NOTFOUND} There is
-     *         not sync session to stop.<br> {@link SyncMsg#ERROR_PFS_NG} Failed by
-     *         unknown reason.<br> {@link SyncMsg#ERROR_PFS_INVARGS} Failed by
-     *         unknown reason.<br>
+     *         invocation failed.<br>
+     *         {@link SyncMsg#ERROR_PFS_NOTFOUND} There is not sync session to
+     *         stop.<br>
+     *         {@link SyncMsg#ERROR_PFS_NG} Failed by unknown reason.<br>
+     *         {@link SyncMsg#ERROR_PFS_INVARGS} Failed by unknown reason.<br>
      */
     public int suspend() {
         return mSyncManager.suspend();
@@ -171,20 +174,24 @@ public class KiiSyncClient {
      * @return {@link SyncMsg#PFS_SYNCRESULT_SUCCESSFULLY} Refresh successfully.<br>
      *         {@link SyncMsg#ERROR_AUTHENTICAION_ERROR} Authentication error.<br>
      *         {@link SyncMsg#PFS_SYNCRESULT_NOT_SETUP} SessionManager is not
-     *         instantiated.<br> {@link SyncMsg#PFS_SYNCRESULT_OTHERERROR} Unknown
-     *         error.<br> {@link SyncMsg#ERROR_INTERRUPTED} Sync session is
-     *         interrupted.<br> {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Could
-     *         not connect to remote method.<br> {@link SyncMsg#PFS_SYNCRESULT_MORE}
-     *         sync OK but not complete yet (more item in server).<br>
-     *         {@link SyncMsg#PFS_SYNCRESULT_REQUEST_FORCE_STOP} Force stop is
-     *         requested.<br> {@link SyncMsg#PFS_SYNCRESULT_FORCE_STOP} Sync is
-     *         forcefully stopped.<br> {@link SyncMsg#PFS_SYNCRESULT_RUNNING}
-     *         Another sync session is running.<br>
-     *         {@link SyncMsg#PFS_SYNCRESULT_BUSY} sync cannot proceed because
-     *         the sync system is busy.<br> {@link SyncMsg#PFS_SYNCRESULT_TIMEOUT}
-     *         Sync is timeout.<br> {@link SyncMsg#PFS_SYNCRESULT_USER_EXPIRED} User
-     *         has expired.<br> {@link SyncMsg#ERROR_SETUP} SyncManager is not
      *         instantiated.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_OTHERERROR} Unknown error.<br>
+     *         {@link SyncMsg#ERROR_INTERRUPTED} Sync session is interrupted.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Could not connect
+     *         to remote method.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_MORE} sync OK but not complete yet
+     *         (more item in server).<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REQUEST_FORCE_STOP} Force stop is
+     *         requested.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_FORCE_STOP} Sync is forcefully
+     *         stopped.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_RUNNING} Another sync session is
+     *         running.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_BUSY} sync cannot proceed because
+     *         the sync system is busy.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_TIMEOUT} Sync is timeout.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_USER_EXPIRED} User has expired.<br>
+     *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
      */
     public int refresh() {
         return mSyncManager.refresh();
@@ -198,20 +205,24 @@ public class KiiSyncClient {
      * @return {@link SyncMsg#PFS_SYNCRESULT_SUCCESSFULLY} Refresh successfully.<br>
      *         {@link SyncMsg#ERROR_AUTHENTICAION_ERROR} Authentication error.<br>
      *         {@link SyncMsg#PFS_SYNCRESULT_NOT_SETUP} SessionManager is not
-     *         instantiated.<br> {@link SyncMsg#PFS_SYNCRESULT_OTHERERROR} Unknown
-     *         error.<br> {@link SyncMsg#ERROR_INTERRUPTED} Sync session is
-     *         interrupted.<br> {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Could
-     *         not connect to remote method.<br> {@link SyncMsg#PFS_SYNCRESULT_MORE}
-     *         sync OK but not complete yet (more item in server).<br>
-     *         {@link SyncMsg#PFS_SYNCRESULT_REQUEST_FORCE_STOP} Force stop is
-     *         requested.<br> {@link SyncMsg#PFS_SYNCRESULT_FORCE_STOP} Sync is
-     *         forcefully stopped.<br> {@link SyncMsg#PFS_SYNCRESULT_RUNNING}
-     *         Another sync session is running.<br>
-     *         {@link SyncMsg#PFS_SYNCRESULT_BUSY} sync cannot proceed because
-     *         the sync system is busy.<br> {@link SyncMsg#PFS_SYNCRESULT_TIMEOUT}
-     *         Sync is timeout.<br> {@link SyncMsg#PFS_SYNCRESULT_USER_EXPIRED} User
-     *         has expired.<br> {@link SyncMsg#ERROR_SETUP} SyncManager is not
      *         instantiated.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_OTHERERROR} Unknown error.<br>
+     *         {@link SyncMsg#ERROR_INTERRUPTED} Sync session is interrupted.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Could not connect
+     *         to remote method.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_MORE} sync OK but not complete yet
+     *         (more item in server).<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REQUEST_FORCE_STOP} Force stop is
+     *         requested.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_FORCE_STOP} Sync is forcefully
+     *         stopped.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_RUNNING} Another sync session is
+     *         running.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_BUSY} sync cannot proceed because
+     *         the sync system is busy.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_TIMEOUT} Sync is timeout.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_USER_EXPIRED} User has expired.<br>
+     *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
      */
     public int refreshQuick() {
         return mSyncManager.refreshQuick();
@@ -224,11 +235,23 @@ public class KiiSyncClient {
      * @return <b>Positive integer between 1 to 100 </b> Percentage of progress.<br>
      *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
      *         {@link SyncMsg#SYNC_NOT_RUNNING} Currently no sync session is
-     *         running.<br> {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Remote
-     *         method invocation failed.
+     *         running.<br>
+     *         {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Remote method
+     *         invocation failed.
      */
-    public int getProgress() {
+    private int getProgress() {
         return mSyncManager.getProgress();
+    }
+
+    public boolean isSyncRunning() {
+        int status = mSyncManager.getProgress();
+        if ((status == SyncMsg.ERROR_SETUP)
+                || (status == SyncMsg.SYNC_NOT_RUNNING)) {
+            return false;
+        } else {
+            return true;
+        }
+
     }
 
     /**
@@ -514,9 +537,7 @@ public class KiiSyncClient {
         for (String file : files) {
             int code = upload(file, false);
             if (code != SyncMsg.OK) {
-                Log
-                        .e(TAG, "Failed to upload(" + file + "), error code:"
-                                + code);
+                Log.e(TAG, "Failed to upload(" + file + "), error code:" + code);
             }
         }
         mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
@@ -708,6 +729,7 @@ public class KiiSyncClient {
         }
         return status;
     }
+
     /**
      * Return the status of an KiiFile from Cache Non Blocking Call
      * 
@@ -876,17 +898,17 @@ public class KiiSyncClient {
      * @return
      */
     public int restoreFromTrash(KiiFile file) {
-    	
-    	 // application specific data
+
+        // application specific data
         file.setAppData("File is restored from trash");
         // reset the category as CATEGORY_NONE to indicate non trash
         file.setCategory(CATEGORY_NONE);
         int ret = update(file);
-    	
+
         // return error code if error with move to trash
-        if(ret!=SyncMsg.OK)
-        	return ret;
-        
+        if (ret != SyncMsg.OK)
+            return ret;
+
         try {
             // download a file
             download(file, file.getResourceUrl());
@@ -947,12 +969,13 @@ public class KiiSyncClient {
         }
         return false;
     }
-    
+
     /**
-     * Notify local change via {@link KiiNewEventListener#onLocalChangeSyncedEvent(Uri[])} 
+     * Notify local change via
+     * {@link KiiNewEventListener#onLocalChangeSyncedEvent(Uri[])}
      */
-    public void notifyKiiFileLocalChange(){
-    	mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
+    public void notifyKiiFileLocalChange() {
+        mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
     }
 
     /**
@@ -972,7 +995,7 @@ public class KiiSyncClient {
             ret = upload(file.getAbsoluteFile());
         }
         if (ret == SyncMsg.OK) {
-        	notifyKiiFileLocalChange();
+            notifyKiiFileLocalChange();
         }
         return SyncMsg.OK;
     }
@@ -985,8 +1008,9 @@ public class KiiSyncClient {
             if (files[ct].isFile()) {
                 int ret = upload(files[ct].getAbsolutePath(), false);
                 if (ret != SyncMsg.OK) {
-                    Log.e(TAG, "Fail(" + ret + ") to Upload file:"
-                            + files[ct].getAbsolutePath());
+                    Log.e(TAG,
+                            "Fail(" + ret + ") to Upload file:"
+                                    + files[ct].getAbsolutePath());
                 }
             } else {
                 total += upload(files[ct]);
@@ -1024,6 +1048,26 @@ public class KiiSyncClient {
         static final int NOTFOUND = 1;
         static final int INVARG = -1;
         static final int NG = -2;
+    }
+
+    /**
+     * @return: integer 0-100: overall progress: pfs and http
+     */
+    public int getOverallProgress() {
+        int pfsProgress = getProgress();
+        int httpProgress = 0;
+        if (downManager != null) {
+            httpProgress = (int) (downManager.getDownloadProgress() * 100);
+        }
+        if ((httpProgress > 0) && (pfsProgress > 0)) {
+            return (int) ((pfsProgress + httpProgress) / 2);
+        } else if (httpProgress > 0) {
+            return httpProgress;
+        } else if (pfsProgress > 0) {
+            return pfsProgress;
+        } else {
+            return 0;
+        }
     }
 
 }

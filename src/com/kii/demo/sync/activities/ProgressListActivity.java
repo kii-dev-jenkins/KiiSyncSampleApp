@@ -225,21 +225,11 @@ public class ProgressListActivity extends ExpandableListActivity implements
     private int updateProgress() {
         KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
         if (kiiClient != null) {
-            int progress = kiiClient.getProgress();
+            int progress = kiiClient.getOverallProgress();
             if (progress > 0 && progress != SyncMsg.SYNC_NOT_RUNNING) {
                 setProgress(progress);
                 mAdapter.notifyDataSetChanged();
                 return progress;
-            }
-
-            DownloadManager downManager = kiiClient.downManager;
-            if (downManager != null) {
-                double downloadProgress = downManager.getDownloadProgress();
-                if (downloadProgress > 0) {
-                    progress = (int) (downManager.getDownloadProgress() * 100);
-                    setProgress(progress);
-                    return progress;
-                }
             }
         }
         return 0;

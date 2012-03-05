@@ -149,12 +149,11 @@ public class StartActivity extends Activity {
         updateView();
 
         Intent i = getIntent();
-        if (i != null
-                && i.getAction() != null ){        	
-            if( i.getAction().compareToIgnoreCase(ACTION_ENTER_PASSWORD) == 0) {
+        if (i != null && i.getAction() != null) {
+            if (i.getAction().compareToIgnoreCase(ACTION_ENTER_PASSWORD) == 0) {
                 updatePwd();
-            }else if ( i.getAction().compareToIgnoreCase(ACTION_LOGOUT) == 0) {
-            	lougoutDemo();
+            } else if (i.getAction().compareToIgnoreCase(ACTION_LOGOUT) == 0) {
+                lougoutDemo();
             }
         }
     }
@@ -205,8 +204,10 @@ public class StartActivity extends Activity {
 
     protected void updatePwd() {
         final EditText input = new EditText(this);
-        new AlertDialog.Builder(this).setTitle("Verification has failed")
-                .setMessage("Enter New Password:").setView(input)
+        new AlertDialog.Builder(this)
+                .setTitle("Verification has failed")
+                .setMessage("Enter New Password:")
+                .setView(input)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String newPassword = input.getText().toString();
@@ -218,7 +219,8 @@ public class StartActivity extends Activity {
                             updatePwd(newPassword);
                         }
                     }
-                }).setNegativeButton("Cancel",
+                })
+                .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,
                                     int whichButton) {
@@ -237,9 +239,11 @@ public class StartActivity extends Activity {
 
     protected void changePwd() {
         final EditText input = new EditText(this);
-        new AlertDialog.Builder(this).setTitle("Change Password").setMessage(
-                "Enter new password:").setView(input).setPositiveButton("Ok",
-                new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(this)
+                .setTitle("Change Password")
+                .setMessage("Enter new password:")
+                .setView(input)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String newPassword = input.getText().toString();
                         if (TextUtils.isEmpty(newPassword)) {
@@ -250,13 +254,16 @@ public class StartActivity extends Activity {
                             changePwd(newPassword);
                         }
                     }
-                }).setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        Toast.makeText(mContext, "Cancel Change Password.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }).show();
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                    int whichButton) {
+                                Toast.makeText(mContext,
+                                        "Cancel Change Password.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }).show();
     }
 
     protected void changePwd(String newPassword) {
@@ -291,7 +298,8 @@ public class StartActivity extends Activity {
         task.execute(mUsr.getText().toString(), mPwd.getText().toString());
     }
 
-    public static void showAlertDialog(Context context, String title, int errorCode) {
+    public static void showAlertDialog(Context context, String title,
+            int errorCode) {
         showAlertDialog(context, title, getErrorMsg(errorCode, context));
     }
 
@@ -301,7 +309,8 @@ public class StartActivity extends Activity {
 
     private static AlertDialog mDialog = null;
 
-    public static void showAlertDialog(Context context, String title, CharSequence msg) {
+    public static void showAlertDialog(Context context, String title,
+            CharSequence msg) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(msg).setTitle(title).setCancelable(true)
@@ -350,10 +359,8 @@ public class StartActivity extends Activity {
             for (KiiFile file : trashFiles) {
                 Log.e(StartActivity.TAG, file.getAppData() + "; remotePath: "
                         + file.getRemotePath());
-                msg
-                        .append(ct + ":  " + Utils.getStatus(file, mContext) + ":"
-                                + file.getAppData() + ":"
-                                + getKiiFilePath(file) + "\n");
+                msg.append(ct + ":  " + Utils.getStatus(file, mContext) + ":"
+                        + file.getAppData() + ":" + getKiiFilePath(file) + "\n");
                 ct++;
             }
         }
@@ -414,7 +421,7 @@ public class StartActivity extends Activity {
                 + Long.toString(kClient.getStorageUsage()) + "bytes");
 
         mLastSyncTime.setText(UiUtils.getLastSyncTime(this));
-        
+
         // print the server location and SDK version
         mServerSite.setText("Connect to Server:" + SyncPref.getServerSite()
                 + " SDK Ver:" + SyncPref.getSDKVersion());
@@ -484,8 +491,8 @@ public class StartActivity extends Activity {
             case SyncMsg.ERROR_FILE_NULL:
                 return context.getString(R.string.msg_ERROR_UPLOAD_FILES);
             default:
-                return String.format(context
-                        .getString(R.string.msg_ERROR_OTHERS), code);
+                return String.format(
+                        context.getString(R.string.msg_ERROR_OTHERS), code);
         }
     }
 
@@ -510,7 +517,8 @@ public class StartActivity extends Activity {
             dialog.setCancelable(false);
             dialog.setButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
+                    KiiSyncClient kiiClient = KiiSyncClient
+                            .getInstance(mContext);
                     if (kiiClient != null) {
                         kiiClient.suspend();
                     }
@@ -528,9 +536,10 @@ public class StartActivity extends Activity {
             public void handleMessage(Message msg) {
 
                 if (dialog != null && dialog.isShowing()) {
-                    KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
+                    KiiSyncClient kiiClient = KiiSyncClient
+                            .getInstance(mContext);
                     if (kiiClient != null) {
-                        int progress = kiiClient.getProgress();
+                        int progress = kiiClient.getOverallProgress();
                         String progressMsg = null;
                         if (progress > 0) {
                             progressMsg = "Sync in progress " + progress + "%";
