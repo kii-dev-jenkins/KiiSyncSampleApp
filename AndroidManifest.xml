@@ -67,7 +67,7 @@
                 android:value="82946bf6961f4e34d3a53bbc941ac115" />
         </provider>
 
-        <activity android:name="com.kii.demo.sync.activities.Settings" >
+        <activity android:name=".activities.SettingsActivity" >
         </activity>
 
         <service android:name="com.kii.cloud.sync.BackupService" >

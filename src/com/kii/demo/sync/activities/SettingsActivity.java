@@ -10,7 +10,7 @@ import com.kii.demo.sync.utils.BackupPref;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.demo.sync.R;
 
-public class Settings extends PreferenceActivity implements
+public class SettingsActivity extends PreferenceActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Override

@@ -141,7 +141,7 @@ public class StartActivity extends Activity {
         mSetting.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, Settings.class);
+                Intent intent = new Intent(mContext, SettingsActivity.class);
                 startActivity(intent);
             }
         });
