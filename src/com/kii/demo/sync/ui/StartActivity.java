@@ -204,7 +204,8 @@ public class StartActivity extends Activity {
 
     protected void updatePwd() {
         final EditText input = new EditText(this);
-        new AlertDialog.Builder(this)
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder
                 .setTitle("Verification has failed")
                 .setMessage("Enter New Password:")
                 .setView(input)
@@ -228,7 +229,9 @@ public class StartActivity extends Activity {
                                         "Cancel Enter Password.",
                                         Toast.LENGTH_SHORT).show();
                             }
-                        }).show();
+                        });
+        mDialog = builder.create();
+        mDialog.show();
     }
 
     private void updatePwd(String newPassword) {
@@ -239,7 +242,8 @@ public class StartActivity extends Activity {
 
     protected void changePwd() {
         final EditText input = new EditText(this);
-        new AlertDialog.Builder(this)
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        mDialog =  builder
                 .setTitle("Change Password")
                 .setMessage("Enter new password:")
                 .setView(input)
@@ -263,7 +267,8 @@ public class StartActivity extends Activity {
                                         "Cancel Change Password.",
                                         Toast.LENGTH_SHORT).show();
                             }
-                        }).show();
+                        }).create();
+        mDialog.show();
     }
 
     protected void changePwd(String newPassword) {
@@ -326,7 +331,9 @@ public class StartActivity extends Activity {
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         if (mDialog != null) {
+            Log.d(TAG, "going to dismiss");
             mDialog.dismiss();
         }
         super.onDestroy();

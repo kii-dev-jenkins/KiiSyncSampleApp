@@ -500,13 +500,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     500);
             if (msg != null) {
                 switch (msg.sync_result) {
-                    case SyncMsg.ERROR_AUTHENTICAION_ERROR:
-                        Intent apiIntent = new Intent(mContext
-                                .getApplicationContext(), StartActivity.class);
-                        apiIntent
-                                .setAction(StartActivity.ACTION_ENTER_PASSWORD);
-                        mContext.startActivity(apiIntent);
-                        break;
                     case SyncMsg.OK:
                         setLastSyncTime();
                         break;
