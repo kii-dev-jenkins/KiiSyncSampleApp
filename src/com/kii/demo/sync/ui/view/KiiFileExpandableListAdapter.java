@@ -169,14 +169,12 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         }
         try {
             if (!TextUtils.isEmpty(sThumbnail)) {
-
                 if (ICON_CACHE.containsKey(sThumbnail)) {
                     icon = ICON_CACHE.get(sThumbnail);
                 } else {
                     File fThumbnail = new File(sThumbnail);
                     if (fThumbnail.exists() && fThumbnail.isFile()) {
                         Bitmap bitmap = BitmapFactory.decodeFile(sThumbnail);
-
                         if (bitmap.getHeight() > 120) {
                             // resize the bitmap if too big, save memory
                             bitmap = Bitmap.createScaledBitmap(
@@ -187,12 +185,12 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                         icon = new BitmapDrawable(bitmap);
                     }
                     ICON_CACHE.put(sThumbnail, icon);
-                    return icon;
                 }
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        return null;
+        return icon;
     }
 
     public Object getGroup(int groupPosition) {

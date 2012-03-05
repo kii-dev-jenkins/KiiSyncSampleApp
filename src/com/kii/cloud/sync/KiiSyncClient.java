@@ -780,14 +780,12 @@ public class KiiSyncClient {
      */
     public int getStatus(KiiFile file) {
         int status = getStatusFromCache(file);
-        Log.d(TAG, "getStatusFromCache: status is "+status+" for "+file.getTitle());
         if (status != 0) {
             return status;
         }
         // read the status of the KiiFile
         // this status is reading from the database
         status = file.getStatus();
-        Log.d(TAG, "getStatus: "+status);
         if (status == KiiFile.STATUS_SYNCED || status == KiiFile.STATUS_NO_BODY) {
             // check if the exist, if not indicate only remote copy
             if (file.isFile()) {

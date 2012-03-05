@@ -84,8 +84,6 @@ public class KiiListItemView extends LinearLayout {
     }
 
     public void refreshWithNewKiiFile(KiiFile file, Drawable mainIcon) {
-        if (file == null)
-            return;
         this.mainIcon = mainIcon;
         getKiiFileView(file);
     }
@@ -147,6 +145,22 @@ public class KiiListItemView extends LinearLayout {
 
     private void getDataFromGroup(KiiFileList group) {
         filename = group.getTitle();
+        if (filename.startsWith("Backup")) {
+            mainIcon = mContext.getResources().getDrawable(
+                    R.drawable.icon_kiisync);
+        } else if (filename.startsWith("Error")) {
+            mainIcon = mContext.getResources().getDrawable(
+                    R.drawable.icon_format_error);
+        } else if (filename.startsWith("Trash")) {
+            mainIcon = mContext.getResources().getDrawable(
+                    R.drawable.icon_format_trashcan);
+        } else if (filename.startsWith("Progress")) {
+            mainIcon = mContext.getResources().getDrawable(
+                    R.drawable.icon_format_progress);
+        } else {
+            mainIcon = mContext.getResources().getDrawable(
+                    R.drawable.icon_format_folder);
+        }
     }
 
     private void bindView() {
@@ -200,17 +214,7 @@ public class KiiListItemView extends LinearLayout {
                     .findViewById(R.id.list_sync_status_icon);
             UiUtils.setSyncStatus(statusIcon, 0);
             UiUtils.setOneLineText(new SpannableString(filename), v);
-            if (filename.startsWith("Backup")) {
-                UiUtils.setIcon(R.drawable.icon_kiisync, v);
-            } else if (filename.startsWith("Error")) {
-                UiUtils.setIcon(R.drawable.icon_format_error, v);
-            } else if (filename.startsWith("Trash")) {
-                UiUtils.setIcon(R.drawable.icon_format_trashcan, v);
-            } else if (filename.startsWith("Progress")) {
-                UiUtils.setIcon(R.drawable.icon_format_progress, v);
-            } else {
-                UiUtils.setIcon(R.drawable.icon_format_folder, v);
-            }
+            UiUtils.setIcon(mainIcon, v);
         }
     }
 
