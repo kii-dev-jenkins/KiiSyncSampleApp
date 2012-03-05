@@ -331,9 +331,7 @@ public class StartActivity extends Activity {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy");
         if (mDialog != null) {
-            Log.d(TAG, "going to dismiss");
             mDialog.dismiss();
         }
         super.onDestroy();
