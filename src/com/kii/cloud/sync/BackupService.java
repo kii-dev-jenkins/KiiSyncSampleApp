@@ -78,10 +78,7 @@ public class BackupService extends Service {
             Context context = BackupService.this;
             BackupPref.init(context);
             mSyncClient = KiiSyncClient.getInstance(context);
-            if (!syncInited) {
-                mSyncClient.initSync();
-                syncInited = true;
-            }
+            initSync();
             mAlarmManager = (AlarmManager) context
                     .getSystemService(Context.ALARM_SERVICE);
             Intent service = new Intent(context, BackupService.class);
@@ -107,10 +104,7 @@ public class BackupService extends Service {
 
         @Override
         protected Integer doInBackground(Void... params) {
-            if (!syncInited) {
-                mSyncClient.initSync();
-                syncInited = true;
-            }
+            initSync();
             if (taskId == SYNC_REFRESH) {
                 return mSyncClient.refresh();
             } else {
@@ -133,15 +127,15 @@ public class BackupService extends Service {
         }
     }
 
-    void showToast(String title, int errorCode) {
+    private void showToast(String title, int errorCode) {
         showToast(title, Utils.getErrorMsg(errorCode, this));
     }
 
-    void showToast(String title, CharSequence msg) {
+    private void showToast(String title, CharSequence msg) {
         showToast(title + ":" + msg);
     }
 
-    void showToast(String msg) {
+    private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 
@@ -157,10 +151,10 @@ public class BackupService extends Service {
         if (mSyncClient == null) {
             mSyncClient = KiiSyncClient.getInstance(this);
         }
-        if (intent == null || intent.getAction() == null)
+        if ((intent == null) || (intent.getAction() == null)) {
             return;
-        String action = intent.getAction();
-        int i = ACTION_MAP.get(action);
+        }
+        int i = ACTION_MAP.get(intent.getAction());
         switch (i) {
             case TIMER_CHANGED:
                 cancelAlarm();
@@ -221,7 +215,7 @@ public class BackupService extends Service {
     }
 
     private boolean shouldAutoSync() {
-        if (hasPendingSync() && isAutoSync() && dataConnectionMatches()) {
+        if (hasPendingSync() && isSetToAutoSync() && dataConnectionMatches()) {
             return true;
         }
         return false;
@@ -230,7 +224,7 @@ public class BackupService extends Service {
     private boolean shouldStopSync() {
         if (!hasPendingSync()) {
             return false;
-        } else if (!isAutoSync()) {
+        } else if (!isSetToAutoSync()) {
             return true;
         } else if (!dataConnectionMatches()) {
             return true;
@@ -243,7 +237,7 @@ public class BackupService extends Service {
         return (list != null) && (list.length > 0);
     }
 
-    private boolean isAutoSync() {
+    private boolean isSetToAutoSync() {
         return (BackupPref.getSyncMode() == BackupPref.MODE_AUTO);
     }
 
@@ -251,11 +245,13 @@ public class BackupService extends Service {
         boolean wifiOnly = BackupPref.getSyncWifiOnly();
         ConnectivityManager cm = (ConnectivityManager) this
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null)
+        if (cm == null) {
             return false;
+        }
         NetworkInfo ni = cm.getActiveNetworkInfo();
-        if (ni == null)
+        if (ni == null) {
             return false;
+        }
         int type = ni.getType();
         return !wifiOnly
                 || (wifiOnly && ((type == ConnectivityManager.TYPE_WIFI) || (type == ConnectivityManager.TYPE_WIMAX)));
@@ -272,6 +268,13 @@ public class BackupService extends Service {
 
     private void cancelAlarm() {
         mAlarmManager.cancel(mPi);
+    }
+
+    private void initSync() {
+        if (!syncInited) {
+            mSyncClient.initSync();
+            syncInited = true;
+        }
     }
 
 }

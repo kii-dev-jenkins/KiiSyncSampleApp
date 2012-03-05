@@ -61,6 +61,7 @@ public class KiiFileListener implements KiiNewEventListener {
 
         if (!isBusy.getAndSet(true)) {
             new Thread(new Runnable() {
+                @Override
                 public void run() {
                     executeUpdateCache();
                 }
@@ -85,7 +86,7 @@ public class KiiFileListener implements KiiNewEventListener {
             }
 
             KiiFile[] astroFiles = client.getAstroFiles();
-            if (astroFiles != null && astroFiles.length > 0) {
+            if ((astroFiles != null) && (astroFiles.length > 0)) {
                 for (int ct = 0; ct < astroFiles.length; ct++) {
                     tempKiiFileStatus.put(astroFiles[ct].getResourceUrl(),
                             astroFiles[ct].getStatus());
@@ -93,7 +94,7 @@ public class KiiFileListener implements KiiNewEventListener {
             }
 
             KiiFile[] backupFiles = client.getBackupFiles();
-            if (backupFiles != null && backupFiles.length > 0) {
+            if ((backupFiles != null) && (backupFiles.length > 0)) {
                 for (int ct = 0; ct < backupFiles.length; ct++) {
                     tempKiiFileStatus.put(backupFiles[ct].getResourceUrl(),
                             backupFiles[ct].getStatus());

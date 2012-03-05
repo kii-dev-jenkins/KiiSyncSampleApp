@@ -272,7 +272,7 @@ public class KiiSyncClient {
      * 
      * @return absolute path of the temp trash folder
      */
-    public String getTrashTempFolder() {
+    private String getTrashTempFolder() {
         if (mContext != null) {
             String cacheDir = mContext.getCacheDir().getAbsolutePath()
                     + "/trash/";
@@ -292,7 +292,7 @@ public class KiiSyncClient {
      * 
      * @return absolute path of the thumbanil folder
      */
-    public String getTempThumbnailFolder() {
+    private String getTempThumbnailFolder() {
         if (mContext != null) {
             String cacheDir = mContext.getCacheDir().getAbsolutePath();
             return cacheDir + "/thumbnail/";
@@ -358,10 +358,11 @@ public class KiiSyncClient {
     public int getUnsyncCount() {
 
         KiiFile[] files = getListInProgress();
-        if (files == null)
+        if (files == null) {
             return 0;
-        else
+        } else {
             return files.length;
+        }
     }
 
     /**
@@ -442,8 +443,9 @@ public class KiiSyncClient {
         } else {
             retValues = mSyncManager.deleteFilesRemainOriginalFile(files);
         }
-        if (retValues == null || retValues.size() == 0)
+        if ((retValues == null) || (retValues.size() == 0)) {
             return SyncMsg.ERROR_FILE_NOT_FOUND;
+        }
 
         // Can iterate through the list of return values
         // for(int ct=0; ct<retValues.size(); ct++){
@@ -462,8 +464,8 @@ public class KiiSyncClient {
      */
     public int cancel(KiiFile file) {
         int status = getStatus(file);
-        if (status == KiiFile.STATUS_PREPARE_TO_SYNC
-                || status == KiiFile.STATUS_UPLOADING_BODY) {
+        if ((status == KiiFile.STATUS_PREPARE_TO_SYNC)
+                || (status == KiiFile.STATUS_UPLOADING_BODY)) {
             int ret = mSyncManager.deleteRemainOrginalFile(file);
             if (ret == SyncMsg.OK) {
                 mSyncManager.getSyncObserver().notifySyncDelete(null);
@@ -761,8 +763,9 @@ public class KiiSyncClient {
         } else {
             KiiFile[] files = getKiiFilesByPath(pathName);
 
-            if (files == null || files.length == 0)
+            if ((files == null) || (files.length == 0)) {
                 return 0;
+            }
             // only takes the first file in the list
             // TODO: when support multiple devices sync, need to iterate through
             // the
@@ -786,7 +789,7 @@ public class KiiSyncClient {
         // read the status of the KiiFile
         // this status is reading from the database
         status = file.getStatus();
-        if (status == KiiFile.STATUS_SYNCED || status == KiiFile.STATUS_NO_BODY) {
+        if ((status == KiiFile.STATUS_SYNCED) || (status == KiiFile.STATUS_NO_BODY)) {
             // check if the exist, if not indicate only remote copy
             if (file.isFile()) {
                 File f = new File(file.getResourceUrl());
@@ -908,8 +911,9 @@ public class KiiSyncClient {
         int ret = update(file);
 
         // return error code if error with move to trash
-        if (ret != SyncMsg.OK)
+        if (ret != SyncMsg.OK) {
             return ret;
+        }
 
         try {
             // download a file
@@ -1032,13 +1036,14 @@ public class KiiSyncClient {
      *         responsive thread (eg. UI/Main thread).
      */
     public int renameFolder(String fullPathOfFolder, String newName) {
-        if (fullPathOfFolder == null || newName == null) {
+        if ((fullPathOfFolder == null) || (newName == null)) {
             return Result.INVARG;
         }
         Log.v(TAG, " going to update files in folder");
         KiiFile[] kiiFiles = KiiFileUtil.listFilesInFolder(fullPathOfFolder);
-        if (kiiFiles == null || kiiFiles.length <= 0)
+        if ((kiiFiles == null) || (kiiFiles.length <= 0)) {
             return Result.NOTFOUND;
+        }
 
         Log.v(TAG, "Total kiiFiles found :" + kiiFiles.length);
         KiiFileUtil.rename2(kiiFiles, fullPathOfFolder, newName);
@@ -1062,7 +1067,7 @@ public class KiiSyncClient {
             httpProgress = (int) (downManager.getDownloadProgress() * 100);
         }
         if ((httpProgress > 0) && (pfsProgress > 0)) {
-            return (int) ((pfsProgress + httpProgress) / 2);
+            return ((pfsProgress + httpProgress) / 2);
         } else if (httpProgress > 0) {
             return httpProgress;
         } else if (pfsProgress > 0) {
