@@ -92,11 +92,15 @@ public class UiUtils {
 
     public static String getLastSyncTime(Context context) {
         long backupTime = 0;
-        
-        try{
-        	backupTime = SyncPref.getLastSuccessfulSyncTime();
-        }catch(Exception ex){}
-        
+
+        try {
+            //sometimes it won't be inited before call this API
+            //need to give more SyncPref some lazy init method;
+            SyncPref.init(context);
+            backupTime = SyncPref.getLastSuccessfulSyncTime();
+        } catch (Exception ex) {
+        }
+
         if (backupTime > 0) {
             return String.format("Last successful sync is %s",
                     (String) DateUtils.getRelativeTimeSpanString(backupTime,
@@ -117,7 +121,7 @@ public class UiUtils {
         } else {
             imageView.setImageResource(iconID);
         }
-    
+
         return curView;
     }
 
@@ -128,7 +132,8 @@ public class UiUtils {
      * @param curView
      * @return
      */
-    public static View setOneLineText(String text, boolean alighCenter, View curView) {
+    public static View setOneLineText(String text, boolean alighCenter,
+            View curView) {
         TextView textView = (TextView) curView
                 .findViewById(R.id.list_complex_1line_title);
         textView.setText(text);
@@ -161,25 +166,25 @@ public class UiUtils {
      * @param curView
      * @return
      */
-    public static View setTwoLinesText(SpannableString title, SpannableString caption,
-            View curView) {
-    
+    public static View setTwoLinesText(SpannableString title,
+            SpannableString caption, View curView) {
+
         TextView titleView = (TextView) curView
                 .findViewById(R.id.list_complex_title);
         TextView captionView = (TextView) curView
                 .findViewById(R.id.list_complex_caption);
         titleView.setText(title);
-    
+
         if (caption != null)
             captionView.setText(caption);
         else
             captionView.setText("");
-    
+
         captionView
                 .setPadding(captionView.getPaddingLeft(),
                         captionView.getPaddingTop(), 50,
                         captionView.getPaddingBottom());
-    
+
         curView.findViewById(R.id.list_complex_1line_text).setVisibility(
                 View.GONE);
         curView.findViewById(R.id.list_complex_2lines_text).setVisibility(
@@ -189,8 +194,8 @@ public class UiUtils {
         return curView;
     }
 
-    public static View setTwoLinesText(SpannableString title, SpannableString caption,
-            String subCaption, int iconId, View curView) {
+    public static View setTwoLinesText(SpannableString title,
+            SpannableString caption, String subCaption, int iconId, View curView) {
         TextView titleView = (TextView) curView
                 .findViewById(R.id.list_complex_title);
         TextView captionView = (TextView) curView
@@ -200,17 +205,17 @@ public class UiUtils {
             captionView.setText(caption);
         else
             captionView.setText("");
-    
+
         // text on the bottom right
         TextView subCaptionView = (TextView) curView
                 .findViewById(R.id.list_complex_sub_caption);
-    
+
         if (subCaption != null) {
             subCaptionView.setText(subCaption);
         } else {
             subCaptionView.setText("");
         }
-    
+
         curView.findViewById(R.id.list_complex_1line_text).setVisibility(
                 View.GONE);
         curView.findViewById(R.id.list_complex_2lines_text).setVisibility(
@@ -231,7 +236,7 @@ public class UiUtils {
     public static View setIcon(Drawable icon, View curView) {
         ImageView imageView = (ImageView) curView
                 .findViewById(R.id.list_complex_icon);
-    
+
         if (icon != null) {
             imageView.setImageDrawable(icon);
             curView.findViewById(R.id.list_complex_icon_main).setVisibility(
@@ -242,7 +247,7 @@ public class UiUtils {
             curView.findViewById(R.id.list_complex_icon_main).setVisibility(
                     View.GONE);
         }
-    
+
         return curView;
     }
 
