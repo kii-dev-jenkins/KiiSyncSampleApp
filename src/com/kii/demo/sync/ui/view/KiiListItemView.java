@@ -42,25 +42,23 @@ public class KiiListItemView extends LinearLayout {
     public KiiListItemView(Context context, File file, KiiSyncClient client,
             Drawable mainIcon, View.OnClickListener listener) {
         super(context);
-        mContext = context;
-        mInflater = (LayoutInflater) mContext
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        v = mInflater.inflate(R.layout.list_complex, this, false);
-        this.client = client;
-        this.mainIcon = mainIcon;
-        mOnClickListener = listener;
-        type = TYPE_FILE;
-        getDataFromFile(file);
-        bindView();
-        v.setTag(file);
+        init(context, client, mainIcon, listener);
+        getFileView(file);
         addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
                 LayoutParams.WRAP_CONTENT));
     }
 
-    public KiiListItemView(Context context, KiiFile kfile,
-            KiiSyncClient client, Drawable mainIcon,
-            View.OnClickListener listener) {
+    public KiiListItemView(Context context, KiiFile file, KiiSyncClient client,
+            Drawable mainIcon, View.OnClickListener listener) {
         super(context);
+        init(context, client, mainIcon, listener);
+        getKiiFileView(file);
+        addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
+                LayoutParams.WRAP_CONTENT));
+    }
+
+    private void init(Context context, KiiSyncClient client, Drawable mainIcon,
+            View.OnClickListener listener) {
         mContext = context;
         mInflater = (LayoutInflater) mContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -68,24 +66,12 @@ public class KiiListItemView extends LinearLayout {
         this.client = client;
         this.mainIcon = mainIcon;
         mOnClickListener = listener;
-        type = TYPE_KII_FILE;
-        getDataFromKiiFile(kfile);
-        bindView();
-        v.setTag(kfile);
-        addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.WRAP_CONTENT));
     }
 
     public KiiListItemView(Context context, KiiFileList group) {
         super(context);
-        mContext = context;
-        mInflater = (LayoutInflater) mContext
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        v = mInflater.inflate(R.layout.list_complex, this, false);
-        type = TYPE_GROUP;
-        getDataFromGroup(group);
-        bindView();
-        v.setTag(null);
+        init(context, null, null, null);
+        getGroupView(group);
         addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
                 LayoutParams.WRAP_CONTENT));
     }
@@ -94,27 +80,39 @@ public class KiiListItemView extends LinearLayout {
 
     public void refreshWithNewFile(File file, Drawable mainIcon) {
         this.mainIcon = mainIcon;
-        type = TYPE_FILE;
-        getDataFromFile(file);
-        bindView();
-        v.setTag(file);
+        getFileView(file);
     }
 
     public void refreshWithNewKiiFile(KiiFile file, Drawable mainIcon) {
         if (file == null)
             return;
         this.mainIcon = mainIcon;
-        type = TYPE_KII_FILE;
-        getDataFromKiiFile(file);
+        getKiiFileView(file);
+    }
+
+    public void refreshWithNewGroup(KiiFileList group) {
+        getGroupView(group);
+    }
+
+    private void getFileView(File file) {
+        type = TYPE_FILE;
+        getDataFromFile(file);
         bindView();
         v.setTag(file);
     }
 
-    public void refreshWithNewGroup(KiiFileList group) {
+    private void getGroupView(KiiFileList group) {
         type = TYPE_GROUP;
         getDataFromGroup(group);
         bindView();
         v.setTag(null);
+    }
+
+    private void getKiiFileView(KiiFile file) {
+        type = TYPE_KII_FILE;
+        getDataFromKiiFile(file);
+        bindView();
+        v.setTag(file);
     }
 
     private void getDataFromFile(File file) {
