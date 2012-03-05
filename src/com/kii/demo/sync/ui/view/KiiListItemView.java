@@ -99,7 +99,7 @@ public class KiiListItemView extends LinearLayout {
         displaytime = file.lastModified();
         filesize = file.length();
         isDirectory = file.isDirectory();
-        syncstatus = client.getStatusFromCache(file.getAbsolutePath());
+        syncstatus = client.getStatus(file.getAbsolutePath());
         mime = MimeUtil.getInfoByFileName(filename);
     }
 
@@ -119,7 +119,7 @@ public class KiiListItemView extends LinearLayout {
                 && KiiSyncClient.CATEGORY_TRASH.equalsIgnoreCase(category)) {
             syncstatus = client.getStatus(kfile);
         } else {
-            syncstatus = client.getStatusFromCache(kfile);
+            syncstatus = client.getStatus(kfile);
         }
         mime = MimeUtil.getInfoByKiiFile(kfile);
     }

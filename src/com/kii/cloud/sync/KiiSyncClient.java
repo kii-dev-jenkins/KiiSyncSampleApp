@@ -736,7 +736,7 @@ public class KiiSyncClient {
      * @param pathName
      * @return
      */
-    public int getStatusFromCache(String pathName) {
+    private int getStatusFromCache(String pathName) {
         return getFileStatusCache().getKiiFileStatus(pathName);
     }
 
@@ -755,18 +755,21 @@ public class KiiSyncClient {
      * @return
      */
     public int getStatus(String pathName) {
+        int status = getStatusFromCache(pathName);
+        if (status != 0) {
+            return status;
+        } else {
+            KiiFile[] files = getKiiFilesByPath(pathName);
 
-        KiiFile[] files = getKiiFilesByPath(pathName);
-
-        if (files == null || files.length == 0)
-            return 0;
-
-        // only takes the first file in the list
-        // TODO: when support multi devices sync, need to iterate through the
-        // list and match by unique key
-        KiiFile file = files[0];
-
-        return getStatus(file);
+            if (files == null || files.length == 0)
+                return 0;
+            // only takes the first file in the list
+            // TODO: when support multiple devices sync, need to iterate through
+            // the
+            // list and match by unique key
+            KiiFile file = files[0];
+            return getStatus(file);
+        }
     }
 
     /**
@@ -776,10 +779,13 @@ public class KiiSyncClient {
      * @return
      */
     public int getStatus(KiiFile file) {
-
+        int status = getStatusFromCache(file);
+        if (status != 0) {
+            return status;
+        }
         // read the status of the KiiFile
         // this status is reading from the database
-        int status = file.getStatus();
+        status = file.getStatus();
 
         if (status == KiiFile.STATUS_SYNCED || status == KiiFile.STATUS_NO_BODY) {
 
