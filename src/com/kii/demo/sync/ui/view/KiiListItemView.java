@@ -37,6 +37,7 @@ public class KiiListItemView extends LinearLayout {
     private int type = -1;
     private static final int TYPE_FILE = 1;
     private static final int TYPE_KII_FILE = 2;
+    private static final int TYPE_GROUP = 3;
 
     public KiiListItemView(Context context, File file, KiiSyncClient client,
             Drawable mainIcon, View.OnClickListener listener) {
@@ -75,7 +76,22 @@ public class KiiListItemView extends LinearLayout {
                 LayoutParams.WRAP_CONTENT));
     }
 
+    public KiiListItemView(Context context, KiiFileList group) {
+        super(context);
+        mContext = context;
+        mInflater = (LayoutInflater) mContext
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        v = mInflater.inflate(R.layout.list_complex, this, false);
+        type = TYPE_GROUP;
+        getDataFromGroup(group);
+        bindView();
+        v.setTag(null);
+        addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
+                LayoutParams.WRAP_CONTENT));
+    }
+
     public static final String TAG = "KiiListItemView";
+
     public void refreshWithNewFile(File file, Drawable mainIcon) {
         this.mainIcon = mainIcon;
         type = TYPE_FILE;
@@ -92,6 +108,13 @@ public class KiiListItemView extends LinearLayout {
         getDataFromKiiFile(file);
         bindView();
         v.setTag(file);
+    }
+
+    public void refreshWithNewGroup(KiiFileList group) {
+        type = TYPE_GROUP;
+        getDataFromGroup(group);
+        bindView();
+        v.setTag(null);
     }
 
     private void getDataFromFile(File file) {
@@ -124,6 +147,10 @@ public class KiiListItemView extends LinearLayout {
         mime = MimeUtil.getInfoByKiiFile(kfile);
     }
 
+    private void getDataFromGroup(KiiFileList group) {
+        filename = group.getTitle();
+    }
+
     private void bindView() {
         ImageView iv = (ImageView) v
                 .findViewById(R.id.list_complex_more_button);
@@ -140,36 +167,55 @@ public class KiiListItemView extends LinearLayout {
         }
         iv.setFocusable(false);
         iv.setFocusableInTouchMode(false);
-        if (isDirectory) {
-            ImageView statusIcon = (ImageView) v
-                    .findViewById(R.id.list_sync_status_icon);
-            UiUtils.setSyncStatus(statusIcon, 0);
-            UiUtils.setIcon(R.drawable.icon_format_folder, v);
-            UiUtils.setOneLineText(new SpannableString(filename), v);
+        if (type != TYPE_GROUP) {
+            if (isDirectory) {
+                ImageView statusIcon = (ImageView) v
+                        .findViewById(R.id.list_sync_status_icon);
+                UiUtils.setSyncStatus(statusIcon, 0);
+                UiUtils.setIcon(R.drawable.icon_format_folder, v);
+                UiUtils.setOneLineText(new SpannableString(filename), v);
+            } else {
+                ImageView statusIcon = (ImageView) v
+                        .findViewById(R.id.list_sync_status_icon);
+                UiUtils.setSyncStatus(statusIcon, syncstatus);
+                String caption = (String) DateUtils.formatSameDayTime(
+                        displaytime, System.currentTimeMillis(),
+                        DateFormat.SHORT, DateFormat.SHORT);
+                String subCaption = Formatter
+                        .formatFileSize(mContext, filesize);
+                UiUtils.setTwoLinesText(new SpannableString(filename),
+                        new SpannableString(caption), subCaption,
+                        R.drawable.icon_format_text, v);
+                iv.setVisibility(View.VISIBLE);
+                if (mainIcon != null) {
+                    UiUtils.setIcon(mainIcon, v);
+                } else {
+                    if (mime != null) {
+                        UiUtils.setIcon(mime.getIconID(), v);
+                    } else {
+                        UiUtils.setIcon(R.drawable.icon_format_unsupport, v);
+                    }
+                }
+            }
         } else {
             ImageView statusIcon = (ImageView) v
                     .findViewById(R.id.list_sync_status_icon);
-            UiUtils.setSyncStatus(statusIcon, syncstatus);
-            String caption = (String) DateUtils.formatSameDayTime(displaytime,
-                    System.currentTimeMillis(), DateFormat.SHORT,
-                    DateFormat.SHORT);
-            String subCaption = Formatter.formatFileSize(mContext, filesize);
-            UiUtils.setTwoLinesText(new SpannableString(filename),
-                    new SpannableString(caption), subCaption,
-                    R.drawable.icon_format_text, v);
-            iv.setVisibility(View.VISIBLE);
-            if (mainIcon != null) {
-                UiUtils.setIcon(mainIcon, v);
+            UiUtils.setSyncStatus(statusIcon, 0);
+            UiUtils.setOneLineText(new SpannableString(filename), v);
+            if (filename.startsWith("Backup")) {
+                UiUtils.setIcon(R.drawable.icon_kiisync, v);
+            } else if (filename.startsWith("Error")) {
+                UiUtils.setIcon(R.drawable.icon_format_error, v);
+            } else if (filename.startsWith("Trash")) {
+                UiUtils.setIcon(R.drawable.icon_format_trashcan, v);
+            } else if (filename.startsWith("Progress")) {
+                UiUtils.setIcon(R.drawable.icon_format_progress, v);
             } else {
-                if (mime != null) {
-                    UiUtils.setIcon(mime.getIconID(), v);
-                } else {
-                    UiUtils.setIcon(R.drawable.icon_format_unsupport, v);
-                }
+                UiUtils.setIcon(R.drawable.icon_format_folder, v);
             }
         }
     }
-    
+
     public void setCaption(String caption, String subCaption) {
         UiUtils.setTwoLinesText(new SpannableString(filename),
                 new SpannableString(caption), subCaption,

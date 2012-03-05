@@ -51,7 +51,6 @@ public class KiiFileListener implements KiiNewEventListener {
     AtomicInteger cacheUpdateState = new AtomicInteger();
 
     public void updateCache(boolean clean) {
-
         if (cacheUpdateState.get() < 3) {
             if (clean) {
                 cacheUpdateState.set(3);
@@ -88,18 +87,16 @@ public class KiiFileListener implements KiiNewEventListener {
             KiiFile[] astroFiles = client.getAstroFiles();
             if (astroFiles != null && astroFiles.length > 0) {
                 for (int ct = 0; ct < astroFiles.length; ct++) {
-                    String path = astroFiles[ct].getResourceUrl();
-                    int status = client.getStatus(astroFiles[ct]);
-                    tempKiiFileStatus.put(path, status);
+                    tempKiiFileStatus.put(astroFiles[ct].getResourceUrl(),
+                            astroFiles[ct].getStatus());
                 }
             }
 
             KiiFile[] backupFiles = client.getBackupFiles();
             if (backupFiles != null && backupFiles.length > 0) {
                 for (int ct = 0; ct < backupFiles.length; ct++) {
-                    String path = backupFiles[ct].getResourceUrl();
-                    int status = client.getStatus(backupFiles[ct]);
-                    tempKiiFileStatus.put(path, status);
+                    tempKiiFileStatus.put(backupFiles[ct].getResourceUrl(),
+                            backupFiles[ct].getStatus());
                 }
             }
 

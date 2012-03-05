@@ -740,7 +740,7 @@ public class KiiSyncClient {
         return getFileStatusCache().getKiiFileStatus(pathName);
     }
 
-    public int getStatusFromCache(KiiFile file) {
+    private int getStatusFromCache(KiiFile file) {
         return getStatusFromCache(file.getResourceUrl());
     }
 
@@ -780,15 +780,15 @@ public class KiiSyncClient {
      */
     public int getStatus(KiiFile file) {
         int status = getStatusFromCache(file);
+        Log.d(TAG, "getStatusFromCache: status is "+status+" for "+file.getTitle());
         if (status != 0) {
             return status;
         }
         // read the status of the KiiFile
         // this status is reading from the database
         status = file.getStatus();
-
+        Log.d(TAG, "getStatus: "+status);
         if (status == KiiFile.STATUS_SYNCED || status == KiiFile.STATUS_NO_BODY) {
-
             // check if the exist, if not indicate only remote copy
             if (file.isFile()) {
                 File f = new File(file.getResourceUrl());
@@ -796,14 +796,12 @@ public class KiiSyncClient {
                     return KiiFile.STATUS_NO_BODY;
                 }
             }
-
             if (bodySameAsLocal(file)) {
                 return KiiFile.STATUS_BODY_OUTDATED;
             } else {
                 return KiiFile.STATUS_SYNCED;
             }
         }
-
         return status;
     }
 
