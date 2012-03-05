@@ -17,6 +17,7 @@ public class FileTabActivity extends TabActivity {
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        setContentView(R.layout.tab_layout);
         mTabHost = getTabHost();
         setupTabs();
         final Intent intent = getIntent();
@@ -37,13 +38,7 @@ public class FileTabActivity extends TabActivity {
                 .setContent(intent));
         intent = new Intent(this, KiiFilePickerActivity.class);
         mTabHost.addTab(mTabHost.newTabSpec("cloud")
-                .setIndicator(getString(R.string.tab_cloud))
-                .setContent(intent));
-        mTabHost.getTabWidget().getChildAt(0).getLayoutParams().height = 
-        	60;
-        mTabHost.getTabWidget().getChildAt(1).getLayoutParams().height = 
-        	60; 
-        
+                .setIndicator(getString(R.string.tab_cloud)).setContent(intent));
     }
 
     @Override

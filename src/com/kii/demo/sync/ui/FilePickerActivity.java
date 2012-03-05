@@ -73,7 +73,7 @@ public class FilePickerActivity extends ListActivity implements
                     for (KiiFile file : files) {
                         int status = client.getStatus(file);
                         if (!KiiSyncClient.isFileInTrash(file)
-                                && (status == KiiFile.STATUS_BODY_OUTDATED || status == KiiFile.STATUS_NO_BODY)) {
+                                && ((status == KiiFile.STATUS_BODY_OUTDATED) || (status == KiiFile.STATUS_NO_BODY))) {
                             client.download(file, Utils.getKiiFileDest(file,
                                     mContext));
                         }
@@ -204,7 +204,7 @@ public class FilePickerActivity extends ListActivity implements
         if (getIntent().hasExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS)) {
             ArrayList<String> collection = getIntent().getStringArrayListExtra(
                     EXTRA_ACCEPTED_FILE_EXTENSIONS);
-            acceptedFileExtensions = (String[]) collection
+            acceptedFileExtensions = collection
                     .toArray(new String[collection.size()]);
         }
         mContext = this;
@@ -262,7 +262,7 @@ public class FilePickerActivity extends ListActivity implements
 
         // Get the files in the directory
         File[] files = mDirectory.listFiles(filter);
-        if (files != null && files.length > 0) {
+        if ((files != null) && (files.length > 0)) {
             for (File f : files) {
                 if (f.isHidden() && !mShowHiddenFiles) {
                     // Don't add the file
@@ -368,6 +368,7 @@ public class FilePickerActivity extends ListActivity implements
                 alert.setTitle("Enter new folder name");
                 alert.setPositiveButton("Ok",
                         new DialogInterface.OnClickListener() {
+                            @Override
                             public void onClick(DialogInterface dialog,
                                     int whichButton) {
                                 String newName = input.getText().toString()
@@ -381,6 +382,7 @@ public class FilePickerActivity extends ListActivity implements
 
                 alert.setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
+                            @Override
                             public void onClick(DialogInterface dialog,
                                     int whichButton) {
                                 dialog.cancel();
@@ -504,7 +506,7 @@ public class FilePickerActivity extends ListActivity implements
                 // Accept all directory names
                 return true;
             }
-            if (mExtensions != null && mExtensions.length > 0) {
+            if ((mExtensions != null) && (mExtensions.length > 0)) {
                 for (int i = 0; i < mExtensions.length; i++) {
                     if (filename.endsWith(mExtensions[i])) {
                         // The filename ends with the extension
@@ -637,6 +639,7 @@ public class FilePickerActivity extends ListActivity implements
 
     private static final int DIALOG_UPDATE = 0;
 
+    @Override
     protected Dialog onCreateDialog(int id) {
         Dialog dialog;
         switch (id) {
@@ -645,12 +648,14 @@ public class FilePickerActivity extends ListActivity implements
                 builder.setMessage(scanChange.size() + " file(s) has changed.")
                         .setCancelable(false).setPositiveButton("Update Now",
                                 new DialogInterface.OnClickListener() {
+                                    @Override
                                     public void onClick(DialogInterface dialog,
                                             int id) {
                                         updateFileChange();
                                     }
                                 }).setNegativeButton("Cancel",
                                 new DialogInterface.OnClickListener() {
+                                    @Override
                                     public void onClick(DialogInterface dialog,
                                             int id) {
                                         dialog.cancel();
