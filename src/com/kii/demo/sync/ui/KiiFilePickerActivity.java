@@ -1,4 +1,4 @@
-package com.kii.demo.sync.activities;
+package com.kii.demo.sync.ui;
 
 import android.app.ExpandableListActivity;
 import android.content.BroadcastReceiver;
@@ -28,6 +28,7 @@ import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.DownloadManager;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
+import com.kii.demo.sync.ui.view.KiiFileExpandableListAdapter;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;

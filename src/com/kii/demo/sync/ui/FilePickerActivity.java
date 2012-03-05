@@ -9,7 +9,7 @@
  * governing permissions and limitations under the License.
  */
 
-package com.kii.demo.sync.activities;
+package com.kii.demo.sync.ui;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -49,6 +49,7 @@ import android.widget.TextView;
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
+import com.kii.demo.sync.ui.view.KiiListItemView;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;

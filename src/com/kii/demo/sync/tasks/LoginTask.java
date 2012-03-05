@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
-import com.kii.demo.sync.activities.StartActivity;
+import com.kii.demo.sync.ui.StartActivity;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.SyncMsg;
 

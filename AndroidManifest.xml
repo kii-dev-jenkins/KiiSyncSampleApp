@@ -73,7 +73,7 @@
         <service android:name="com.kii.cloud.sync.BackupService" >
         </service>
 
-        <receiver android:name="com.kii.demo.sync.tasks.KiiRefReceiver" >
+        <receiver android:name=".tasks.KiiRefReceiver" >
             <intent-filter >
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
@@ -81,7 +81,7 @@
 
         <activity
             android:launchMode="singleInstance"
-            android:name="com.kii.demo.sync.activities.ProgressListActivity"
+            android:name=".ui.ProgressListActivity"
             android:screenOrientation="portrait" >
         </activity>
     </application>

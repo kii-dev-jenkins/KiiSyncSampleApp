@@ -1,4 +1,4 @@
-package com.kii.demo.sync.activities;
+package com.kii.demo.sync.ui;
 
 import android.app.TabActivity;
 import android.content.Intent;

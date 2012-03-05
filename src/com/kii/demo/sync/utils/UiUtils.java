@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kii.demo.sync.R;
-import com.kii.demo.sync.activities.KiiFileExpandableListAdapter;
+import com.kii.demo.sync.ui.view.KiiFileExpandableListAdapter;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncPref;
 

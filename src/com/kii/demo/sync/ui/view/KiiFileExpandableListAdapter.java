@@ -1,4 +1,4 @@
-package com.kii.demo.sync.activities;
+package com.kii.demo.sync.ui.view;
 
 import java.io.File;
 import java.util.ArrayList;

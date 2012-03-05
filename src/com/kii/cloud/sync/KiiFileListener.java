@@ -9,8 +9,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-import com.kii.demo.sync.activities.ProgressListActivity;
-import com.kii.demo.sync.activities.StartActivity;
+import com.kii.demo.sync.ui.ProgressListActivity;
+import com.kii.demo.sync.ui.StartActivity;
 import com.kii.demo.sync.utils.NotificationUtil;
 import com.kii.sync.KiiFile;
 import com.kii.sync.KiiNewEventListener;

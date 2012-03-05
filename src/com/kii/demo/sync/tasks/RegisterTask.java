@@ -7,7 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.kii.cloud.sync.KiiSyncClient;
-import com.kii.demo.sync.activities.StartActivity;
+import com.kii.demo.sync.ui.StartActivity;
 import com.kii.sync.SyncMsg;
 
 public class RegisterTask extends AsyncTask<String, Void, Integer> {

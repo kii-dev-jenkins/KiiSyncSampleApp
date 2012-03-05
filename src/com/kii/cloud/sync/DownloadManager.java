@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
-import com.kii.demo.sync.activities.ProgressListActivity;
+import com.kii.demo.sync.ui.ProgressListActivity;
 import com.kii.demo.sync.utils.NotificationUtil;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
