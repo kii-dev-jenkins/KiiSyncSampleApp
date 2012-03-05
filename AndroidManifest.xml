@@ -17,7 +17,7 @@
         android:label="@string/app_name" >
         <activity
             android:label="@string/app_name"
-            android:name="com.kii.demo.sync.activities.StartActivity"
+            android:name="com.kii.demo.sync.ui.StartActivity"
             android:screenOrientation="portrait" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
@@ -28,19 +28,19 @@
         <activity
             android:configChanges="keyboardHidden|orientation"
             android:label="FilePicker"
-            android:name="com.kii.demo.sync.activities.FilePickerActivity"
+            android:name="com.kii.demo.sync.ui.FilePickerActivity"
             android:screenOrientation="portrait" />
         <activity
             android:configChanges="keyboardHidden|orientation"
             android:label="KiiFileViewer"
             android:launchMode="singleTask"
-            android:name="com.kii.demo.sync.activities.KiiFilePickerActivity"
+            android:name="com.kii.demo.sync.ui.KiiFilePickerActivity"
             android:screenOrientation="portrait" />
         <activity
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/hello"
             android:launchMode="singleTask"
-            android:name="com.kii.demo.sync.activities.FileTabActivity"
+            android:name="com.kii.demo.sync.ui.FileTabActivity"
             android:screenOrientation="portrait" />
 
         <service android:name="com.synclore.android.pfscsdk.PFSyncService" >
@@ -67,7 +67,7 @@
                 android:value="82946bf6961f4e34d3a53bbc941ac115" />
         </provider>
 
-        <activity android:name=".activities.SettingsActivity" >
+        <activity android:name=".ui.SettingsActivity" >
         </activity>
 
         <service android:name="com.kii.cloud.sync.BackupService" >
