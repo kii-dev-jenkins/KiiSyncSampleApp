@@ -22,19 +22,19 @@ import com.kii.sync.KiiClient;
 import com.kii.sync.SyncMsg;
 import com.kii.sync.utils.HttpClientUtils;
 
-public class Astro extends Identity{
-	
-	public Astro(KiiClient syncManager, String URL) {
-		super(syncManager, URL);
-	}
+public class Astro extends Identity {
 
-	private static String TAG = "Astro";
-	
+    public Astro(KiiClient syncManager, String URL) {
+        super(syncManager, URL);
+    }
+
+    private static String TAG = "Astro";
+
     private static final String URL_SUBSCRIPTION = "/integration/astro/subscription/sync";
     private static final String TAG_SYNC_ENABLED = "syncEnabled";
     private static final String TAG_USED_BYTE_SIZE = "usedByteSize";
     private static final String TAG_QUOTA_BYTE_SIZE = "quotaByteSize";
-    
+
     /**
      * For testing only Set the subscription and quota
      * 
@@ -137,6 +137,5 @@ public class Astro extends Identity{
         }
         return null;
     }
-
 
 }
