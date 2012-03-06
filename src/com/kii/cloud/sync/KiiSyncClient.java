@@ -429,34 +429,6 @@ public class KiiSyncClient {
     }
 
     /**
-     * Delete given list of KiiFiles and call quick refresh to update header
-     * 
-     * @param files
-     * @param deleteLocal
-     *            if true, the local file will be deleted
-     * @return
-     */
-    public int delete(KiiFile[] files, boolean deleteLocal) {
-        List<Integer> retValues;
-        if (deleteLocal) {
-            retValues = mSyncManager.deleteFiles(files);
-        } else {
-            retValues = mSyncManager.deleteFilesRemainOriginalFile(files);
-        }
-        if ((retValues == null) || (retValues.size() == 0)) {
-            return SyncMsg.ERROR_FILE_NOT_FOUND;
-        }
-
-        // Can iterate through the list of return values
-        // for(int ct=0; ct<retValues.size(); ct++){
-        //
-        // }
-
-        mSyncManager.getSyncObserver().notifySyncDelete(null);
-        return SyncMsg.OK;
-    }
-
-    /**
      * Cancel a file to be uploaded. To remove a uploaded file, refer to
      * {@link KiiSyncClient#delete(KiiFile, boolean)}
      * 
@@ -525,25 +497,6 @@ public class KiiSyncClient {
         }
         return ret;
 
-    }
-
-    /**
-     * Upload the given list of file
-     * 
-     * @param files
-     *            list of files to be upload by full path name
-     * @return SyncMsg
-     * @see SyncMsg
-     */
-    public int upload(String[] files) {
-        for (String file : files) {
-            int code = upload(file, false);
-            if (code != SyncMsg.OK) {
-                Log.e(TAG, "Failed to upload(" + file + "), error code:" + code);
-            }
-        }
-        mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
-        return SyncMsg.OK;
     }
 
     /**
@@ -683,7 +636,7 @@ public class KiiSyncClient {
         return ret;
     }
 
-    public int upload(KiiFile[] files) {
+    private int upload(KiiFile[] files) {
         int ret = 0;
         for (KiiFile file : files) {
             ret = upload(file);
@@ -720,6 +673,11 @@ public class KiiSyncClient {
         return ret;
     }
 
+    /**
+     * Return the status of a KiiFile, Non blocking call
+     * @param file
+     * @return
+     */
     public int getKiiFileStatus(KiiFile file) {
         int status;
         String category = file.getCategory();
@@ -732,12 +690,6 @@ public class KiiSyncClient {
         return status;
     }
 
-    /**
-     * Return the status of an KiiFile from Cache Non Blocking Call
-     * 
-     * @param pathName
-     * @return
-     */
     private int getStatusFromCache(String pathName) {
         return getFileStatusCache().getKiiFileStatus(pathName);
     }
@@ -751,7 +703,7 @@ public class KiiSyncClient {
     }
 
     /**
-     * Return the status of an KiiFile Non Blocking Call
+     * Return the status of a file Non Blocking Call
      * 
      * @param pathName
      * @return
@@ -808,24 +760,13 @@ public class KiiSyncClient {
     }
 
     /**
-     * Get the list of KiiFile by matching the unique key Non Blocking Call
-     * 
-     * @param uniqueKey
-     * @return
-     */
-    KiiFile[] getKiiFileByUniqueKey(String uniqueKey) {
-        return KiiFileUtil.listBySelection(mContext,
-                DatabaseHelper.FileColumns.UNIQUE_KEY + "='" + uniqueKey + "'");
-    }
-
-    /**
      * Get KiiFile by the path provided. If the KiiFile already exist, it will
      * return the existing KiiFilr Non Blocking Call
      * 
      * @param path
      * @return
      */
-    KiiFile createKiiFileByPath(String filepath) {
+    private KiiFile createKiiFileByPath(String filepath) {
         return KiiFileUtil.createKiiFileFromFile(filepath);
     }
 
@@ -835,7 +776,7 @@ public class KiiSyncClient {
      * @param path
      * @return
      */
-    KiiFile[] getKiiFilesByPath(String path) {
+    private KiiFile[] getKiiFilesByPath(String path) {
         path = path.replaceAll("'", "''");
         return KiiFileUtil.listBySelection(mContext,
                 DatabaseHelper.FileColumns.RESOURCE_URL + "='" + path + "'");
@@ -938,48 +879,6 @@ public class KiiSyncClient {
     }
 
     /**
-     * Upload all the files in a given folder, support recursive
-     * 
-     * @param filePath
-     * @return SyncMsg
-     * @see SyncMsg
-     */
-    public int uploadByFolder(String filePath) {
-        int ret;
-        File file = new File(filePath);
-        if (file.isDirectory()) {
-            upload(file);
-            ret = SyncMsg.OK;
-        } else {
-            ret = upload(file.getAbsoluteFile());
-        }
-        if (ret == SyncMsg.OK) {
-            notifyKiiFileLocalChange();
-        }
-        return SyncMsg.OK;
-    }
-
-    private int upload(File directory) {
-        int total = 0;
-        File[] files = directory.listFiles();
-
-        for (int ct = 0; ct < files.length; ct++) {
-            if (files[ct].isFile()) {
-                int ret = upload(files[ct].getAbsolutePath(), false);
-                if (ret != SyncMsg.OK) {
-                    Log.e(TAG,
-                            "Fail(" + ret + ") to Upload file:"
-                                    + files[ct].getAbsolutePath());
-                }
-            } else {
-                total += upload(files[ct]);
-            }
-        }
-
-        return total;
-    }
-
-    /**
      * @param fullPathOfFolder
      *            fullpath of folder would be renamed.
      * @param newName
@@ -990,24 +889,17 @@ public class KiiSyncClient {
      */
     public int renameFolder(String fullPathOfFolder, String newName) {
         if ((fullPathOfFolder == null) || (newName == null)) {
-            return Result.INVARG;
+            return SyncMsg.ERROR_ACCESS_FILE;
         }
         Log.v(TAG, " going to update files in folder");
         KiiFile[] kiiFiles = KiiFileUtil.listFilesInFolder(fullPathOfFolder);
         if ((kiiFiles == null) || (kiiFiles.length <= 0)) {
-            return Result.NOTFOUND;
+            return SyncMsg.ERROR_FILE_NOT_FOUND;
         }
 
         Log.v(TAG, "Total kiiFiles found :" + kiiFiles.length);
         KiiFileUtil.rename2(kiiFiles, fullPathOfFolder, newName);
         return upload(kiiFiles);
-    }
-
-    class Result {
-        static final int OK = 0;
-        static final int NOTFOUND = 1;
-        static final int INVARG = -1;
-        static final int NG = -2;
     }
 
     /**
@@ -1029,5 +921,4 @@ public class KiiSyncClient {
             return 0;
         }
     }
-
 }
