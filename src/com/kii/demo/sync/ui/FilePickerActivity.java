@@ -214,7 +214,6 @@ public class FilePickerActivity extends ListActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         menu.add(0, OPTIONS_MENU_SCAN_CHANGE, 0, R.string.scan_change);
         menu.add(0, OPTIONS_MENU_DOWNLOAD_ALL, 1, R.string.download_all);
         return true;
@@ -252,7 +251,7 @@ public class FilePickerActivity extends ListActivity implements
     /**
      * Updates the list view to the current directory
      */
-    protected void refreshFilesList() {
+    private void refreshFilesList() {
         // Clear the files ArrayList
         mFiles.clear();
 

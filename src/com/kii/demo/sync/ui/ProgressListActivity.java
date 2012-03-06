@@ -220,7 +220,6 @@ public class ProgressListActivity extends ExpandableListActivity implements
     public final static int PROGRESS_START = 1;
     public final static int PROGRESS_END = 3;
     public final static int PROGRESS_AUTO = 4;
-    public final static int SETUP_ADPTOR = 5;
     public final static int PROGRESS_UPDATE = 6;
 
     private int updateProgress() {
@@ -240,17 +239,16 @@ public class ProgressListActivity extends ExpandableListActivity implements
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-
             switch (msg.what) {
-                case SETUP_ADPTOR:
-                    adpterSetup();
-                    break;
                 case PROGRESS_AUTO:
                     mProgress = updateProgress();
-                    if (mProgress > 0) {
+                    Log.d(TAG, "mProgress is "+mProgress);
+                    Log.d(TAG, "mAdapter.getGroupCount is: "+mAdapter.getGroupCount());
+                    if ((mProgress > 0)
+                            || (mAdapter.getGroupCount()>0)) {
                         setProgressBarIndeterminateVisibility(true);
                         setProgressBarVisibility(true);
-                        handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 500);
+                        handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 5000);
                         setHeaderText();
                     } else {
                         setProgressBarIndeterminateVisibility(false);
@@ -260,13 +258,15 @@ public class ProgressListActivity extends ExpandableListActivity implements
                 case PROGRESS_START:
                     handler.removeMessages(PROGRESS_AUTO);
                     handler.removeMessages(PROGRESS_END);
-                    handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 5000);
+                    handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 500);
                     setProgressBarIndeterminateVisibility(true);
                     setProgressBarVisibility(true);
                     if ((msg.obj != null) && (msg.obj instanceof String)) {
                         setTitle((String) msg.obj);
                     }
                 case PROGRESS_UPDATE:
+                    handler.removeMessages(PROGRESS_AUTO);
+                    handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 5000);
                     mProgress = updateProgress();
                     if (mProgress > 0) {
                         setHeaderText();
@@ -278,6 +278,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                 case PROGRESS_END:
                 default:
                     handler.removeMessages(PROGRESS_AUTO);
+                    handler.removeMessages(PROGRESS_UPDATE);
                     handler.removeMessages(PROGRESS_END);
                     setProgressBarIndeterminateVisibility(false);
                     setProgressBarVisibility(false);

@@ -1064,7 +1064,7 @@ public class KiiSyncClient {
         int pfsProgress = getProgress();
         int httpProgress = 0;
         if (downManager != null) {
-            httpProgress = (int) (downManager.getDownloadProgress() * 100);
+            httpProgress = (int) (downManager.getDownloadProgress());
         }
         if ((httpProgress > 0) && (pfsProgress > 0)) {
             return ((pfsProgress + httpProgress) / 2);

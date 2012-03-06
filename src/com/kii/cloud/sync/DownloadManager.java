@@ -32,8 +32,8 @@ public class DownloadManager {
 
     final static String TAG = "DownloadManager";
 
-    public long downloadTotalSize = 0;
-    public long downloadCurrentSize = 0;
+    private long downloadTotalSize = 0;
+    private long downloadCurrentSize = 0;
     public AtomicBoolean downloadPorgress = new AtomicBoolean(false);
     public String destPath = null;
     private ArrayList<Pair<KiiFile, String>> dnList = new ArrayList<Pair<KiiFile, String>>();
@@ -45,7 +45,7 @@ public class DownloadManager {
 
     public double getDownloadProgress() {
         if (destPath == null) {
-            return -1;
+            return 0;
         }
         double percentage;
         if (downloadTotalSize == 0) {

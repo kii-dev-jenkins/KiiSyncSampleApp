@@ -43,10 +43,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     public static final String TAG = "KiiFilePickerActivity";
     // message for the handler
     public final static int PROGRESS_START = 1;
-    public final static int PROGRESS_CHECK = 2;
     public final static int PROGRESS_END = 3;
-    public final static int PROGRESS_AUTO = 4;
-    public final static int SETUP_ADPTOR = 5;
     public final static int PROGRESS_UPDATE = 6;
 
     final static int MENU_RESTORE_TRASH = 1;
@@ -71,50 +68,20 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         registerForContextMenu(getExpandableListView());
     }
 
-    private boolean updateProgress() {
-        KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
-        if (kiiClient != null) {
-            int progress = kiiClient.getOverallProgress();
-            if (progress > 0) {
-                setProgress(progress * 100);
-                mAdapter.notifyDataSetChanged();
-                return true;
-            }
-        }
-        return false;
-    }
-
     final static int DIALOG_UPDATE = 2;
 
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case SETUP_ADPTOR:
-                    adpaterSetup();
-                    break;
-                case PROGRESS_AUTO:
-                    break;
                 case PROGRESS_START:
-                    handler.removeMessages(PROGRESS_AUTO);
-                    handler.removeMessages(PROGRESS_CHECK);
                     handler.removeMessages(PROGRESS_END);
-                    if ((msg.obj != null) && (msg.obj instanceof String)) {
-                        setTitle((String) msg.obj);
-                    }
-                case PROGRESS_CHECK:
-                    updateProgress();
-                    break;
-
                 case PROGRESS_UPDATE:
                     mAdapter.notifyDataSetChanged();
                     break;
                 case PROGRESS_END:
                 default:
-                    handler.removeMessages(PROGRESS_AUTO);
-                    handler.removeMessages(PROGRESS_CHECK);
                     handler.removeMessages(PROGRESS_END);
-
                     setTitle(R.string.app_name);
                     if (mAdapter != null) {
                         mAdapter.notifyDataSetChanged();
