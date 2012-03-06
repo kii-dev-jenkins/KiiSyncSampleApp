@@ -789,7 +789,8 @@ public class KiiSyncClient {
         // read the status of the KiiFile
         // this status is reading from the database
         status = file.getStatus();
-        if ((status == KiiFile.STATUS_SYNCED) || (status == KiiFile.STATUS_NO_BODY)) {
+        if ((status == KiiFile.STATUS_SYNCED)
+                || (status == KiiFile.STATUS_NO_BODY)) {
             // check if the exist, if not indicate only remote copy
             if (file.isFile()) {
                 File f = new File(file.getResourceUrl());
@@ -964,7 +965,7 @@ public class KiiSyncClient {
      * Notify local change via
      * {@link KiiNewEventListener#onLocalChangeSyncedEvent(Uri[])}
      */
-    public void notifyKiiFileLocalChange() {
+    void notifyKiiFileLocalChange() {
         mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
     }
 
