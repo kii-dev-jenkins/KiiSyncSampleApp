@@ -40,25 +40,6 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
     public static final int TYPE_DATA = 1;
     public static final int TYPE_PROGRESS = 2;
 
-    /**
-     * Get the KiiFile path which can download the file
-     * 
-     * @param file
-     * @return
-     */
-    String getKiiFilePath(KiiFile file) {
-        if (file.isFile()) {
-            String path = file.getLocalPath();
-            if (path == null) {
-                return file.getAvailableURL().toString();
-            } else {
-                return path;
-            }
-        } else {
-            return file.getBucketName();
-        }
-    }
-
     public KiiFileExpandableListAdapter(Activity activity,
             KiiSyncClient kiiClient, int type, OnClickListener listener) {
         if (kiiClient == null) {

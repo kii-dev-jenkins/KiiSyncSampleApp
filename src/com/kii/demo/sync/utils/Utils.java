@@ -340,4 +340,23 @@ public class Utils {
         }
         return false;
     }
+
+    /**
+     * Get the KiiFile path which can download the file
+     * 
+     * @param file
+     * @return
+     */
+    public static String getKiiFilePath(KiiFile file) {
+        if (file.isFile()) {
+            String path = file.getLocalPath();
+            if (path == null) {
+                return file.getAvailableURL().toString();
+            } else {
+                return path;
+            }
+        } else {
+            return file.getBucketName();
+        }
+    }
 }

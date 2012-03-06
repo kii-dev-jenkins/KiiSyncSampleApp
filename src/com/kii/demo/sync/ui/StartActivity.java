@@ -242,7 +242,7 @@ public class StartActivity extends Activity {
         task.execute(mUsr.getText().toString(), newPassword);
     }
 
-    protected void changePwd() {
+    private void changePwd() {
         final EditText input = new EditText(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         mDialog =  builder
@@ -275,18 +275,18 @@ public class StartActivity extends Activity {
         mDialog.show();
     }
 
-    protected void changePwd(String newPassword) {
+    private void changePwd(String newPassword) {
         ChangePwdTask task = new ChangePwdTask(mActivity);
         task.execute(mPwd.getText().toString(), newPassword);
     }
 
-    protected void manualSync() {
+    private void manualSync() {
         SyncTask task = new SyncTask(this, mUsr.getText().toString(), mPwd
                 .getText().toString());
         task.execute();
     }
 
-    protected void lougoutDemo() {
+    private void lougoutDemo() {
         LogoutTask task = new LogoutTask(this);
         task.execute();
     }
@@ -309,7 +309,7 @@ public class StartActivity extends Activity {
 
     public static void showAlertDialog(Context context, String title,
             int errorCode) {
-        showAlertDialog(context, title, getErrorMsg(errorCode, context));
+        showAlertDialog(context, title, UiUtils.getErrorMsg(errorCode, context));
     }
 
     static void showToast(Context context, String message) {
@@ -348,7 +348,7 @@ public class StartActivity extends Activity {
      * @param kiiClient
      * @return
      */
-    static public StringBuilder showKiiFileList(KiiSyncClient kiiClient) {
+    private static String showKiiFileList(KiiSyncClient kiiClient) {
         StringBuilder msg = new StringBuilder();
 
         msg.append("Normal:\n");
@@ -358,7 +358,7 @@ public class StartActivity extends Activity {
             for (KiiFile file : files) {
                 Log.e(StartActivity.TAG + " ALL", "" + file);
                 msg.append(ct + ":  " + Utils.getStatus(file, mContext) + ":"
-                        + getKiiFilePath(file) + "\n");
+                        + Utils.getKiiFilePath(file) + "\n");
                 ct++;
             }
         }
@@ -370,30 +370,11 @@ public class StartActivity extends Activity {
                 Log.e(StartActivity.TAG, file.getAppData() + "; remotePath: "
                         + file.getRemotePath());
                 msg.append(ct + ":  " + Utils.getStatus(file, mContext) + ":"
-                        + file.getAppData() + ":" + getKiiFilePath(file) + "\n");
+                        + file.getAppData() + ":" + Utils.getKiiFilePath(file) + "\n");
                 ct++;
             }
         }
-        return msg;
-    }
-
-    /**
-     * Get the KiiFile path which can download the file
-     * 
-     * @param file
-     * @return
-     */
-    static String getKiiFilePath(KiiFile file) {
-        if (file.isFile()) {
-            String path = file.getLocalPath();
-            if (path == null) {
-                return file.getAvailableURL().toString();
-            } else {
-                return path;
-            }
-        } else {
-            return file.getBucketName();
-        }
+        return msg.toString();
     }
 
     /**
@@ -444,71 +425,6 @@ public class StartActivity extends Activity {
                 + SyncPref.getAppName());
     }
 
-    /**
-     * Convert the error code to error message
-     * 
-     * @param code
-     * @param context
-     * @return
-     */
-    static public String getErrorMsg(int code, Context context) {
-        switch (code) {
-
-            case SyncMsg.OK:
-                return "Successful";
-
-            case SyncMsg.PFS_SYNCRESULT_FORCE_STOP:
-            case SyncMsg.PFS_SYNCRESULT_REQUEST_FORCE_STOP:
-                return context.getString(R.string.msg_ERROR_FORCE_STOP);
-
-            case SyncMsg.PFS_SYNCRESULT_RUNNING:
-            case SyncMsg.PFS_SYNCRESULT_BUSY:
-                return context.getString(R.string.msg_ERROR_BUSY);
-
-            case SyncMsg.ERROR_ALREADY_KII_USER:
-                return context.getString(R.string.msg_ERROR_ALREADY_KII_USER);
-
-            case SyncMsg.ERROR_GET_ACCOUNTS:
-                return context.getString(R.string.msg_ERROR_GET_ACCOUNTS);
-
-            case SyncMsg.ERROR_AUTHENTICAION_ERROR:
-                return context
-                        .getString(R.string.msg_ERROR_AUTHENTICAION_ERROR);
-            case SyncMsg.ERROR_NO_ACCOUNT:
-                return context.getString(R.string.msg_ERROR_NO_ACCOUNT);
-            case SyncMsg.ERROR_DIFFERENT_USERNAME:
-                return context.getString(R.string.msg_ERROR_DIFFERENT_USERNAME);
-            case SyncMsg.ERROR_NON_VERIFIED_USERNAME:
-                return context
-                        .getString(R.string.msg_ERROR_NON_VERIFIED_USERNAME);
-            case SyncMsg.ERROR_INVALID_INPUT:
-                return context.getString(R.string.msg_ERROR_INVALID_INPUT);
-            case SyncMsg.ERROR_NO_CONNECTION:
-                return context.getString(R.string.msg_ERROR_NO_CONNECTION);
-            case SyncMsg.ERROR_NO_HOST:
-                return context.getString(R.string.msg_ERROR_NO_HOST);
-            case SyncMsg.ERROR_TIMEOUT:
-                return context.getString(R.string.msg_ERROR_TIMEOUT);
-            case SyncMsg.ERROR_IO:
-                return context.getString(R.string.msg_ERROR_IO);
-            case SyncMsg.ERROR_PROTOCOL:
-                return context.getString(R.string.msg_ERROR_PROTOCOL);
-            case SyncMsg.ERROR_SERVER_HARD_ERROR:
-                return context.getString(R.string.msg_ERROR_SERVER_HARD_ERROR);
-            case SyncMsg.ERROR_SERVER_TEMP_ERROR:
-                return context.getString(R.string.msg_ERROR_SERVER_TEMP_ERROR);
-            case SyncMsg.ERROR_GET_SITE_ERROR:
-                return context.getString(R.string.msg_ERROR_GET_SITE_ERROR);
-            case SyncMsg.ERROR_JSON:
-                return context.getString(R.string.msg_ERROR_JSON);
-            case SyncMsg.ERROR_FILE_NULL:
-                return context.getString(R.string.msg_ERROR_UPLOAD_FILES);
-            default:
-                return String.format(
-                        context.getString(R.string.msg_ERROR_OTHERS), code);
-        }
-    }
-
     public class SyncTask extends AsyncTask<String, Void, Integer> {
 
         static final String TAG = "SyncTask";
@@ -519,7 +435,7 @@ public class StartActivity extends Activity {
         private String mEmail;
         private String mPassword;
 
-        StringBuilder msg = new StringBuilder();
+        String msg = "";
 
         @Override
         protected void onPreExecute() {
@@ -560,7 +476,7 @@ public class StartActivity extends Activity {
                         } else if (progress == -1) {
                             progressMsg = "...";
                         } else {
-                            progressMsg = StartActivity.getErrorMsg(progress,
+                            progressMsg = UiUtils.getErrorMsg(progress,
                                     mContext);
                         }
                         dialog.setMessage(progressMsg);
@@ -624,6 +540,5 @@ public class StartActivity extends Activity {
                 StartActivity.showAlertDialog(mContext, TAG, result);
             }
         }
-
     }
 }

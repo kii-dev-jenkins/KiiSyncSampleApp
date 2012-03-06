@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.ui.view.KiiFileExpandableListAdapter;
 import com.kii.sync.KiiFile;
+import com.kii.sync.SyncMsg;
 import com.kii.sync.SyncPref;
 
 public class UiUtils {
@@ -276,6 +277,71 @@ public class UiUtils {
                     DateFormat.SHORT, DateFormat.SHORT);
         }
         return caption;
+    }
+
+    /**
+     * Convert the error code to error message
+     * 
+     * @param code
+     * @param context
+     * @return
+     */
+    public static String getErrorMsg(int code, Context context) {
+        switch (code) {
+    
+            case SyncMsg.OK:
+                return "Successful";
+    
+            case SyncMsg.PFS_SYNCRESULT_FORCE_STOP:
+            case SyncMsg.PFS_SYNCRESULT_REQUEST_FORCE_STOP:
+                return context.getString(R.string.msg_ERROR_FORCE_STOP);
+    
+            case SyncMsg.PFS_SYNCRESULT_RUNNING:
+            case SyncMsg.PFS_SYNCRESULT_BUSY:
+                return context.getString(R.string.msg_ERROR_BUSY);
+    
+            case SyncMsg.ERROR_ALREADY_KII_USER:
+                return context.getString(R.string.msg_ERROR_ALREADY_KII_USER);
+    
+            case SyncMsg.ERROR_GET_ACCOUNTS:
+                return context.getString(R.string.msg_ERROR_GET_ACCOUNTS);
+    
+            case SyncMsg.ERROR_AUTHENTICAION_ERROR:
+                return context
+                        .getString(R.string.msg_ERROR_AUTHENTICAION_ERROR);
+            case SyncMsg.ERROR_NO_ACCOUNT:
+                return context.getString(R.string.msg_ERROR_NO_ACCOUNT);
+            case SyncMsg.ERROR_DIFFERENT_USERNAME:
+                return context.getString(R.string.msg_ERROR_DIFFERENT_USERNAME);
+            case SyncMsg.ERROR_NON_VERIFIED_USERNAME:
+                return context
+                        .getString(R.string.msg_ERROR_NON_VERIFIED_USERNAME);
+            case SyncMsg.ERROR_INVALID_INPUT:
+                return context.getString(R.string.msg_ERROR_INVALID_INPUT);
+            case SyncMsg.ERROR_NO_CONNECTION:
+                return context.getString(R.string.msg_ERROR_NO_CONNECTION);
+            case SyncMsg.ERROR_NO_HOST:
+                return context.getString(R.string.msg_ERROR_NO_HOST);
+            case SyncMsg.ERROR_TIMEOUT:
+                return context.getString(R.string.msg_ERROR_TIMEOUT);
+            case SyncMsg.ERROR_IO:
+                return context.getString(R.string.msg_ERROR_IO);
+            case SyncMsg.ERROR_PROTOCOL:
+                return context.getString(R.string.msg_ERROR_PROTOCOL);
+            case SyncMsg.ERROR_SERVER_HARD_ERROR:
+                return context.getString(R.string.msg_ERROR_SERVER_HARD_ERROR);
+            case SyncMsg.ERROR_SERVER_TEMP_ERROR:
+                return context.getString(R.string.msg_ERROR_SERVER_TEMP_ERROR);
+            case SyncMsg.ERROR_GET_SITE_ERROR:
+                return context.getString(R.string.msg_ERROR_GET_SITE_ERROR);
+            case SyncMsg.ERROR_JSON:
+                return context.getString(R.string.msg_ERROR_JSON);
+            case SyncMsg.ERROR_FILE_NULL:
+                return context.getString(R.string.msg_ERROR_UPLOAD_FILES);
+            default:
+                return String.format(
+                        context.getString(R.string.msg_ERROR_OTHERS), code);
+        }
     }
 
 }
