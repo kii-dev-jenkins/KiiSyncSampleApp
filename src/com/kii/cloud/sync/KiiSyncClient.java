@@ -798,45 +798,13 @@ public class KiiSyncClient {
                     return KiiFile.STATUS_NO_BODY;
                 }
             }
-            if (bodySameAsLocal(file)) {
+            if (Utils.bodySameAsLocal(file)) {
                 return KiiFile.STATUS_BODY_OUTDATED;
             } else {
                 return KiiFile.STATUS_SYNCED;
             }
         }
         return status;
-    }
-
-    /**
-     * check if the local file is the same as given KiiFile
-     * 
-     * @param file
-     * @return true if the same otherwise false
-     */
-    public boolean bodySameAsLocal(KiiFile file) {
-        String localPath = file.getResourceUrl();
-        if (TextUtils.isEmpty(localPath)) {
-            return false;
-        }
-        File localFile = new File(localPath);
-        if (!(localFile.exists() && localFile.isFile())) {
-            return false;
-        }
-        long fileUpdated = localFile.lastModified();
-        Log.v(TAG, "fileUpdated: " + fileUpdated);
-        long lastUpdated = file.lastModified();
-        if (lastUpdated == -1) {
-            return false;
-        }
-        if (fileUpdated != lastUpdated) {
-            return true;
-        }
-        long size = localFile.length();
-        Log.v(TAG, "size: " + size);
-        if (size != file.getSizeOnDB()) {
-            return true;
-        }
-        return false;
     }
 
     /**

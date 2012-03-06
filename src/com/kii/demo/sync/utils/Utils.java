@@ -295,7 +295,7 @@ public class Utils {
         return ret;
     }
 
-    public static boolean isFileInTrash(KiiFile file) {
+    public static boolean isKiiFileInTrash(KiiFile file) {
         if (file == null) {
             return false;
         }
@@ -306,6 +306,36 @@ public class Utils {
         }
     
         if (category.contentEquals(KiiSyncClient.CATEGORY_TRASH)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * check if the local file is the same as given KiiFile
+     * 
+     * @param file
+     * @return true if the same otherwise false
+     */
+    public static boolean bodySameAsLocal(KiiFile file) {
+        String localPath = file.getResourceUrl();
+        if (TextUtils.isEmpty(localPath)) {
+            return false;
+        }
+        File localFile = new File(localPath);
+        if (!(localFile.exists() && localFile.isFile())) {
+            return false;
+        }
+        long fileUpdated = localFile.lastModified();
+        long lastUpdated = file.lastModified();
+        if (lastUpdated == -1) {
+            return false;
+        }
+        if (fileUpdated != lastUpdated) {
+            return true;
+        }
+        long size = localFile.length();
+        if (size != file.getSizeOnDB()) {
             return true;
         }
         return false;
