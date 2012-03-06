@@ -44,8 +44,8 @@ public class KiiListItemView extends LinearLayout {
         super(context);
         init(context, client, mainIcon, listener);
         getFileView(file);
-        addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.WRAP_CONTENT));
+        addView(v, new LayoutParams(android.view.ViewGroup.LayoutParams.FILL_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     public KiiListItemView(Context context, KiiFile file, KiiSyncClient client,
@@ -53,8 +53,8 @@ public class KiiListItemView extends LinearLayout {
         super(context);
         init(context, client, mainIcon, listener);
         getKiiFileView(file);
-        addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.WRAP_CONTENT));
+        addView(v, new LayoutParams(android.view.ViewGroup.LayoutParams.FILL_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     private void init(Context context, KiiSyncClient client, Drawable mainIcon,
@@ -72,8 +72,8 @@ public class KiiListItemView extends LinearLayout {
         super(context);
         init(context, null, null, null);
         getGroupView(group);
-        addView(v, new LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.WRAP_CONTENT));
+        addView(v, new LayoutParams(android.view.ViewGroup.LayoutParams.FILL_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     public static final String TAG = "KiiListItemView";

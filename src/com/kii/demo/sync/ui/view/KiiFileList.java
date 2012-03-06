@@ -42,13 +42,14 @@ public class KiiFileList {
     }
 
     boolean hasChildren() {
-        if (children == null)
+        if (children == null) {
             return false;
+        }
         return true;
     }
 
     KiiFile getChild(int index) {
-        if (children != null && children.length > index) {
+        if ((children != null) && (children.length > index)) {
             return children[index];
         }
         return null;

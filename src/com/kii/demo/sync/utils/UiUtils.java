@@ -66,10 +66,12 @@ public class UiUtils {
     }
 
     public static Intent getLaunchFileIntent(String path, MimeInfo mime) {
-        if (TextUtils.isEmpty(path))
+        if (TextUtils.isEmpty(path)) {
             return null;
-        if (mime == null)
+        }
+        if (mime == null) {
             return null;
+        }
         Intent commIntent = null;
         Uri fileUri = Uri.fromFile(new File(path));
         commIntent = new Intent(Intent.ACTION_VIEW);
@@ -175,10 +177,11 @@ public class UiUtils {
                 .findViewById(R.id.list_complex_caption);
         titleView.setText(title);
 
-        if (caption != null)
+        if (caption != null) {
             captionView.setText(caption);
-        else
+        } else {
             captionView.setText("");
+        }
 
         captionView
                 .setPadding(captionView.getPaddingLeft(),
@@ -201,10 +204,11 @@ public class UiUtils {
         TextView captionView = (TextView) curView
                 .findViewById(R.id.list_complex_caption);
         titleView.setText(title);
-        if (caption != null)
+        if (caption != null) {
             captionView.setText(caption);
-        else
+        } else {
             captionView.setText("");
+        }
 
         // text on the bottom right
         TextView subCaptionView = (TextView) curView
@@ -257,12 +261,13 @@ public class UiUtils {
 
     public static String getKiiFileCaption(KiiFile file, int status, int type) {
         String caption;
-        if (type == KiiFileExpandableListAdapter.TYPE_PROGRESS
-                && (status == KiiFile.STATUS_SYNC_IN_QUEUE
-                        || status == KiiFile.STATUS_UPLOADING_BODY || status == KiiFile.STATUS_PREPARE_TO_SYNC)) {
+        if ((type == KiiFileExpandableListAdapter.TYPE_PROGRESS)
+                && ((status == KiiFile.STATUS_SYNC_IN_QUEUE)
+                        || (status == KiiFile.STATUS_UPLOADING_BODY) || (status == KiiFile.STATUS_PREPARE_TO_SYNC))) {
             int progress = file.getUploadProgress();
-            if (progress < 0)
+            if (progress < 0) {
                 progress = 0;
+            }
             caption = Integer.toString(progress) + " %";
         } else {
             // set the creation date

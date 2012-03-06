@@ -49,10 +49,11 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
     String getKiiFilePath(KiiFile file) {
         if (file.isFile()) {
             String path = file.getLocalPath();
-            if (path == null)
+            if (path == null) {
                 return file.getAvailableURL().toString();
-            else
+            } else {
                 return path;
+            }
         } else {
             return file.getBucketName();
         }
@@ -60,8 +61,9 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
 
     public KiiFileExpandableListAdapter(Activity activity,
             KiiSyncClient kiiClient, int type, OnClickListener listener) {
-        if (kiiClient == null)
+        if (kiiClient == null) {
             throw new NullPointerException();
+        }
         kiiClient.refreshKiiFileStatusCache();
         mActivity = activity;
         mOnClickListener = listener;
@@ -82,36 +84,36 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
             DownloadManager downloadManager = kiiClient.downManager;
             if (downloadManager != null) {
                 KiiFile[] downloadFiles = downloadManager.getDownloadList();
-                if (downloadFiles != null && downloadFiles.length > 0) {
+                if ((downloadFiles != null) && (downloadFiles.length > 0)) {
                     itemsList
                             .add(new KiiFileList("Downloading", downloadFiles));
                 }
             }
 
             KiiFile[] uploadingFiles = kiiClient.getListInProgress();
-            if (uploadingFiles != null && uploadingFiles.length > 0) {
+            if ((uploadingFiles != null) && (uploadingFiles.length > 0)) {
                 itemsList.add(new KiiFileList("Progress", uploadingFiles));
             }
         } else if (mType == TYPE_DATA) {
             KiiFile[] errorFiles = kiiClient.getListError();
-            if (errorFiles != null && errorFiles.length > 0) {
+            if ((errorFiles != null) && (errorFiles.length > 0)) {
                 itemsList.add(new KiiFileList("Error", errorFiles));
             }
 
             KiiFile[] trashFiles = kiiClient.getTrashFiles();
-            if (trashFiles != null && trashFiles.length > 0) {
+            if ((trashFiles != null) && (trashFiles.length > 0)) {
                 itemsList.add(new KiiFileList("Trash", trashFiles));
             } else {
                 itemsList.add(new KiiFileList("Trash"));
             }
 
             KiiFile[] astroFiles = kiiClient.getAstroFiles();
-            if (astroFiles != null && astroFiles.length > 0) {
+            if ((astroFiles != null) && (astroFiles.length > 0)) {
                 itemsList.add(new KiiFileList("Astro", astroFiles));
             }
 
             KiiFile[] backupFiles = kiiClient.getBackupFiles();
-            if (backupFiles != null && backupFiles.length > 0) {
+            if ((backupFiles != null) && (backupFiles.length > 0)) {
                 itemsList.add(new KiiFileList("Backup", backupFiles));
 
                 // KiiFile[] root = kiiClient.getBackupFolders();
@@ -126,20 +128,24 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         }
     }
 
+    @Override
     public Object getChild(int groupPosition, int childPosition) {
         KiiFileList group = itemsList.get(groupPosition);
         return group.getChild(childPosition);
     }
 
+    @Override
     public long getChildId(int groupPosition, int childPosition) {
         return childPosition;
     }
 
+    @Override
     public int getChildrenCount(int groupPosition) {
         KiiFileList group = itemsList.get(groupPosition);
         return group.getChildrenCount();
     }
 
+    @Override
     public View getChildView(int groupPosition, int childPosition,
             boolean isLastChild, View convertView, ViewGroup parent) {
         KiiFile file = (KiiFile) getChild(groupPosition, childPosition);
@@ -193,18 +199,22 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         return icon;
     }
 
+    @Override
     public Object getGroup(int groupPosition) {
         return itemsList.get(groupPosition);
     }
 
+    @Override
     public int getGroupCount() {
         return itemsList.size();
     }
 
+    @Override
     public long getGroupId(int groupPosition) {
         return groupPosition;
     }
 
+    @Override
     public View getGroupView(int groupPosition, boolean isExpanded,
             View convertView, ViewGroup parent) {
 
@@ -220,10 +230,12 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         return view;
     }
 
+    @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
 
+    @Override
     public boolean hasStableIds() {
         return true;
     }

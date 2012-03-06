@@ -149,7 +149,7 @@ public class StartActivity extends Activity {
         updateView();
 
         Intent i = getIntent();
-        if (i != null && i.getAction() != null) {
+        if ((i != null) && (i.getAction() != null)) {
             if (i.getAction().compareToIgnoreCase(ACTION_ENTER_PASSWORD) == 0) {
                 updatePwd();
             } else if (i.getAction().compareToIgnoreCase(ACTION_LOGOUT) == 0) {
@@ -161,12 +161,12 @@ public class StartActivity extends Activity {
     void updateView() {
         if (SyncPref.isLoggedIn()) {
             Intent i = getIntent();
-            if (i == null
-                    || i.getAction() == null
-                    || (i.getAction().compareToIgnoreCase(
-                            Intent.ACTION_CONFIGURATION_CHANGED) != 0 && i
+            if ((i == null)
+                    || (i.getAction() == null)
+                    || ((i.getAction().compareToIgnoreCase(
+                            Intent.ACTION_CONFIGURATION_CHANGED) != 0) && (i
                             .getAction().compareToIgnoreCase(
-                                    ACTION_ENTER_PASSWORD) != 0)) {
+                                    ACTION_ENTER_PASSWORD) != 0))) {
                 Intent intent = new Intent(mContext, FileTabActivity.class);
                 intent.putExtra(FileTabActivity.TAB_INDEX_EXTRA,
                         FileTabActivity.TAB_INDEX_CLOUD);
@@ -210,6 +210,7 @@ public class StartActivity extends Activity {
                 .setMessage("Enter New Password:")
                 .setView(input)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String newPassword = input.getText().toString();
                         if (TextUtils.isEmpty(newPassword)) {
@@ -223,6 +224,7 @@ public class StartActivity extends Activity {
                 })
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
+                            @Override
                             public void onClick(DialogInterface dialog,
                                     int whichButton) {
                                 Toast.makeText(mContext,
@@ -248,6 +250,7 @@ public class StartActivity extends Activity {
                 .setMessage("Enter new password:")
                 .setView(input)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String newPassword = input.getText().toString();
                         if (TextUtils.isEmpty(newPassword)) {
@@ -261,6 +264,7 @@ public class StartActivity extends Activity {
                 })
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
+                            @Override
                             public void onClick(DialogInterface dialog,
                                     int whichButton) {
                                 Toast.makeText(mContext,
@@ -320,6 +324,7 @@ public class StartActivity extends Activity {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(msg).setTitle(title).setCancelable(true)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int id) {
                     }
                 });
@@ -349,7 +354,7 @@ public class StartActivity extends Activity {
         msg.append("Normal:\n");
         KiiFile[] files = kiiClient.getBackupFiles();
         int ct = 1;
-        if (files != null && files.length > 0) {
+        if ((files != null) && (files.length > 0)) {
             for (KiiFile file : files) {
                 Log.e(StartActivity.TAG + " ALL", "" + file);
                 msg.append(ct + ":  " + Utils.getStatus(file, mContext) + ":"
@@ -360,7 +365,7 @@ public class StartActivity extends Activity {
 
         msg.append("Trash:\n");
         KiiFile[] trashFiles = kiiClient.getTrashFiles();
-        if (trashFiles != null && trashFiles.length > 0) {
+        if ((trashFiles != null) && (trashFiles.length > 0)) {
             for (KiiFile file : trashFiles) {
                 Log.e(StartActivity.TAG, file.getAppData() + "; remotePath: "
                         + file.getRemotePath());
@@ -381,10 +386,11 @@ public class StartActivity extends Activity {
     static String getKiiFilePath(KiiFile file) {
         if (file.isFile()) {
             String path = file.getLocalPath();
-            if (path == null)
+            if (path == null) {
                 return file.getAvailableURL().toString();
-            else
+            } else {
                 return path;
+            }
         } else {
             return file.getBucketName();
         }
@@ -399,8 +405,9 @@ public class StartActivity extends Activity {
 
         KiiSyncClient kClient = KiiSyncClient.getInstance(mContext);
 
-        if (kClient == null)
+        if (kClient == null) {
             return;
+        }
 
         int completed = kClient.getSyncCount();
         int total = completed + kClient.getUnsyncCount();
@@ -412,10 +419,11 @@ public class StartActivity extends Activity {
             mProgressStatus.setProgress(completed);
         }
         double percentage;
-        if (total == 0)
+        if (total == 0) {
             percentage = 0;
-        else
+        } else {
             percentage = ((double) (completed) / (double) total) * 100;
+        }
 
         String progressMsg = String.format(
                 "%3.2f%s  (%d out of %d items are sync)", percentage, "%",
@@ -521,6 +529,7 @@ public class StartActivity extends Activity {
             dialog.setMessage("...");
             dialog.setCancelable(false);
             dialog.setButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int id) {
                     KiiSyncClient kiiClient = KiiSyncClient
                             .getInstance(mContext);
@@ -540,7 +549,7 @@ public class StartActivity extends Activity {
             @Override
             public void handleMessage(Message msg) {
 
-                if (dialog != null && dialog.isShowing()) {
+                if ((dialog != null) && dialog.isShowing()) {
                     KiiSyncClient kiiClient = KiiSyncClient
                             .getInstance(mContext);
                     if (kiiClient != null) {
@@ -582,12 +591,14 @@ public class StartActivity extends Activity {
             try {
                 KiiSyncClient syncClient = KiiSyncClient.getInstance(mContext);
                 result = syncClient.login(mEmail, mPassword);
-                if (result != SyncMsg.OK)
+                if (result != SyncMsg.OK) {
                     return result;
+                }
                 // execute the sync
                 result = syncClient.refresh();
-                if (result != SyncMsg.OK)
+                if (result != SyncMsg.OK) {
                     return result;
+                }
 
                 msg = StartActivity.showKiiFileList(syncClient);
 
@@ -604,8 +615,9 @@ public class StartActivity extends Activity {
          */
         @Override
         protected void onPostExecute(Integer result) {
-            if (dialog != null)
+            if (dialog != null) {
                 dialog.dismiss();
+            }
             if (result == SyncMsg.OK) {
                 StartActivity.showAlertDialog(mContext, TAG, msg);
             } else {

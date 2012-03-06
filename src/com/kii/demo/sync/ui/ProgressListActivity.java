@@ -227,7 +227,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
         KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
         if (kiiClient != null) {
             int progress = kiiClient.getOverallProgress();
-            if (progress > 0 && progress != SyncMsg.SYNC_NOT_RUNNING) {
+            if ((progress > 0) && (progress != SyncMsg.SYNC_NOT_RUNNING)) {
                 setProgress(progress);
                 mAdapter.notifyDataSetChanged();
                 return progress;
@@ -263,7 +263,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 5000);
                     setProgressBarIndeterminateVisibility(true);
                     setProgressBarVisibility(true);
-                    if (msg.obj != null && msg.obj instanceof String) {
+                    if ((msg.obj != null) && (msg.obj instanceof String)) {
                         setTitle((String) msg.obj);
                     }
                 case PROGRESS_UPDATE:
@@ -304,9 +304,9 @@ public class ProgressListActivity extends ExpandableListActivity implements
         int child = ExpandableListView
                 .getPackedPositionChild(info.packedPosition);
         if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            KiiFile kFile = (KiiFile) mAdapter.getChild((int) group,
-                    (int) child);
-            if (kFile != null && kFile.isFile()) {
+            KiiFile kFile = (KiiFile) mAdapter.getChild(group,
+                    child);
+            if ((kFile != null) && kFile.isFile()) {
                 menu.setHeaderTitle(kFile.getTitle());
                 KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
                 if (kiiClient == null) {
@@ -341,9 +341,9 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     .getPackedPositionGroup(info.packedPosition);
             int childPos = ExpandableListView
                     .getPackedPositionChild(info.packedPosition);
-            final KiiFile kFile = (KiiFile) mAdapter.getChild((int) groupPos,
-                    (int) childPos);
-            if (kFile != null && kFile.isFile()) {
+            final KiiFile kFile = (KiiFile) mAdapter.getChild(groupPos,
+                    childPos);
+            if ((kFile != null) && kFile.isFile()) {
                 switch (item.getGroupId()) {
                     case MENU_ITEM_CANCEL:
                         client.cancel(kFile);

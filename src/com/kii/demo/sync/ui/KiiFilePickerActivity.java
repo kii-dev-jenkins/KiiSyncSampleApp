@@ -99,7 +99,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     handler.removeMessages(PROGRESS_AUTO);
                     handler.removeMessages(PROGRESS_CHECK);
                     handler.removeMessages(PROGRESS_END);
-                    if (msg.obj != null && msg.obj instanceof String) {
+                    if ((msg.obj != null) && (msg.obj instanceof String)) {
                         setTitle((String) msg.obj);
                     }
                 case PROGRESS_CHECK:
@@ -207,8 +207,9 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
 
     private void adpaterSetup() {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (mHeaderView == null)
+        if (mHeaderView == null) {
             mHeaderView = inflater.inflate(R.layout.header_view, null);
+        }
         Button b = (Button) mHeaderView.findViewById(R.id.button_left);
         b.setText(getString(R.string.button_refresh));
         b = (Button) mHeaderView.findViewById(R.id.button_right);
@@ -249,7 +250,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     intent = UiUtils.getLaunchFileIntent(kFile.getLocalPath(),
                             mime);
                 }
-                if (intent == null && kFile.getAvailableURL() != null) {
+                if ((intent == null) && (kFile.getAvailableURL() != null)) {
                     if (mime != null) {
                         intent = UiUtils.getLaunchURLIntent(kFile
                                 .getAvailableURL(), mime.getMimeType());
@@ -291,9 +292,9 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 .getPackedPositionChild(info.packedPosition);
         // Only create a context menu for child items
         if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            KiiFile kFile = (KiiFile) mAdapter.getChild((int) group,
-                    (int) child);
-            if (kFile != null && kFile.isFile()) {
+            KiiFile kFile = (KiiFile) mAdapter.getChild(group,
+                    child);
+            if ((kFile != null) && kFile.isFile()) {
                 menu.setHeaderTitle(kFile.getTitle());
 
                 KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
@@ -365,9 +366,9 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
             int childPos = ExpandableListView
                     .getPackedPositionChild(info.packedPosition);
 
-            final KiiFile kFile = (KiiFile) mAdapter.getChild((int) groupPos,
-                    (int) childPos);
-            if (kFile != null && kFile.isFile()) {
+            final KiiFile kFile = (KiiFile) mAdapter.getChild(groupPos,
+                    childPos);
+            if ((kFile != null) && kFile.isFile()) {
                 final KiiSyncClient client = KiiSyncClient
                         .getInstance(mContext);
                 if (client == null) {
@@ -377,6 +378,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 switch (item.getGroupId()) {
                     case MENU_RESTORE_TRASH:
                         Runnable r = new Runnable() {
+                            @Override
                             public void run() {
                                 client.restoreFromTrash(kFile);
                             }
@@ -407,6 +409,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                                                 .getDownloadFolder(),
                                 Toast.LENGTH_SHORT).show();
                         Runnable r1 = new Runnable() {
+                            @Override
                             public void run() {
                                 client.download(kFile, null);
                             }

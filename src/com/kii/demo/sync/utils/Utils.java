@@ -16,7 +16,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
+import android.provider.BaseColumns;
 import android.provider.MediaStore.Images;
+import android.provider.MediaStore.MediaColumns;
 import android.provider.MediaStore.Video;
 import android.text.TextUtils;
 import android.util.Log;
@@ -42,10 +44,12 @@ public class Utils {
      * @return String
      */
     static public String getStatus(KiiFile kFile, Context context) {
-        if (kFile == null)
+        if (kFile == null) {
             return "NULL";
-        if (kFile.isDirectory())
+        }
+        if (kFile.isDirectory()) {
             return "folder";
+        }
         switch (KiiSyncClient.getInstance(context).getStatus(kFile)) {
             case KiiFile.STATUS_UNKNOWN:
                 return "UNKNOWN";
@@ -270,10 +274,10 @@ public class Utils {
         Drawable ret = null;
         Cursor c = Images.Media.query(context.getContentResolver(),
                 Images.Media.EXTERNAL_CONTENT_URI,
-                new String[] { Images.Media._ID }, Images.Media.DATA + "=?",
+                new String[] { BaseColumns._ID }, MediaColumns.DATA + "=?",
                 new String[] { filename }, null);
         try {
-            if (c != null && c.moveToFirst()) {
+            if ((c != null) && c.moveToFirst()) {
                 long id = c.getLong(0);
                 Bitmap b = Images.Thumbnails.getThumbnail(context
                         .getContentResolver(), id,
