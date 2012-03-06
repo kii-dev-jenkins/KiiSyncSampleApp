@@ -40,7 +40,6 @@ public class Utils {
      * 
      * @param kFile
      * @param context
-     *            TODO
      * @return String
      */
     static public String getStatus(KiiFile kFile, Context context) {
