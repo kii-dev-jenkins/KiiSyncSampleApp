@@ -72,7 +72,7 @@ public class FilePickerActivity extends ListActivity implements
                 if (files != null) {
                     for (KiiFile file : files) {
                         int status = client.getStatus(file);
-                        if (!KiiSyncClient.isFileInTrash(file)
+                        if (!Utils.isFileInTrash(file)
                                 && ((status == KiiFile.STATUS_BODY_OUTDATED) || (status == KiiFile.STATUS_NO_BODY))) {
                             client.download(file, Utils.getKiiFileDest(file,
                                     mContext));

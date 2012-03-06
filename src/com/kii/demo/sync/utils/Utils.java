@@ -294,4 +294,20 @@ public class Utils {
         }
         return ret;
     }
+
+    public static boolean isFileInTrash(KiiFile file) {
+        if (file == null) {
+            return false;
+        }
+    
+        String category = file.getCategory();
+        if (category == null) {
+            return false;
+        }
+    
+        if (category.contentEquals(KiiSyncClient.CATEGORY_TRASH)) {
+            return true;
+        }
+        return false;
+    }
 }

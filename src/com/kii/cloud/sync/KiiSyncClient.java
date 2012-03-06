@@ -960,22 +960,6 @@ public class KiiSyncClient {
         return downManager;
     }
 
-    public static boolean isFileInTrash(KiiFile file) {
-        if (file == null) {
-            return false;
-        }
-
-        String category = file.getCategory();
-        if (category == null) {
-            return false;
-        }
-
-        if (category.contentEquals(CATEGORY_TRASH)) {
-            return true;
-        }
-        return false;
-    }
-
     /**
      * Notify local change via
      * {@link KiiNewEventListener#onLocalChangeSyncedEvent(Uri[])}
