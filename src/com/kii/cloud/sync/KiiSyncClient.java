@@ -938,13 +938,6 @@ public class KiiSyncClient {
 
     private DownloadManager downManager = null;
 
-    public DownloadManager getDownManager() {
-        if(downManager == null) {
-            downManager = new DownloadManager(mContext);
-        }
-        return downManager;
-    }
-
     /**
      * Download the file to dnload folder
      * 

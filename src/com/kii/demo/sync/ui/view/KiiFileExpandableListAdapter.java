@@ -81,7 +81,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
 
     protected void addDataSet(ArrayList<KiiFileList> itemsList) {
         if (mType == TYPE_PROGRESS) {
-            DownloadManager downloadManager = kiiClient.getDownManager();
+            DownloadManager downloadManager = kiiClient.getDownloadManager();
             if (downloadManager != null) {
                 KiiFile[] downloadFiles = downloadManager.getDownloadList();
                 if ((downloadFiles != null) && (downloadFiles.length > 0)) {
