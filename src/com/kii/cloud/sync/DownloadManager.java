@@ -1,7 +1,6 @@
 package com.kii.cloud.sync;
 
 import java.io.BufferedOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,6 +24,7 @@ import android.util.Pair;
 
 import com.kii.demo.sync.ui.ProgressListActivity;
 import com.kii.demo.sync.utils.NotificationUtil;
+import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
 
@@ -264,9 +264,9 @@ public class DownloadManager {
             throw new IOException("IllegalArgumentException:" + ex.getMessage());
 
         } finally {
-            close(bos);
-            close(fos);
-            close(input);
+            Utils.closeSilently(bos);
+            Utils.closeSilently(fos);
+            Utils.closeSilently(input);
             if (mContext != null) {
                 Intent intent = new Intent();
                 intent.setAction(ACTION_DOWNLOAD_END);
@@ -285,16 +285,6 @@ public class DownloadManager {
                 }
                 KiiSyncClient.getInstance(mContext).notifyKiiFileLocalChange();
             }
-        }
-    }
-
-    private void close(Closeable closeable) {
-        try {
-            if (closeable != null) {
-                closeable.close();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "", e);
         }
     }
 
