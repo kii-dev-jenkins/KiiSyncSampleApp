@@ -12,11 +12,9 @@ import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -41,31 +39,19 @@ public class ProgressListActivity extends ExpandableListActivity implements
     private static final int MENU_ITEM_CANCEL = 2;
 
     private static final int OPTION_MENU_SETTING = 0;
-    private View mHeaderView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         requestWindowFeature(Window.FEATURE_PROGRESS);
-        // set the view when it is empty
-        LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View emptyView = inflator.inflate(R.layout.uploads_empty_view, null);
-        ((ViewGroup) this.getExpandableListView().getParent())
-                .addView(emptyView);
-        getExpandableListView().setEmptyView(emptyView);
-
         mNewEventListener = new NewEventListener(this);
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (mHeaderView == null) {
-            mHeaderView = inflater.inflate(R.layout.header_view, null);
-        }
-        Button b = (Button) mHeaderView.findViewById(R.id.button_left);
+        setContentView(R.layout.expandable_list_with_header);
+        Button b = (Button) findViewById(R.id.button_left);
         b.setText(getString(R.string.pause));
-        b = (Button) mHeaderView.findViewById(R.id.button_right);
+        b = (Button) findViewById(R.id.button_right);
         b.setText(getString(R.string.resume));
         setHeaderText();
-        getExpandableListView().addHeaderView(mHeaderView);
         connect();
         registerForContextMenu(getExpandableListView());
     }
@@ -241,10 +227,11 @@ public class ProgressListActivity extends ExpandableListActivity implements
             switch (msg.what) {
                 case PROGRESS_AUTO:
                     mProgress = updateProgress();
-                    Log.d(TAG, "mProgress is "+mProgress);
-                    Log.d(TAG, "mAdapter.getGroupCount is: "+mAdapter.getGroupCount());
-                    if ((mProgress > 0)
-                            || (mAdapter.getGroupCount()>0)) {
+                    Log.d(TAG, "mProgress is " + mProgress);
+                    Log.d(TAG,
+                            "mAdapter.getGroupCount is: "
+                                    + mAdapter.getGroupCount());
+                    if ((mProgress > 0) || (mAdapter.getGroupCount() > 0)) {
                         setProgressBarIndeterminateVisibility(true);
                         setProgressBarVisibility(true);
                         handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 5000);
@@ -304,8 +291,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
         int child = ExpandableListView
                 .getPackedPositionChild(info.packedPosition);
         if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            KiiFile kFile = (KiiFile) mAdapter.getChild(group,
-                    child);
+            KiiFile kFile = (KiiFile) mAdapter.getChild(group, child);
             if ((kFile != null) && kFile.isFile()) {
                 menu.setHeaderTitle(kFile.getTitle());
                 KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
@@ -376,15 +362,13 @@ public class ProgressListActivity extends ExpandableListActivity implements
     }
 
     private void setHeaderText() {
-        if (mHeaderView != null) {
-            TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
-            if (mProgress > 0) {
-                tv.setText("Progress: " + mProgress + "%");
-            } else {
-                tv.setText(UiUtils.getLastSyncTime(this));
-            }
-
+        TextView tv = (TextView) findViewById(R.id.header_text);
+        if (mProgress > 0) {
+            tv.setText("Progress: " + mProgress + "%");
+        } else {
+            tv.setText(UiUtils.getLastSyncTime(this));
         }
+
     }
 
     @Override

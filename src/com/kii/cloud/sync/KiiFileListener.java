@@ -135,6 +135,7 @@ public class KiiFileListener implements KiiNewEventListener {
         NotificationUtil.cancelSyncProgressNotification(context);
         updateCache(false);
         if (msg != null) {
+            Log.d(TAG, "syncResult is "+msg.sync_result);
             if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
                 Intent apiIntent = new Intent(context.getApplicationContext(),
                         StartActivity.class);

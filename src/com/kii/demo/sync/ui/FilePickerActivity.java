@@ -34,7 +34,6 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,8 +73,8 @@ public class FilePickerActivity extends ListActivity implements
                         int status = client.getStatus(file);
                         if (!Utils.isKiiFileInTrash(file)
                                 && ((status == KiiFile.STATUS_BODY_OUTDATED) || (status == KiiFile.STATUS_NO_BODY))) {
-                            client.download(file, Utils.getKiiFileDest(file,
-                                    mContext));
+                            client.download(file,
+                                    Utils.getKiiFileDest(file, mContext));
                         }
                     }
                 }
@@ -159,26 +158,18 @@ public class FilePickerActivity extends ListActivity implements
     protected FilePickerListAdapter mAdapter;
     protected boolean mShowHiddenFiles = false;
     protected String[] acceptedFileExtensions;
-    View mHeaderView;
     private Context mContext;
     private NewEventListener mListener = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.list_with_header);
 
-        // Set the view to be shown if the list is empty
-        LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View emptyView = inflator
-                .inflate(R.layout.file_picker_empty_view, null);
-        ((ViewGroup) getListView().getParent()).addView(emptyView);
-        getListView().setEmptyView(emptyView);
-        mHeaderView = inflator.inflate(R.layout.header_view, null);
-        Button b = (Button) mHeaderView.findViewById(R.id.button_left);
+        Button b = (Button) findViewById(R.id.button_left);
         b.setText(getString(R.string.header_btn_home));
-        b = (Button) mHeaderView.findViewById(R.id.button_right);
+        b = (Button) findViewById(R.id.button_right);
         b.setText(getString(R.string.header_btn_up));
-        getListView().addHeaderView(mHeaderView);
         // Set initial directory
         mDirectory = new File(DEFAULT_INITIAL_DIRECTORY);
 
@@ -187,6 +178,7 @@ public class FilePickerActivity extends ListActivity implements
 
         // Set the ListAdapter
         mAdapter = new FilePickerListAdapter(this, mFiles);
+
         setListAdapter(mAdapter);
         registerForContextMenu(getListView());
 
@@ -204,8 +196,8 @@ public class FilePickerActivity extends ListActivity implements
         if (getIntent().hasExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS)) {
             ArrayList<String> collection = getIntent().getStringArrayListExtra(
                     EXTRA_ACCEPTED_FILE_EXTENSIONS);
-            acceptedFileExtensions = collection
-                    .toArray(new String[collection.size()]);
+            acceptedFileExtensions = collection.toArray(new String[collection
+                    .size()]);
         }
         mContext = this;
         mListener = new NewEventListener(mContext);
@@ -274,14 +266,14 @@ public class FilePickerActivity extends ListActivity implements
             Collections.sort(mFiles, new FileComparator());
         }
         mAdapter.notifyDataSetChanged();
-        Button b = (Button) mHeaderView.findViewById(R.id.button_right);
+        Button b = (Button) findViewById(R.id.button_right);
         if (isAtSdHome()) {
             // at SD card home, disable Up button
             b.setEnabled(false);
         } else {
             b.setEnabled(true);
         }
-        TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
+        TextView tv = (TextView) findViewById(R.id.header_text);
         tv.setText(getString(R.string.header_text_path) + mDirectory.getPath());
     }
 
@@ -293,7 +285,7 @@ public class FilePickerActivity extends ListActivity implements
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         File newFile = (File) l.getItemAtPosition(position);
-        Log.d(TAG, "onListItemClick: newFile is "+newFile.getName());
+        Log.d(TAG, "onListItemClick: newFile is " + newFile.getName());
         if (newFile.isFile()) {
             Intent intent = null;
             MimeInfo mime = MimeUtil.getInfoByFileName(newFile
@@ -308,7 +300,8 @@ public class FilePickerActivity extends ListActivity implements
                 try {
                     startActivity(intent);
                 } catch (Exception ex) {
-                    UiUtils.showToast(this,
+                    UiUtils.showToast(
+                            this,
                             "Encounter error when launch file ("
                                     + newFile.getName() + "). Error("
                                     + ex.getMessage() + ")");
@@ -436,8 +429,8 @@ public class FilePickerActivity extends ListActivity implements
             if (ICON_CACHE.containsKey(file.getAbsolutePath())) {
                 icon = ICON_CACHE.get(file.getAbsolutePath());
             } else {
-                icon = Utils.getThumbnailDrawableByFilename(file
-                        .getAbsolutePath(), FilePickerActivity.this);
+                icon = Utils.getThumbnailDrawableByFilename(
+                        file.getAbsolutePath(), FilePickerActivity.this);
                 ICON_CACHE.put(file.getAbsolutePath(), icon);
             }
             KiiListItemView v;
@@ -590,10 +583,10 @@ public class FilePickerActivity extends ListActivity implements
                 needDownload = false;
             }
             FilePickerActivity.this.getListView().post(new Runnable() {
-               @Override
-               public void run() {
-                   mAdapter.notifyDataSetChanged();
-               }
+                @Override
+                public void run() {
+                    mAdapter.notifyDataSetChanged();
+                }
             });
         }
 
@@ -645,14 +638,16 @@ public class FilePickerActivity extends ListActivity implements
             case DIALOG_UPDATE:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(scanChange.size() + " file(s) has changed.")
-                        .setCancelable(false).setPositiveButton("Update Now",
+                        .setCancelable(false)
+                        .setPositiveButton("Update Now",
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog,
                                             int id) {
                                         updateFileChange();
                                     }
-                                }).setNegativeButton("Cancel",
+                                })
+                        .setNegativeButton("Cancel",
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog,

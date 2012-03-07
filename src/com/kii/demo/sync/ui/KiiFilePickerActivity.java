@@ -13,7 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -56,7 +55,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     NewEventListener mNewEventListener = null;
 
     KiiFileExpandableListAdapter mAdapter;
-    View mHeaderView = null;
     private static Context mContext;
 
     @Override
@@ -64,6 +62,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         super.onCreate(savedInstanceState);
         mContext = this;
         mNewEventListener = new NewEventListener(this);
+        setContentView(R.layout.expandable_list_with_header);
         connect();
         registerForContextMenu(getExpandableListView());
     }
@@ -173,19 +172,14 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     }
 
     private void adpaterSetup() {
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (mHeaderView == null) {
-            mHeaderView = inflater.inflate(R.layout.header_view, null);
-        }
-        Button b = (Button) mHeaderView.findViewById(R.id.button_left);
+        Button b = (Button) findViewById(R.id.button_left);
         b.setText(getString(R.string.button_refresh));
-        b = (Button) mHeaderView.findViewById(R.id.button_right);
+        b = (Button) findViewById(R.id.button_right);
         b.setText(getString(R.string.header_upload));
-        getExpandableListView().addHeaderView(mHeaderView);
         setLastSyncTime();
-        mAdapter = new KiiFileExpandableListAdapter(this, KiiSyncClient
-                .getInstance(mContext), KiiFileExpandableListAdapter.TYPE_DATA,
-                this);
+        mAdapter = new KiiFileExpandableListAdapter(this,
+                KiiSyncClient.getInstance(mContext),
+                KiiFileExpandableListAdapter.TYPE_DATA, this);
         setListAdapter(mAdapter);
         mNewEventListener.register();
     }
@@ -219,8 +213,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 }
                 if ((intent == null) && (kFile.getAvailableURL() != null)) {
                     if (mime != null) {
-                        intent = UiUtils.getLaunchURLIntent(kFile
-                                .getAvailableURL(), mime.getMimeType());
+                        intent = UiUtils.getLaunchURLIntent(
+                                kFile.getAvailableURL(), mime.getMimeType());
                     }
                 }
 
@@ -231,7 +225,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     try {
                         startActivity(intent);
                     } catch (Exception ex) {
-                        UiUtils.showToast(mContext,
+                        UiUtils.showToast(
+                                mContext,
                                 "Encounter error when launch file ("
                                         + kFile.getTitle() + "). Error("
                                         + ex.getMessage() + ")");
@@ -259,8 +254,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 .getPackedPositionChild(info.packedPosition);
         // Only create a context menu for child items
         if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            KiiFile kFile = (KiiFile) mAdapter.getChild(group,
-                    child);
+            KiiFile kFile = (KiiFile) mAdapter.getChild(group, child);
             if ((kFile != null) && kFile.isFile()) {
                 menu.setHeaderTitle(kFile.getTitle());
 
@@ -523,10 +517,8 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     }
 
     private void setLastSyncTime() {
-        if (mHeaderView != null) {
-            TextView tv = (TextView) mHeaderView.findViewById(R.id.header_text);
-            tv.setText(UiUtils.getLastSyncTime(this));
-        }
+        TextView tv = (TextView) findViewById(R.id.header_text);
+        tv.setText(UiUtils.getLastSyncTime(this));
     }
 
 }
