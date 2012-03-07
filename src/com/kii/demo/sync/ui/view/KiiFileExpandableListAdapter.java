@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -29,7 +29,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
     // if items[] is null, it is reference to trash folder
     ArrayList<KiiFileList> itemsList = new ArrayList<KiiFileList>();
 
-    Activity mActivity = null;
+    Context mContext = null;
     View.OnClickListener mOnClickListener = null;
 
     KiiSyncClient kiiClient = null;
@@ -40,13 +40,13 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
     public static final int TYPE_DATA = 1;
     public static final int TYPE_PROGRESS = 2;
 
-    public KiiFileExpandableListAdapter(Activity activity,
+    public KiiFileExpandableListAdapter(Context activity,
             KiiSyncClient kiiClient, int type, OnClickListener listener) {
         if (kiiClient == null) {
             throw new NullPointerException();
         }
         kiiClient.refreshKiiFileStatusCache();
-        mActivity = activity;
+        mContext = activity;
         mOnClickListener = listener;
         this.kiiClient = kiiClient;
         this.mType = type;
@@ -126,7 +126,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         Drawable icon = getKiiFileMainIcon(file);
         KiiListItemView view;
         if (convertView == null) {
-            view = new KiiListItemView(mActivity, file, kiiClient, icon,
+            view = new KiiListItemView(mContext, file, kiiClient, icon,
                     mOnClickListener);
         } else {
             view = (KiiListItemView) convertView;
@@ -134,7 +134,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         }
         int status = kiiClient.getKiiFileStatus(file);
         String caption = UiUtils.getKiiFileCaption(file, status, mType);
-        String subCaption = Formatter.formatFileSize(mActivity,
+        String subCaption = Formatter.formatFileSize(mContext,
                 file.getSizeOnDB());
         view.setCaption(caption, subCaption);
         return view;
@@ -196,7 +196,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
         KiiFileList group = (KiiFileList) getGroup(groupPosition);
 
         if (convertView == null) {
-            view = new KiiListItemView(mActivity, group);
+            view = new KiiListItemView(mContext, group);
         } else {
             view = (KiiListItemView) convertView;
             view.refreshWithNewGroup(group);
