@@ -179,8 +179,7 @@ public class CloudStorage implements Authentication {
             if (email.contains("@")) {
                 accType = "EMAIL";
             }
-            KiiUMInfo info = new KiiUMInfo(mContext, email, password, mBaseURL
-                    + URL_PFS, accType, email);
+            KiiUMInfo info = new KiiUMInfo(mContext, email, password, accType, email);
             mSyncClient.setKiiUMInfo(info);
 
             SyncPref.setShareUrl(mBaseURL + URL_RESOURCE);

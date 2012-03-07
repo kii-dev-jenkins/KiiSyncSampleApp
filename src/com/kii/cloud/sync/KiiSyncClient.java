@@ -301,6 +301,7 @@ public class KiiSyncClient {
         }
     }
 
+    private static final String BASEURL = "http://dev-usergrid.kii.com";
     /**
      * @param context
      * @throws InterruptedException
@@ -309,6 +310,7 @@ public class KiiSyncClient {
     private KiiSyncClient(Context context) throws InterruptedException,
             InstantiationException {
         mSyncManager = KiiClient.getInstance(context);
+        mSyncManager.setServerBaseUrl(BASEURL);
         mContext = context;
         // configure the KiiClient don't generate the thumbnail
         SyncPref.setGenerateThumbnail(false);
