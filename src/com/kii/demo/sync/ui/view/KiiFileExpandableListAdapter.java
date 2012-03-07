@@ -88,11 +88,6 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                 itemsList.add(new KiiFileList("Trash"));
             }
 
-            KiiFile[] astroFiles = kiiClient.getAstroFiles();
-            if ((astroFiles != null) && (astroFiles.length > 0)) {
-                itemsList.add(new KiiFileList("Astro", astroFiles));
-            }
-
             KiiFile[] backupFiles = kiiClient.getBackupFiles();
             if ((backupFiles != null) && (backupFiles.length > 0)) {
                 itemsList.add(new KiiFileList("Backup", backupFiles));

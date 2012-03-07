@@ -85,14 +85,6 @@ public class KiiFileListener implements KiiNewEventListener {
                 tempKiiFileStatus = cacheKiiFileStatus;
             }
 
-            KiiFile[] astroFiles = client.getAstroFiles();
-            if ((astroFiles != null) && (astroFiles.length > 0)) {
-                for (int ct = 0; ct < astroFiles.length; ct++) {
-                    tempKiiFileStatus.put(astroFiles[ct].getResourceUrl(),
-                            astroFiles[ct].getStatus());
-                }
-            }
-
             KiiFile[] backupFiles = client.getBackupFiles();
             if ((backupFiles != null) && (backupFiles.length > 0)) {
                 for (int ct = 0; ct < backupFiles.length; ct++) {

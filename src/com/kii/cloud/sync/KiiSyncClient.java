@@ -47,8 +47,6 @@ public class KiiSyncClient {
      */
     public static final String CATEGORY_NONE = "none";
 
-    public static final String CATEGORY_ASTRO = "file";
-
     public static final String CATEGORY_BACKUP = "backup";
 
     Context mContext;
@@ -465,15 +463,6 @@ public class KiiSyncClient {
      */
     public KiiFile[] getTrashFiles() {
         return KiiFileUtil.listByCategory(mContext, CATEGORY_TRASH);
-    }
-
-    /**
-     * Get all the files that are backup by Astro
-     * 
-     * @return
-     */
-    public KiiFile[] getAstroFiles() {
-        return KiiFileUtil.listByCategory(mContext, CATEGORY_ASTRO);
     }
 
     /**

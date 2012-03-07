@@ -175,15 +175,11 @@ public class CloudStorage implements Authentication {
         String accType = "KII_ID";
         KiiUser user = result.getKiiUser();
         if (user != null) {
-            SyncPref.setUsername(email);
             if (email.contains("@")) {
                 accType = "EMAIL";
             }
             KiiUMInfo info = new KiiUMInfo(mContext, email, password, accType, email);
             mSyncClient.setKiiUMInfo(info);
-
-            SyncPref.setShareUrl(mBaseURL + URL_RESOURCE);
-            SyncPref.setResourceUrl(mBaseURL + URL_RESOURCE);
         }
         return 0;
     }
