@@ -1,4 +1,4 @@
-package com.kii.cloud.sync.auth;
+package com.kii.cloud.sync;
 
 import java.io.IOException;
 
@@ -14,7 +14,6 @@ import com.kii.cloud.storage.dataType.KiiUser;
 import com.kii.cloud.storage.manager.AuthManager;
 import com.kii.cloud.storage.response.CloudExecutionException;
 import com.kii.cloud.storage.response.UserResult;
-import com.kii.cloud.sync.Authentication;
 import com.kii.mobilesdk.bridge.AppUtil;
 import com.kii.mobilesdk.bridge.KiiUMInfo;
 import com.kii.sync.KiiClient;
