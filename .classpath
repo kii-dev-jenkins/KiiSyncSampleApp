@@ -4,10 +4,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="lib" path="libs/KiiCloudStorageSDK-r20654.jar"/>
-	<classpathentry kind="lib" path="libs/KiiSyncManager-r20664.jar" sourcepath="/KiiSyncManager">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/KiiSyncSampleApp/doc/apidoc-r20664.zip!/"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="libs/KiiSyncManager-r20664.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
