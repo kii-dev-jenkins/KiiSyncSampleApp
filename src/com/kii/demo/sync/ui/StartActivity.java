@@ -78,6 +78,8 @@ public class StartActivity extends Activity {
         mLastSyncTime = (TextView) findViewById(R.id.lastSyncTime);
         mServerSite = (TextView) findViewById(R.id.server);
         mUserInfo = (TextView) findViewById(R.id.kiiid);
+        mServerSite.setVisibility(View.GONE);
+        mUserInfo.setVisibility(View.GONE);
 
         mRegister = (Button) findViewById(R.id.register);
         mRegister.setOnClickListener(new OnClickListener() {
@@ -415,14 +417,6 @@ public class StartActivity extends Activity {
                 + Long.toString(kClient.getStorageUsage()) + "bytes");
 
         mLastSyncTime.setText(UiUtils.getLastSyncTime(this));
-
-        // print the server location and SDK version
-        mServerSite.setText("Connect to Server:" + SyncPref.getServerSite()
-                + " SDK Ver:" + SyncPref.getSDKVersion());
-
-        // print the User Id and App ID
-        mUserInfo.setText("KiiID:" + SyncPref.getKiiId() + "\nAppID:"
-                + SyncPref.getAppName());
     }
 
     public class SyncTask extends AsyncTask<String, Void, Integer> {

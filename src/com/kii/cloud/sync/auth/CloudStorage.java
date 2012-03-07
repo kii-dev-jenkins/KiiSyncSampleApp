@@ -99,7 +99,6 @@ public class CloudStorage implements Authentication {
             }
 
             if (result.getKiiUser() != null) {
-                SyncPref.setPassword(newPassword);
                 return SyncMsg.OK;
             }
         }

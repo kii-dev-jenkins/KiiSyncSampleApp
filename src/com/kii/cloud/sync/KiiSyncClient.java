@@ -310,18 +310,8 @@ public class KiiSyncClient {
         mSyncManager = KiiClient.getInstance(context);
         mSyncManager.setServerBaseUrl(BASEURL);
         mContext = context;
-        // configure the KiiClient don't generate the thumbnail
-        SyncPref.setGenerateThumbnail(false);
-        // disable the auto backup
-        SyncPref.setSyncAuto(false);
-        // SyncPref.setAutoUpdate(SyncPref.AUTO_UPDATE_OFF);
-        // SyncPref.setIdentityUrl("http://new-dev-us.kii.com/app/identity/");
-        // SyncPref.setIdentityUrl("http://test-ms2.kii.com/app/identity/");
-        // SyncPref.setIdentityUrl("https://product-jp.kii.com/app/identity/");
         mAuthManager = new CloudStorage(context, mSyncManager,
-                "http://dev-usergrid.kii.com");
-        // mAuthManager = new Identity(mSyncManager,
-        // "http://new-dev-us.kii.com");
+                BASEURL);
     }
 
     public static synchronized KiiSyncClient getInstance(Context context) {
