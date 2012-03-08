@@ -251,8 +251,9 @@ public class KiiFileFragment extends Fragment {
         mNewEventListener.register();
     }
 
+    private Receiver receiver;
     private void connect() {
-        Receiver receiver = new Receiver();
+        receiver = new Receiver();
         getActivity().registerReceiver(receiver,
                 new IntentFilter(DownloadManager.ACTION_DOWNLOAD_END));
         getActivity().registerReceiver(receiver,
@@ -278,6 +279,7 @@ public class KiiFileFragment extends Fragment {
         if (mNewEventListener != null) {
             mNewEventListener.unregister();
         }
+        getActivity().unregisterReceiver(receiver);
         super.onDestroy();
     }
 
