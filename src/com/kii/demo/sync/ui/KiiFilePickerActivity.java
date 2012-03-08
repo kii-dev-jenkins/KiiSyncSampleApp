@@ -81,7 +81,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                 case PROGRESS_END:
                 default:
                     handler.removeMessages(PROGRESS_END);
-                    setTitle(R.string.app_name);
                     if (mAdapter != null) {
                         mAdapter.notifyDataSetChanged();
                     }
@@ -187,55 +186,52 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     @Override
     public boolean onChildClick(ExpandableListView parent, View v,
             int groupPosition, int childPosition, long id) {
-        if (true) {
-            KiiFile kFile = (KiiFile) mAdapter.getChild(groupPosition,
-                    childPosition);
-            Log.d(TAG, "onChildClick: kFile is " + kFile.getTitle());
-            if (kFile.isFile()) {
+        KiiFile kFile = (KiiFile) mAdapter.getChild(groupPosition,
+                childPosition);
+        Log.d(TAG, "onChildClick: kFile is " + kFile.getTitle());
+        if (kFile.isFile()) {
 
-                String category = kFile.getCategory();
+            String category = kFile.getCategory();
 
-                // check if the file is trash category, if yes prompt for
-                // restore
-                if (!TextUtils.isEmpty(category)
-                        && KiiSyncClient.CATEGORY_TRASH
-                                .equalsIgnoreCase(category)) {
-                    UiUtils.showToast(mContext, "Please restore before view!");
-                    return true;
-                }
-
-                Intent intent = null;
-                MimeInfo mime = MimeUtil.getInfoByKiiFile(kFile);
-
-                if (KiiSyncClient.getInstance(mContext).getStatus(kFile) != KiiFile.STATUS_NO_BODY) {
-                    intent = UiUtils.getLaunchFileIntent(kFile.getLocalPath(),
-                            mime);
-                }
-                if ((intent == null) && (kFile.getAvailableURL() != null)) {
-                    if (mime != null) {
-                        intent = UiUtils.getLaunchURLIntent(
-                                kFile.getAvailableURL(), mime.getMimeType());
-                    }
-                }
-
-                if (intent == null) {
-                    UiUtils.showToast(mContext, "Failed to launch the file - "
-                            + kFile.getTitle());
-                } else {
-                    try {
-                        startActivity(intent);
-                    } catch (Exception ex) {
-                        UiUtils.showToast(
-                                mContext,
-                                "Encounter error when launch file ("
-                                        + kFile.getTitle() + "). Error("
-                                        + ex.getMessage() + ")");
-                    }
-                }
-            } else {
-                UiUtils.showToast(mContext, "Failed to launch the viewer for "
-                        + kFile.getTitle());
+            // check if the file is trash category, if yes prompt for
+            // restore
+            if (!TextUtils.isEmpty(category)
+                    && KiiSyncClient.CATEGORY_TRASH.equalsIgnoreCase(category)) {
+                UiUtils.showToast(mContext, "Please restore before view!");
+                return true;
             }
+
+            Intent intent = null;
+            MimeInfo mime = MimeUtil.getInfoByKiiFile(kFile);
+
+            if (KiiSyncClient.getInstance(mContext).getStatus(kFile) != KiiFile.STATUS_NO_BODY) {
+                intent = UiUtils
+                        .getLaunchFileIntent(kFile.getLocalPath(), mime);
+            }
+            if ((intent == null) && (kFile.getAvailableURL() != null)) {
+                if (mime != null) {
+                    intent = UiUtils.getLaunchURLIntent(
+                            kFile.getAvailableURL(), mime.getMimeType());
+                }
+            }
+
+            if (intent == null) {
+                UiUtils.showToast(mContext, "Failed to launch the file - "
+                        + kFile.getTitle());
+            } else {
+                try {
+                    startActivity(intent);
+                } catch (Exception ex) {
+                    UiUtils.showToast(
+                            mContext,
+                            "Encounter error when launch file ("
+                                    + kFile.getTitle() + "). Error("
+                                    + ex.getMessage() + ")");
+                }
+            }
+        } else {
+            UiUtils.showToast(mContext, "Failed to launch the viewer for "
+                    + kFile.getTitle());
         }
         return super.onChildClick(parent, v, groupPosition, childPosition, id);
     }
@@ -349,7 +345,9 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     case MENU_MOVE_TRASH:
                         int ret = client.moveKiiFileToTrash(kFile);
                         if (ret == SyncMsg.ERROR_RECORD_NOT_FOUND) {
-                            showToast(getString(R.string.error_cannot_trash_server_file));
+                            UiUtils.showToast(
+                                    this,
+                                    getString(R.string.error_cannot_trash_server_file));
                             return true;
                         }
                         break;
@@ -394,10 +392,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         }
 
         return false;
-    }
-
-    private static void showToast(String msg) {
-        Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show();
     }
 
     class Receiver extends BroadcastReceiver {

@@ -261,7 +261,7 @@ public class Utils {
     }
 
     public static void startSync(Context context, String command) {
-        Intent service = new Intent(context, BackupService.class);
+        Intent service = new Intent(context.getApplicationContext(), BackupService.class);
         if (!TextUtils.isEmpty(command)) {
             service.setAction(command);
         }

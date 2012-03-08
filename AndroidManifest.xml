@@ -84,6 +84,7 @@
             android:name=".ui.ProgressListActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity android:name=".ui.FragmentTabsPager"></activity>
     </application>
 
 </manifest>
