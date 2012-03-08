@@ -135,19 +135,16 @@ public class KiiFileListener implements KiiNewEventListener {
         NotificationUtil.cancelSyncProgressNotification(context);
         updateCache(false);
         if (msg != null) {
-            Log.d(TAG, "syncResult is "+msg.sync_result);
             if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
-                Intent apiIntent = new Intent(context.getApplicationContext(),
+                Intent intent = new Intent(context,
                         StartActivity.class);
-                apiIntent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
-                context.startActivity(apiIntent);
-            }
-
-            if (msg.sync_result == SyncMsg.PFS_SYNCRESULT_USER_EXPIRED) {
-                Intent apiIntent = new Intent(context.getApplicationContext(),
+                intent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
+                context.startActivity(intent);
+            } else if (msg.sync_result == SyncMsg.PFS_SYNCRESULT_USER_EXPIRED) {
+                Intent intent = new Intent(context,
                         StartActivity.class);
-                apiIntent.setAction(StartActivity.ACTION_LOGOUT);
-                context.startActivity(apiIntent);
+                intent.setAction(StartActivity.ACTION_LOGOUT);
+                context.startActivity(intent);
             }
         }
     }
