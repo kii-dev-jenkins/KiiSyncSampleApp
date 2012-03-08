@@ -410,7 +410,6 @@ public class KiiSyncClient {
                 upload(path, false);
             }
         }
-        mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
         return SyncMsg.OK;
     }
 
@@ -430,9 +429,6 @@ public class KiiSyncClient {
         } else {
             ret = mSyncManager.deleteRemainOrginalFile(file);
         }
-        if (ret == SyncMsg.OK) {
-            mSyncManager.getSyncObserver().notifySyncDelete(null);
-        }
         return ret;
     }
 
@@ -447,9 +443,6 @@ public class KiiSyncClient {
         if ((status == KiiFile.STATUS_PREPARE_TO_SYNC)
                 || (status == KiiFile.STATUS_UPLOADING_BODY)) {
             int ret = mSyncManager.deleteRemainOrginalFile(file);
-            if (ret == SyncMsg.OK) {
-                mSyncManager.getSyncObserver().notifySyncDelete(null);
-            }
             return ret;
         }
         return SyncMsg.ERROR_INVALID_INPUT;
@@ -491,9 +484,6 @@ public class KiiSyncClient {
      */
     public int upload(String filePath) {
         int ret = upload(filePath, false);
-        if (ret == SyncMsg.OK) {
-            mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
-        }
         return ret;
 
     }
@@ -628,10 +618,6 @@ public class KiiSyncClient {
      */
     public int upload(KiiFile file) {
         int ret = mSyncManager.upload(file, false);
-        if (ret == SyncMsg.OK) {
-            mSyncManager.getSyncObserver().notifyLocalChangeSynced(
-                    new Uri[] { file.getUri() });
-        }
         return ret;
     }
 
@@ -839,9 +825,6 @@ public class KiiSyncClient {
      */
     public int update(KiiFile kFile) {
         int res = mSyncManager.update(kFile, false);
-        if (res == SyncMsg.OK) {
-            mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
-        }
         return res;
     }
 

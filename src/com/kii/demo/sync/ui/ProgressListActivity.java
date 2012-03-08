@@ -254,9 +254,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     handler.removeMessages(PROGRESS_AUTO);
                     handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 5000);
                     mProgress = updateProgress();
-                    if (mProgress > 0) {
-                        setHeaderText();
-                    }
+                    setHeaderText();
                     setProgressBarIndeterminateVisibility(true);
                     setProgressBarVisibility(true);
                     mAdapter.notifyDataSetChanged();
@@ -272,7 +270,8 @@ public class ProgressListActivity extends ExpandableListActivity implements
                     if (mAdapter != null) {
                         mAdapter.notifyDataSetChanged();
                     }
-                    // finish();
+                    mProgress = updateProgress();
+                    setHeaderText();
                     return;
             }
 
@@ -363,7 +362,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
 
     private void setHeaderText() {
         TextView tv = (TextView) findViewById(R.id.header_text);
-        if (mProgress > 0) {
+        if ((mProgress > 0) && (mProgress < 100)) {
             tv.setText("Progress: " + mProgress + "%");
         } else {
             tv.setText(UiUtils.getLastSyncTime(this));
