@@ -25,9 +25,11 @@ import com.kii.sync.SyncPref;
 import com.kii.sync.provider.DatabaseHelper;
 
 /**
- * Extension of KiiClient to provide customize service for Application specific
- * 
- * @author HueyMeng
+ * The purpose of this class is to enforce at most one instance of 
+ * KiiSyncClient so that it is easy access throughout the application.
+ * It also put together the sync, upload, download, caching together.
+ * If you are using Android 2.3 and above, it is advisable to use Android DownloadManager
+ * The caching is provide a quick mechanism for the UI thread to retrieve/check the progress status of the file.
  */
 public class KiiSyncClient {
 
@@ -36,7 +38,11 @@ public class KiiSyncClient {
 
     private KiiClient mSyncManager = null;
     private Authentication mAuthManager = null;
+    
+    private DownloadManager downManager = null;
 
+    private static final String BASEURL = "http://dev-usergrid.kii.com";
+    
     /**
      * Category of TRASH.
      */
@@ -240,6 +246,10 @@ public class KiiSyncClient {
         return mSyncManager.getProgress();
     }
 
+    /**
+     * Check the sync status
+     * @return true if busy else false
+     */
     public boolean isSyncRunning() {
         int status = mSyncManager.getProgress();
         if ((status == SyncMsg.ERROR_SETUP)
@@ -298,7 +308,8 @@ public class KiiSyncClient {
         }
     }
 
-    private static final String BASEURL = "http://dev-usergrid.kii.com";
+
+    
     /**
      * @param context
      * @throws InterruptedException
@@ -313,6 +324,11 @@ public class KiiSyncClient {
                 BASEURL);
     }
 
+    /**
+     * Get an instance of KiiSyncClient. It is designed to be singleton.
+     * @param context is the application context
+     * @return KiiSyncClient
+     */
     public static synchronized KiiSyncClient getInstance(Context context) {
         if (mInstance == null) {
             try {
@@ -327,6 +343,9 @@ public class KiiSyncClient {
         return mInstance;
     }
 
+    /**
+     * Start the sync service
+     */
     public void initSync() {
         try {
             mSyncManager.initSync();
@@ -826,8 +845,6 @@ public class KiiSyncClient {
         return res;
     }
 
-    private DownloadManager downManager = null;
-
     /**
      * Download the file to dnload folder
      * 
@@ -883,7 +900,7 @@ public class KiiSyncClient {
     }
 
     /**
-     * @return: integer 0-100: overall progress: pfs and http
+     * @return: integer 0-100: overall progress: sync(upload & update) & download
      */
     public int getOverallProgress() {
         int pfsProgress = getProgress();
