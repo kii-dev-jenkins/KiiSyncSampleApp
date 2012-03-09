@@ -15,7 +15,7 @@ Using sync sdk, developer just focus on developing the application logic and lea
 
 == Screen shots == 
 
-[[File:DeviceTab.png|link=http://static.kii.com/hm/img|List Device Files]]
-[[File:CloudTab.png|link=http://static.kii.com/hm/img|List Cloud Files]]
-[[File:ProgressUI.png|link=http://static.kii.com/hm/img|List Files in progress]]
+[[File:http://static.kii.com/hm/img/DeviceTab.png|link=http://static.kii.com/hm/img|List Device Files]]
+[[File:http://static.kii.com/hm/img/CloudTab.png|link=http://static.kii.com/hm/img|List Cloud Files]]
+[[File:http://static.kii.com/hm/img/ProgressUI.png|link=http://static.kii.com/hm/img|List Files in progress]]
  
