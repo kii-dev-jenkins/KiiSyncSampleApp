@@ -1,18 +1,21 @@
-h2. Sync SDK
+== Sync SDK ==
 
-!sync.png|border=1! 
+[[File:sync.png|Overview of Sync SDK]]
 
-h2. Sample App 
+== Sample App == 
 
 A sample application that demonstrate how to use Kii Sync technology for backup files, restore files and trash files. 
 
 Using sync sdk, developer just focus on developing the application logic and leave the data management to sdk. &nbsp; 
 
-h5. Overview of Software Components 
+== Overview of Software Components == 
 
-!SyncSampleComponentsOverview.png|border=1! 
+[[File:SyncSampleComponentsOverview.png|Overview of Sample App Software Components]]
 
 
-h5. Screen shots 
+== Screen shots == 
 
-!DeviceTab.png|border=1! !CloudTab.png|border=1! !ProgressUI.png|border=1! 
+[[File:DeviceTab.png|List Device Files]]
+[[File:CloudTab.png|List Cloud Files]]
+[[File:ProgressUI.png|List Files in progress]]
+ 
