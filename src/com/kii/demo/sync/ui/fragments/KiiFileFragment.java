@@ -386,7 +386,7 @@ public class KiiFileFragment extends Fragment {
     public final static int PROGRESS_END = 2;
     public final static int PROGRESS_UPDATE = 3;
 
-    public static void refreshUI(Context context) {
+    private static void refreshUI(Context context) {
         //refresh the header text;
         TextView tv = (TextView) mView.findViewById(R.id.header_text);
         tv.setText(UiUtils.getLastSyncTime(context));

@@ -214,9 +214,9 @@ public class FragmentTabsPager extends FragmentActivity {
         public void onTabChanged(String tabId) {
             int position = mTabHost.getCurrentTab();
             mViewPager.setCurrentItem(position);
-            if((tabId!=null) && (tabId.contentEquals(TAG_CLOUD))) {
-                KiiFileFragment.refreshUI(mContext);
-            }
+//            if((tabId!=null) && (tabId.contentEquals(TAG_CLOUD))) {
+//                KiiFileFragment.refreshUI(mContext);
+//            }
         }
 
         @Override

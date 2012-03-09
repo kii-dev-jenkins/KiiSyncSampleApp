@@ -97,20 +97,23 @@ public class UiUtils {
         long backupTime = 0;
 
         try {
-            //sometimes it won't be inited before call this API
-            //need to give more SyncPref some lazy init method;
+            // sometimes it won't be inited before call this API
+            // need to give more SyncPref some lazy init method;
             SyncPref.init(context);
             backupTime = SyncPref.getLastSuccessfulSyncTime();
         } catch (Exception ex) {
         }
 
         if (backupTime > 0) {
-            return String.format("Last successful sync is %s",
-                    (String) DateUtils.getRelativeTimeSpanString(backupTime,
-                            System.currentTimeMillis(),
-                            DateUtils.MINUTE_IN_MILLIS,
-                            DateUtils.FORMAT_ABBREV_RELATIVE
-                                    | DateUtils.FORMAT_ABBREV_ALL));
+            // return String.format("Last successful sync is %s",
+            // (String) DateUtils.getRelativeTimeSpanString(backupTime,
+            // System.currentTimeMillis(),
+            // DateUtils.MINUTE_IN_MILLIS,
+            // DateUtils.FORMAT_ABBREV_RELATIVE
+            // | DateUtils.FORMAT_ABBREV_ALL));
+            return String.format("Last successful sync is %s", DateUtils
+                    .formatSameDayTime(backupTime, System.currentTimeMillis(),
+                            DateFormat.DEFAULT, DateFormat.DEFAULT));
         } else {
             return context.getString(R.string.none);
         }
@@ -288,24 +291,24 @@ public class UiUtils {
      */
     public static String getErrorMsg(int code, Context context) {
         switch (code) {
-    
+
             case SyncMsg.OK:
                 return "Successful";
-    
+
             case SyncMsg.PFS_SYNCRESULT_FORCE_STOP:
             case SyncMsg.PFS_SYNCRESULT_REQUEST_FORCE_STOP:
                 return context.getString(R.string.msg_ERROR_FORCE_STOP);
-    
+
             case SyncMsg.PFS_SYNCRESULT_RUNNING:
             case SyncMsg.PFS_SYNCRESULT_BUSY:
                 return context.getString(R.string.msg_ERROR_BUSY);
-    
+
             case SyncMsg.ERROR_ALREADY_KII_USER:
                 return context.getString(R.string.msg_ERROR_ALREADY_KII_USER);
-    
+
             case SyncMsg.ERROR_GET_ACCOUNTS:
                 return context.getString(R.string.msg_ERROR_GET_ACCOUNTS);
-    
+
             case SyncMsg.ERROR_AUTHENTICAION_ERROR:
                 return context
                         .getString(R.string.msg_ERROR_AUTHENTICAION_ERROR);
