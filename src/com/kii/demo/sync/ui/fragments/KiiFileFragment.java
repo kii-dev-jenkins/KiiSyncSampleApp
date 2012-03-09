@@ -41,7 +41,7 @@ import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
 public class KiiFileFragment extends Fragment {
-    private View mView;
+    private static View mView;
     private NewEventListener mNewEventListener = null;
     private ExpandableListView mList = null;
     KiiFileExpandableListAdapter mAdapter;
@@ -228,7 +228,7 @@ public class KiiFileFragment extends Fragment {
         b = (Button) mView.findViewById(R.id.button_right);
         b.setText(getString(R.string.header_upload));
         b.setOnClickListener(mClickListener);
-        setLastSyncTime();
+        refreshUI(getActivity());
         mList = (ExpandableListView) mView.findViewById(android.R.id.list);
         setHasOptionsMenu(true);
         return mView;
@@ -253,6 +253,7 @@ public class KiiFileFragment extends Fragment {
     }
 
     private Receiver receiver;
+
     private void connect() {
         receiver = new Receiver();
         getActivity().registerReceiver(receiver,
@@ -353,7 +354,7 @@ public class KiiFileFragment extends Fragment {
             if (msg != null) {
                 switch (msg.sync_result) {
                     case SyncMsg.OK:
-                        setLastSyncTime();
+                        refreshUI(getActivity());
                         break;
                 }
             }
@@ -385,9 +386,10 @@ public class KiiFileFragment extends Fragment {
     public final static int PROGRESS_END = 2;
     public final static int PROGRESS_UPDATE = 3;
 
-    private void setLastSyncTime() {
+    public static void refreshUI(Context context) {
+        //refresh the header text;
         TextView tv = (TextView) mView.findViewById(R.id.header_text);
-        tv.setText(UiUtils.getLastSyncTime(getActivity()));
+        tv.setText(UiUtils.getLastSyncTime(context));
     }
 
     View.OnClickListener mClickListener = new View.OnClickListener() {

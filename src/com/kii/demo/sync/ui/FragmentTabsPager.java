@@ -42,31 +42,36 @@ import com.kii.demo.sync.utils.Utils;
 public class FragmentTabsPager extends FragmentActivity {
     public static class AlertDialogFragment extends DialogFragment {
         private int id;
+
         public static AlertDialogFragment newInstance(int id) {
             AlertDialogFragment frag = new AlertDialogFragment();
             frag.id = id;
             return frag;
         }
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             switch (id) {
                 case FileListFragment.DIALOG_UPDATE:
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage(FileListFragment.getLocalChanges().size() + " file(s) has changed.")
+                    AlertDialog.Builder builder = new AlertDialog.Builder(
+                            getActivity());
+                    builder.setMessage(
+                            FileListFragment.getLocalChanges().size()
+                                    + " file(s) has changed.")
                             .setCancelable(false)
                             .setPositiveButton("Update Now",
                                     new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onClick(DialogInterface dialog,
-                                                int id) {
+                                        public void onClick(
+                                                DialogInterface dialog, int id) {
                                             updateFileChange();
                                         }
                                     })
                             .setNegativeButton("Cancel",
                                     new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onClick(DialogInterface dialog,
-                                                int id) {
+                                        public void onClick(
+                                                DialogInterface dialog, int id) {
                                             dialog.cancel();
                                         }
                                     });
@@ -77,6 +82,7 @@ public class FragmentTabsPager extends FragmentActivity {
             }
             return null;
         }
+
         private void updateFileChange() {
             KiiSyncClient client = KiiSyncClient.getInstance(getActivity());
             client.updateBody(FileListFragment.getLocalChanges());
@@ -87,6 +93,8 @@ public class FragmentTabsPager extends FragmentActivity {
     TabHost mTabHost;
     ViewPager mViewPager;
     TabsAdapter mTabsAdapter;
+    private static final String TAG_DEVICE = "device";
+    private static final String TAG_CLOUD = "cloud";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,10 +108,14 @@ public class FragmentTabsPager extends FragmentActivity {
 
         mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
-        mTabsAdapter.addTab(mTabHost.newTabSpec("device")
-                .setIndicator("Device"), FileListFragment.class, null);
-        mTabsAdapter.addTab(mTabHost.newTabSpec("cloud").setIndicator("Cloud"),
-                KiiFileFragment.class, null);
+        mTabsAdapter.addTab(
+                mTabHost.newTabSpec(TAG_DEVICE).setIndicator(
+                        getString(R.string.tab_device)),
+                FileListFragment.class, null);
+        mTabsAdapter.addTab(
+                mTabHost.newTabSpec(TAG_CLOUD).setIndicator(
+                        getString(R.string.tab_cloud)), KiiFileFragment.class,
+                null);
         if (savedInstanceState != null) {
             mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
         }
@@ -202,6 +214,9 @@ public class FragmentTabsPager extends FragmentActivity {
         public void onTabChanged(String tabId) {
             int position = mTabHost.getCurrentTab();
             mViewPager.setCurrentItem(position);
+            if((tabId!=null) && (tabId.contentEquals(TAG_CLOUD))) {
+                KiiFileFragment.refreshUI(mContext);
+            }
         }
 
         @Override
@@ -227,5 +242,5 @@ public class FragmentTabsPager extends FragmentActivity {
         public void onPageScrollStateChanged(int state) {
         }
     }
-    
+
 }
