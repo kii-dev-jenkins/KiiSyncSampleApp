@@ -855,7 +855,7 @@ public class KiiSyncClient {
      * {@link KiiNewEventListener#onLocalChangeSyncedEvent(Uri[])}
      */
     void notifyKiiFileLocalChange() {
-        mSyncManager.getSyncObserver().notifyLocalChangeSynced(null);
+        //TODO: new notification method
     }
 
     /**
