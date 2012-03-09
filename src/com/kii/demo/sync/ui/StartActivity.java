@@ -28,9 +28,9 @@ import com.kii.demo.sync.tasks.LogoutTask;
 import com.kii.demo.sync.tasks.RegisterTask;
 import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
+import com.kii.mobilesdk.bridge.KiiUMInfo;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
-import com.kii.sync.SyncPref;
 
 public class StartActivity extends Activity {
     protected static final String TAG = "StartActivity";
@@ -66,8 +66,6 @@ public class StartActivity extends Activity {
 
         mContext = this.getApplicationContext();
         mActivity = this;
-
-        SyncPref.init(this);
 
         mStorage = (TextView) findViewById(R.id.storage);
         mUsr = (EditText) findViewById(R.id.username);
@@ -126,7 +124,8 @@ public class StartActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (KiiSyncClient.getInstance(mContext) != null) {
-                    Intent intent = new Intent(mContext, FragmentTabsPager.class);
+                    Intent intent = new Intent(mContext,
+                            FragmentTabsPager.class);
                     startActivity(intent);
                     finish();
                 } else {
@@ -158,7 +157,9 @@ public class StartActivity extends Activity {
     }
 
     void updateView() {
-        if (SyncPref.isLoggedIn()) {
+        Log.d(TAG, "updateView");
+        KiiUMInfo um = KiiSyncClient.getInstance(this).getKiiUMInfo();
+        if (um != null) {
             Intent i = getIntent();
             if ((i == null)
                     || (i.getAction() == null)
@@ -170,8 +171,8 @@ public class StartActivity extends Activity {
                 startActivity(intent);
                 finish();
             } else {
-                mUsr.setText(SyncPref.getUsername());
-                mPwd.setText(SyncPref.getPassword());
+                mUsr.setText(um.getAccountName());
+                mPwd.setText(um.getPassword());
                 mUsr.setEnabled(false);
 
                 mRegister.setEnabled(false);
@@ -202,8 +203,7 @@ public class StartActivity extends Activity {
     protected void updatePwd() {
         final EditText input = new EditText(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder
-                .setTitle("Verification has failed")
+        builder.setTitle("Verification has failed")
                 .setMessage("Enter New Password:")
                 .setView(input)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -242,7 +242,7 @@ public class StartActivity extends Activity {
     private void changePwd() {
         final EditText input = new EditText(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        mDialog =  builder
+        mDialog = builder
                 .setTitle("Change Password")
                 .setMessage("Enter new password:")
                 .setView(input)
@@ -367,7 +367,8 @@ public class StartActivity extends Activity {
                 Log.e(StartActivity.TAG, file.getAppData() + "; remotePath: "
                         + file.getRemotePath());
                 msg.append(ct + ":  " + Utils.getStatus(file, mContext) + ":"
-                        + file.getAppData() + ":" + Utils.getKiiFilePath(file) + "\n");
+                        + file.getAppData() + ":" + Utils.getKiiFilePath(file)
+                        + "\n");
                 ct++;
             }
         }

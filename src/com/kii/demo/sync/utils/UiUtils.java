@@ -17,11 +17,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.ui.view.KiiFileExpandableListAdapter;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
-import com.kii.sync.SyncPref;
 
 public class UiUtils {
 
@@ -97,10 +97,8 @@ public class UiUtils {
         long backupTime = 0;
 
         try {
-            // sometimes it won't be inited before call this API
-            // need to give more SyncPref some lazy init method;
-            SyncPref.init(context);
-            backupTime = SyncPref.getLastSuccessfulSyncTime();
+            backupTime = KiiSyncClient.getInstance(context)
+                    .getLastSuccessfulSyncTime();
         } catch (Exception ex) {
         }
 

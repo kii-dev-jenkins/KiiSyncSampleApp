@@ -19,12 +19,12 @@ import android.util.Log;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.Utils;
+import com.kii.mobilesdk.bridge.KiiUMInfo;
 import com.kii.sync.KiiClient;
 import com.kii.sync.KiiFile;
 import com.kii.sync.KiiFileUtil;
 import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
-import com.kii.sync.SyncPref;
 import com.kii.sync.provider.DatabaseHelper;
 
 /**
@@ -110,8 +110,9 @@ public class KiiSyncClient {
      * @return
      */
     public int login(String username, String password) {
-        if (SyncPref.isLoggedIn()) {
-            if (SyncPref.getPassword().compareTo(password) == 0) {
+        KiiUMInfo um = mSyncManager.getKiiUMInfo();
+        if (um != null) {
+            if (um.getPassword().compareTo(password) == 0) {
                 return SyncMsg.OK;
             }
         }
@@ -242,15 +243,14 @@ public class KiiSyncClient {
     }
 
     /**
-     * Returns the sync overall progress if the sync is not running, it will
-     * return -1
+     * Returns the sync overall progress. If the sync is not running or<br>
+     * any error happens return value will be mapped to 0.
      * 
-     * @return <b>Positive integer between 1 to 100 </b> Percentage of progress.<br>
-     *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
-     *         {@link SyncMsg#SYNC_NOT_RUNNING} Currently no sync session is
-     *         running.<br>
-     *         {@link SyncMsg#PFS_SYNCRESULT_REMOTEEXCEPTION} Remote method
-     *         invocation failed.
+     * @return <b>Positive integer between 0 to 100 </b> Percentage of progress.<br>
+     *         <b> Integer between -1 to -101 </b> If the sync session is
+     *         paused, returns<br>
+     *         negative integer calculated by negative of (progress at the time
+     *         of pause +1)<br>
      */
     private int getProgress() {
         return mSyncManager.getProgress();
@@ -262,14 +262,12 @@ public class KiiSyncClient {
      * @return true if busy else false
      */
     public boolean isSyncRunning() {
-        int status = mSyncManager.getProgress();
-        if ((status == SyncMsg.ERROR_SETUP)
-                || (status == SyncMsg.SYNC_NOT_RUNNING)) {
+        int progress = mSyncManager.getProgress();
+        if (progress <= 0) {
             return false;
         } else {
             return true;
         }
-
     }
 
     /**
@@ -916,4 +914,13 @@ public class KiiSyncClient {
             return 0;
         }
     }
+
+    public long getLastSuccessfulSyncTime() {
+        return mSyncManager.getLastSuccessfulSyncTime();
+    }
+
+    public KiiUMInfo getKiiUMInfo() {
+        return mSyncManager.getKiiUMInfo();
+    }
+
 }

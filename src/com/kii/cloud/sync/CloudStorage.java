@@ -18,7 +18,6 @@ import com.kii.mobilesdk.bridge.AppUtil;
 import com.kii.mobilesdk.bridge.KiiUMInfo;
 import com.kii.sync.KiiClient;
 import com.kii.sync.SyncMsg;
-import com.kii.sync.SyncPref;
 
 /**
  * The Authentication is using the Cloud Storage
@@ -70,12 +69,13 @@ public class CloudStorage implements Authentication {
             return SyncMsg.ERROR_INVALID_INPUT;
         }
 
-        if (TextUtils.isEmpty(SyncPref.getKiiId())) {
+        KiiUMInfo um = mSyncClient.getKiiUMInfo();
+        if (um == null) {
             return SyncMsg.ERROR_USERNAME_EMPTY;
         }
 
-        String username = SyncPref.getKiiId();
-        String password = SyncPref.getPassword();
+        String username = um.getUserId();
+        String password = um.getPassword();
 
         if (oldPassword.compareTo(password) == 0) {
             if (mUserMgr.getLoginUser() == null) {

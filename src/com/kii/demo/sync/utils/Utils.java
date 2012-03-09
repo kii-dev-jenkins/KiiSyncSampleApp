@@ -326,7 +326,7 @@ public class Utils {
             return false;
         }
         long fileUpdated = localFile.lastModified();
-        long lastUpdated = file.lastModified();
+        long lastUpdated = file.getUpdateTime();
         if (lastUpdated == -1) {
             return false;
         }

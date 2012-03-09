@@ -20,7 +20,6 @@ import com.kii.demo.sync.utils.BackupPref;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 import com.kii.sync.SyncMsg;
-import com.kii.sync.SyncPref;
 
 public class BackupService extends Service {
 
@@ -200,7 +199,7 @@ public class BackupService extends Service {
     };
 
     private void startSync(int mode) {
-        if (SyncPref.isLoggedIn()) {
+        if (mSyncClient.getKiiUMInfo() != null) {
             if (!mSyncClient.isSyncRunning()) {
                 new SyncTask(mode).execute();
             }
@@ -208,7 +207,7 @@ public class BackupService extends Service {
     }
 
     private void stopSync() {
-        if (SyncPref.isLoggedIn()) {
+        if (mSyncClient.getKiiUMInfo() != null) {
             mSyncClient.suspend();
             handler.removeMessages(AUTO_SYNC_MODE);
         }

@@ -231,7 +231,7 @@ public class DownloadManager {
                 tempDest = new File(destFile.getAbsolutePath());
                 // check if the file exists
                 if (tempDest.exists()) {
-                    if (tempDest.setLastModified(srcFile.lastModified()) == false) {
+                    if (tempDest.setLastModified(srcFile.getUpdateTime()) == false) {
                         throw new IllegalArgumentException("Failed to restore:"
                                 + tempDest.getAbsolutePath());
                     }
