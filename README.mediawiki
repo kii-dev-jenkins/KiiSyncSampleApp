@@ -1,0 +1,18 @@
+h2. Sync SDK
+
+!sync.png|border=1! 
+
+h2. Sample App 
+
+A sample application that demonstrate how to use Kii Sync technology for backup files, restore files and trash files. 
+
+Using sync sdk, developer just focus on developing the application logic and leave the data management to sdk. &nbsp; 
+
+h5. Overview of Software Components 
+
+!SyncSampleComponentsOverview.png|border=1! 
+
+
+h5. Screen shots 
+
+!DeviceTab.png|border=1! !CloudTab.png|border=1! !ProgressUI.png|border=1! 
