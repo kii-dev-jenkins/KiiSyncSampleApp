@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.DownloadManager;
 import com.kii.cloud.sync.KiiSyncClient;
+import com.kii.cloud.sync.SyncNewEventListener;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.ui.ProgressListActivity;
 import com.kii.demo.sync.ui.SettingsActivity;
@@ -37,7 +38,6 @@ import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
-import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
 public class KiiFileFragment extends Fragment {
@@ -242,7 +242,6 @@ public class KiiFileFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mNewEventListener = new NewEventListener(getActivity());
-        connect();
         registerForContextMenu(getExpandableListView());
         mAdapter = new KiiFileExpandableListAdapter(getActivity(),
                 KiiSyncClient.getInstance(getActivity()),
@@ -250,11 +249,12 @@ public class KiiFileFragment extends Fragment {
         mList.setAdapter(mAdapter);
         mList.setOnChildClickListener(mChildListener);
         mNewEventListener.register();
+        registerReceiver();
     }
 
     private Receiver receiver;
 
-    private void connect() {
+    private void registerReceiver() {
         receiver = new Receiver();
         getActivity().registerReceiver(receiver,
                 new IntentFilter(DownloadManager.ACTION_DOWNLOAD_END));
@@ -308,29 +308,10 @@ public class KiiFileFragment extends Fragment {
         return true;
     }
 
-    public class NewEventListener implements KiiNewEventListener {
-
-        final static String TAG = "NewEventListener";
-
-        KiiSyncClient client = null;
-        long id = 0;
+    public class NewEventListener extends SyncNewEventListener {
 
         public NewEventListener(Context context) {
-            id = System.currentTimeMillis();
-        }
-
-        public boolean register() {
-            client = KiiSyncClient.getInstance(getActivity());
-            if (client == null) {
-                throw new NullPointerException();
-            }
-            return client.registerNewEventListener(id, this);
-        }
-
-        public void unregister() {
-            if (id != 0) {
-                client.unregisterNewEventListener(id);
-            }
+            super(context);
         }
 
         @Override
@@ -376,8 +357,9 @@ public class KiiFileFragment extends Fragment {
             handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 500);
         }
 
-        public void onConnectComplete() {
-
+        @Override
+        public void onDownloadComplete(Uri[] arg0) {
+            handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 500);
         }
 
     }

@@ -47,6 +47,7 @@ import android.widget.TextView;
 
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
+import com.kii.cloud.sync.SyncNewEventListener;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.ui.view.KiiListItemView;
 import com.kii.demo.sync.utils.MimeInfo;
@@ -54,7 +55,6 @@ import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
-import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
 public class FilePickerActivity extends ListActivity implements
@@ -200,7 +200,7 @@ public class FilePickerActivity extends ListActivity implements
                     .size()]);
         }
         mContext = this;
-        mListener = new NewEventListener(mContext);
+        mListener = new NewEventListener(this);
         mListener.register();
     }
 
@@ -539,29 +539,10 @@ public class FilePickerActivity extends ListActivity implements
         }
     }
 
-    public class NewEventListener implements KiiNewEventListener {
-
-        final static String TAG = "FilePickerNewEventListener";
-
-        KiiSyncClient client = null;
-        long id = 0;
-
+    public class NewEventListener extends SyncNewEventListener {
+        
         public NewEventListener(Context context) {
-            id = System.currentTimeMillis();
-        }
-
-        public boolean register() {
-            client = KiiSyncClient.getInstance(mContext);
-            if (client == null) {
-                throw new NullPointerException();
-            }
-            return client.registerNewEventListener(id, this);
-        }
-
-        public void unregister() {
-            if (id != 0) {
-                client.unregisterNewEventListener(id);
-            }
+            super(context);
         }
 
         @Override
@@ -602,9 +583,11 @@ public class FilePickerActivity extends ListActivity implements
         public void onLocalChangeSyncedEvent(Uri[] uris) {
         }
 
-        public void onConnectComplete() {
-        }
+        @Override
+        public void onDownloadComplete(Uri[] arg0) {
+            // TODO Auto-generated method stub
 
+        }
     }
 
     ArrayList<KiiFile> scanChange = null;

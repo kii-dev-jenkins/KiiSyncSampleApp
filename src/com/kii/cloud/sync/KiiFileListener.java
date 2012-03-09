@@ -7,44 +7,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 import com.kii.demo.sync.ui.ProgressListActivity;
 import com.kii.demo.sync.ui.StartActivity;
 import com.kii.demo.sync.utils.NotificationUtil;
 import com.kii.sync.KiiFile;
-import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
-public class KiiFileListener implements KiiNewEventListener {
+public class KiiFileListener extends SyncNewEventListener {
 
     final static String TAG = "KiiFileStatusCache";
 
     KiiSyncClient client = null;
     long id = 0;
-    Context context = null;
 
     HashMap<String, Integer> cacheKiiFileStatus = new HashMap<String, Integer>();
 
     public KiiFileListener(Context context) {
-        this.context = context;
-        client = KiiSyncClient.getInstance(context);
-        if (client == null) {
-            throw new NullPointerException();
-        }
-        id = System.currentTimeMillis();
-        if (client.registerNewEventListener(id, this) == false) {
-            Log.e(TAG,
-                    "KiiFileStatusCache registerNewEventListener returns false");
-        }
-
+        super(context);
         updateCache(true);
-    }
-
-    public void unregister() {
-        if (id != 0) {
-            client.unregisterNewEventListener(id);
-        }
     }
 
     AtomicBoolean isBusy = new AtomicBoolean(false);
@@ -83,6 +64,11 @@ public class KiiFileListener implements KiiNewEventListener {
                 tempKiiFileStatus = new HashMap<String, Integer>();
             } else {
                 tempKiiFileStatus = cacheKiiFileStatus;
+            }
+            
+            //workaround: avoid NPE crash
+            if(client == null) {
+                client = KiiSyncClient.getInstance(mContext);
             }
 
             KiiFile[] backupFiles = client.getBackupFiles();
@@ -132,40 +118,42 @@ public class KiiFileListener implements KiiNewEventListener {
 
     @Override
     public void onSyncComplete(SyncMsg msg) {
-        NotificationUtil.cancelSyncProgressNotification(context);
+        NotificationUtil.cancelSyncProgressNotification(mContext);
         updateCache(false);
         if (msg != null) {
             if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
-                Intent intent = new Intent(context,
-                        StartActivity.class);
+                Intent intent = new Intent(mContext, StartActivity.class);
                 intent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
+                mContext.startActivity(intent);
             } else if (msg.sync_result == SyncMsg.PFS_SYNCRESULT_USER_EXPIRED) {
-                Intent intent = new Intent(context,
-                        StartActivity.class);
+                Intent intent = new Intent(mContext, StartActivity.class);
                 intent.setAction(StartActivity.ACTION_LOGOUT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
+                mContext.startActivity(intent);
             }
         }
     }
 
     @Override
     public void onSyncStart(String syncMode) {
-        Intent progressIntent = new Intent(context.getApplicationContext(),
+        Intent progressIntent = new Intent(mContext.getApplicationContext(),
                 ProgressListActivity.class);
         NotificationUtil.showSyncProgressNotification(
-                context.getApplicationContext(), progressIntent);
+                mContext.getApplicationContext(), progressIntent);
     }
 
     @Override
     public void onQuotaExceeded(Uri arg0) {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void onLocalChangeSyncedEvent(Uri[] uris) {
+        updateCache(false);
+    }
+
+    @Override
+    public void onDownloadComplete(Uri[] arg0) {
         updateCache(false);
     }
 

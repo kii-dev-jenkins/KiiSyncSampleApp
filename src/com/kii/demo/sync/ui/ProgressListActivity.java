@@ -24,12 +24,12 @@ import android.widget.TextView;
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.DownloadManager;
 import com.kii.cloud.sync.KiiSyncClient;
+import com.kii.cloud.sync.SyncNewEventListener;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.ui.view.KiiFileExpandableListAdapter;
 import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
-import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
 public class ProgressListActivity extends ExpandableListActivity implements
@@ -46,6 +46,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         requestWindowFeature(Window.FEATURE_PROGRESS);
         mNewEventListener = new NewEventListener(this);
+        mNewEventListener.register();
         setContentView(R.layout.expandable_list_with_header);
         Button b = (Button) findViewById(R.id.button_left);
         b.setText(getString(R.string.pause));
@@ -105,31 +106,9 @@ public class ProgressListActivity extends ExpandableListActivity implements
         }
     }
 
-    public class NewEventListener implements KiiNewEventListener {
-
-        final static String TAG = "NewEventListener";
-
-        KiiSyncClient client = null;
-        long id = 0;
-        Context context = null;
-
+    public class NewEventListener extends SyncNewEventListener {
         public NewEventListener(Context context) {
-            this.context = context;
-            id = System.currentTimeMillis();
-        }
-
-        public boolean register() {
-            client = KiiSyncClient.getInstance(context);
-            if (client == null) {
-                throw new NullPointerException();
-            }
-            return client.registerNewEventListener(id, this);
-        }
-
-        public void unregister() {
-            if (id != 0) {
-                client.unregisterNewEventListener(id);
-            }
+            super(context);
         }
 
         @Override
@@ -151,11 +130,11 @@ public class ProgressListActivity extends ExpandableListActivity implements
         public void onSyncComplete(SyncMsg msg) {
             if (msg != null) {
                 if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
-                    Intent apiIntent = new Intent(
-                            context.getApplicationContext(),
+                    Intent intent = new Intent(
+                            mContext,
                             StartActivity.class);
-                    apiIntent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
-                    context.startActivity(apiIntent);
+                    intent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
+                    mContext.startActivity(intent);
                 } else if (msg.sync_result == SyncMsg.ERROR_PFS_BUSY) {
                     return;
                 }
@@ -180,8 +159,9 @@ public class ProgressListActivity extends ExpandableListActivity implements
             handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 500);
         }
 
-        public void onConnectComplete() {
-
+        @Override
+        public void onDownloadComplete(Uri[] arg0) {
+            handler.sendEmptyMessageDelayed(PROGRESS_UPDATE, 500);
         }
 
     }
@@ -196,7 +176,6 @@ public class ProgressListActivity extends ExpandableListActivity implements
             mAdapter = new KiiFileExpandableListAdapter(this, client,
                     KiiFileExpandableListAdapter.TYPE_PROGRESS, this);
             setListAdapter(mAdapter);
-            mNewEventListener.register();
             handler.sendEmptyMessageDelayed(PROGRESS_AUTO, 500);
             updateProgress();
         }

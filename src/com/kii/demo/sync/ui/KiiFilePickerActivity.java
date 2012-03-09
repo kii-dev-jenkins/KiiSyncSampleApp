@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.DownloadManager;
 import com.kii.cloud.sync.KiiSyncClient;
+import com.kii.cloud.sync.SyncNewEventListener;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.ui.view.KiiFileExpandableListAdapter;
 import com.kii.demo.sync.utils.MimeInfo;
@@ -33,7 +34,6 @@ import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;
 import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
-import com.kii.sync.KiiNewEventListener;
 import com.kii.sync.SyncMsg;
 
 public class KiiFilePickerActivity extends ExpandableListActivity implements
@@ -407,7 +407,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         }
     }
 
-    public class NewEventListener implements KiiNewEventListener {
+    public class NewEventListener extends SyncNewEventListener {
 
         final static String TAG = "NewEventListener";
 
@@ -415,21 +415,7 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         long id = 0;
 
         public NewEventListener(Context context) {
-            id = System.currentTimeMillis();
-        }
-
-        public boolean register() {
-            client = KiiSyncClient.getInstance(mContext);
-            if (client == null) {
-                throw new NullPointerException();
-            }
-            return client.registerNewEventListener(id, this);
-        }
-
-        public void unregister() {
-            if (id != 0) {
-                client.unregisterNewEventListener(id);
-            }
+            super(context);
         }
 
         @Override
@@ -482,8 +468,10 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
                     KiiFilePickerActivity.PROGRESS_UPDATE, 500);
         }
 
-        public void onConnectComplete() {
-
+        @Override
+        public void onDownloadComplete(Uri[] arg0) {
+            handler.sendEmptyMessageDelayed(
+                    KiiFilePickerActivity.PROGRESS_UPDATE, 500);
         }
 
     }

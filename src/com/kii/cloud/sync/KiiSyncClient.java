@@ -4,7 +4,10 @@
 package com.kii.cloud.sync;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import android.content.Context;
 import android.content.Intent;
@@ -136,8 +139,11 @@ public class KiiSyncClient {
      * @return TRUE: success, FALSE: key has already in use.
      *         {@link KiiSyncClient#unregisterNewEventListener(Long)}
      */
+    private Map<Long, SyncNewEventListener> listeners = new HashMap<Long, SyncNewEventListener>();
+
     public boolean registerNewEventListener(Long key,
-            KiiNewEventListener listener) {
+            SyncNewEventListener listener) {
+        listeners.put(key, listener);
         return mSyncManager.registerNewEventListener(key, listener);
     }
 
@@ -149,6 +155,9 @@ public class KiiSyncClient {
      *            {@link KiiSyncClient#registerNewEventListener(Long, KiiNewEventListener)}
      */
     public void unregisterNewEventListener(Long key) {
+        if (listeners.containsKey(key)) {
+            listeners.remove(key);
+        }
         mSyncManager.unregisterNewEventListener(key);
     }
 
@@ -858,7 +867,9 @@ public class KiiSyncClient {
      * {@link KiiNewEventListener#onLocalChangeSyncedEvent(Uri[])}
      */
     void notifyKiiFileLocalChange() {
-        // TODO: new notification method
+        for (Entry<Long, SyncNewEventListener> e : listeners.entrySet()) {
+            e.getValue().onDownloadComplete(null);
+        }
     }
 
     /**
