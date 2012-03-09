@@ -603,7 +603,6 @@ public class FilePickerActivity extends ListActivity implements
         }
 
         public void onConnectComplete() {
-
         }
 
     }
