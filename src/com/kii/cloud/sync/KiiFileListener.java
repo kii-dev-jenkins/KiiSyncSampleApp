@@ -139,11 +139,13 @@ public class KiiFileListener implements KiiNewEventListener {
                 Intent intent = new Intent(context,
                         StartActivity.class);
                 intent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             } else if (msg.sync_result == SyncMsg.PFS_SYNCRESULT_USER_EXPIRED) {
                 Intent intent = new Intent(context,
                         StartActivity.class);
                 intent.setAction(StartActivity.ACTION_LOGOUT);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }
         }

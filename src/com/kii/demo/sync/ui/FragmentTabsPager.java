@@ -12,8 +12,12 @@ package com.kii.demo.sync.ui;
 
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -23,9 +27,12 @@ import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 
+import com.kii.cloud.sync.BackupService;
+import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.ui.fragments.FileListFragment;
 import com.kii.demo.sync.ui.fragments.KiiFileFragment;
+import com.kii.demo.sync.utils.Utils;
 
 /**
  * Demonstrates combining a TabHost with a ViewPager to implement a tab UI that
@@ -33,6 +40,50 @@ import com.kii.demo.sync.ui.fragments.KiiFileFragment;
  * to move between the tabs.
  */
 public class FragmentTabsPager extends FragmentActivity {
+    public static class AlertDialogFragment extends DialogFragment {
+        private int id;
+        public static AlertDialogFragment newInstance(int id) {
+            AlertDialogFragment frag = new AlertDialogFragment();
+            frag.id = id;
+            return frag;
+        }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            switch (id) {
+                case FileListFragment.DIALOG_UPDATE:
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage(FileListFragment.getLocalChanges().size() + " file(s) has changed.")
+                            .setCancelable(false)
+                            .setPositiveButton("Update Now",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                int id) {
+                                            updateFileChange();
+                                        }
+                                    })
+                            .setNegativeButton("Cancel",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                    AlertDialog dialog = builder.create();
+                    return dialog;
+                default:
+                    break;
+            }
+            return null;
+        }
+        private void updateFileChange() {
+            KiiSyncClient client = KiiSyncClient.getInstance(getActivity());
+            client.updateBody(FileListFragment.getLocalChanges());
+            Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
+        }
+    }
+
     TabHost mTabHost;
     ViewPager mViewPager;
     TabsAdapter mTabsAdapter;
@@ -176,4 +227,5 @@ public class FragmentTabsPager extends FragmentActivity {
         public void onPageScrollStateChanged(int state) {
         }
     }
+    
 }

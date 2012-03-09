@@ -230,6 +230,7 @@ public class KiiFileFragment extends Fragment {
         b.setOnClickListener(mClickListener);
         setLastSyncTime();
         mList = (ExpandableListView) mView.findViewById(android.R.id.list);
+        setHasOptionsMenu(true);
         return mView;
     }
 
@@ -429,8 +430,6 @@ public class KiiFileFragment extends Fragment {
     private void syncRefresh() {
         Utils.startSync(getActivity(), BackupService.ACTION_REFRESH_QUICK);
     }
-
-    public final static int DIALOG_UPDATE = 201;
 
     public Handler handler = new Handler() {
         @Override

@@ -25,11 +25,12 @@ import com.kii.sync.SyncPref;
 import com.kii.sync.provider.DatabaseHelper;
 
 /**
- * The purpose of this class is to enforce at most one instance of 
- * KiiSyncClient so that it is easy access throughout the application.
- * It also put together the sync, upload, download, caching together.
- * If you are using Android 2.3 and above, it is advisable to use Android DownloadManager
- * The caching is provide a quick mechanism for the UI thread to retrieve/check the progress status of the file.
+ * The purpose of this class is to enforce at most one instance of KiiSyncClient
+ * so that it is easy access throughout the application. It also put together
+ * the sync, upload, download, caching together. If you are using Android 2.3
+ * and above, it is advisable to use Android DownloadManager The caching is
+ * provide a quick mechanism for the UI thread to retrieve/check the progress
+ * status of the file.
  */
 public class KiiSyncClient {
 
@@ -38,11 +39,11 @@ public class KiiSyncClient {
 
     private KiiClient mSyncManager = null;
     private Authentication mAuthManager = null;
-    
+
     private DownloadManager downManager = null;
 
     private static final String BASEURL = "http://dev-usergrid.kii.com";
-    
+
     /**
      * Category of TRASH.
      */
@@ -248,6 +249,7 @@ public class KiiSyncClient {
 
     /**
      * Check the sync status
+     * 
      * @return true if busy else false
      */
     public boolean isSyncRunning() {
@@ -308,8 +310,6 @@ public class KiiSyncClient {
         }
     }
 
-
-    
     /**
      * @param context
      * @throws InterruptedException
@@ -320,20 +320,22 @@ public class KiiSyncClient {
         mSyncManager = KiiClient.getInstance(context);
         mSyncManager.setServerBaseUrl(BASEURL);
         mContext = context;
-        mAuthManager = new CloudStorage(context, mSyncManager,
-                BASEURL);
+        mAuthManager = new CloudStorage(context, mSyncManager, BASEURL);
     }
 
     /**
      * Get an instance of KiiSyncClient. It is designed to be singleton.
-     * @param context is the application context
+     * 
+     * @param context
+     *            is the application context
      * @return KiiSyncClient
      */
     public static synchronized KiiSyncClient getInstance(Context context) {
         if (mInstance == null) {
             try {
-                mInstance = new KiiSyncClient(context);
-                mFileStatusCache = new KiiFileListener(context);
+                mInstance = new KiiSyncClient(context.getApplicationContext());
+                mFileStatusCache = new KiiFileListener(
+                        context.getApplicationContext());
                 // start the backup service
                 context.startService(new Intent(context, BackupService.class));
             } catch (Exception e) {
@@ -660,6 +662,7 @@ public class KiiSyncClient {
 
     /**
      * Return the status of a KiiFile, Non blocking call
+     * 
      * @param file
      * @return
      */
@@ -855,7 +858,7 @@ public class KiiSyncClient {
      * {@link KiiNewEventListener#onLocalChangeSyncedEvent(Uri[])}
      */
     void notifyKiiFileLocalChange() {
-        //TODO: new notification method
+        // TODO: new notification method
     }
 
     /**
@@ -883,7 +886,8 @@ public class KiiSyncClient {
     }
 
     /**
-     * @return: integer 0-100: overall progress: sync(upload & update) & download
+     * @return: integer 0-100: overall progress: sync(upload & update) &
+     *          download
      */
     public int getOverallProgress() {
         int pfsProgress = getProgress();

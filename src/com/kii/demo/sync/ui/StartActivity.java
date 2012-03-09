@@ -126,10 +126,7 @@ public class StartActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (KiiSyncClient.getInstance(mContext) != null) {
-
-                    Intent intent = new Intent(mContext, FileTabActivity.class);
-                    intent.putExtra(FileTabActivity.TAB_INDEX_EXTRA,
-                            FileTabActivity.TAB_INDEX_CLOUD);
+                    Intent intent = new Intent(mContext, FragmentTabsPager.class);
                     startActivity(intent);
                     finish();
                 } else {
@@ -169,9 +166,7 @@ public class StartActivity extends Activity {
                             Intent.ACTION_CONFIGURATION_CHANGED) != 0) && (i
                             .getAction().compareToIgnoreCase(
                                     ACTION_ENTER_PASSWORD) != 0))) {
-                Intent intent = new Intent(mContext, FileTabActivity.class);
-                intent.putExtra(FileTabActivity.TAB_INDEX_EXTRA,
-                        FileTabActivity.TAB_INDEX_CLOUD);
+                Intent intent = new Intent(mContext, FragmentTabsPager.class);
                 startActivity(intent);
                 finish();
             } else {

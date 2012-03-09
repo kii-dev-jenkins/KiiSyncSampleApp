@@ -74,6 +74,7 @@ public class FileListFragment extends ListFragment {
         b = (Button) mView.findViewById(R.id.button_right);
         b.setText(getString(R.string.header_btn_up));
         b.setOnClickListener(mClickListener);
+        setHasOptionsMenu(true);
         return mView;
     }
 
@@ -539,7 +540,7 @@ public class FileListFragment extends ListFragment {
 
     }
 
-    ArrayList<KiiFile> scanChange = null;
+    static ArrayList<KiiFile> scanChange = null;
     int scanTotalCount = -1;
     int scanCurCount = 0;
 
@@ -558,6 +559,10 @@ public class FileListFragment extends ListFragment {
                 }
             }
         }
+    }
+    
+    public static List<KiiFile> getLocalChanges() {
+        return scanChange;
     }
 
     public static final int DIALOG_UPDATE = 101;
