@@ -67,8 +67,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
         registerForContextMenu(getExpandableListView());
     }
 
-    final static int DIALOG_UPDATE = 2;
-
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
