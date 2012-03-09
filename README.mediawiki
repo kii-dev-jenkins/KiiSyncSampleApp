@@ -1,6 +1,8 @@
 == Sync SDK ==
 
-[[File:sync.png|link=http://static.kii.com/hm/img|Overview of Sync SDK]]
+[[File:http://static.kii.com/hm/img/sync.png|Overview of Sync SDK]]
+
+[http://static.kii.com/hm/FileSyncSDK/ Javadoc for Sync SDK]
 
 == Sample App == 
 
@@ -10,12 +12,11 @@ Using sync sdk, developer just focus on developing the application logic and lea
 
 == Overview of Software Components == 
 
-[[File:SyncSampleComponentsOverview.png|link=http://static.kii.com/hm/img|Overview of Sample App Software Components]]
+[[File:http://static.kii.com/hm/img/SyncSampleComponentsOverview.png|Overview of Sample App Software Components]]
 
 
 == Screen shots == 
-
-[[File:http://static.kii.com/hm/img/DeviceTab.png|link=http://static.kii.com/hm/img|List Device Files]]
-[[File:http://static.kii.com/hm/img/CloudTab.png|link=http://static.kii.com/hm/img|List Cloud Files]]
-[[File:http://static.kii.com/hm/img/ProgressUI.png|link=http://static.kii.com/hm/img|List Files in progress]]
  
+[[File:http://static.kii.com/hm/img/DeviceTab.png|List Device Files]]
+[[File:http://static.kii.com/hm/img/CloudTab.png|List Cloud Files]]
+[[File:http://static.kii.com/hm/img/ProgressUI.png|List Files in progress]]
