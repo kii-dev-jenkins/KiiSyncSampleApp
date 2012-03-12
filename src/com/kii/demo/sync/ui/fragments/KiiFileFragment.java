@@ -46,15 +46,18 @@ public class KiiFileFragment extends Fragment {
     private ExpandableListView mList = null;
     KiiFileExpandableListAdapter mAdapter;
 
-    final static int MENU_RESTORE_TRASH = 1;
-    final static int MENU_MOVE_TRASH = 2;
-    final static int MENU_DELETE = 3;
-    final static int MENU_DELETE_LOCAL = 4;
-    final static int MENU_DOWNLOAD = 5;
-    final static int MENU_CANCEL = 6;
+    final static int MENU_RESTORE_TRASH = 201;
+    final static int MENU_MOVE_TRASH = 202;
+    final static int MENU_DELETE = 203;
+    final static int MENU_DELETE_LOCAL = 204;
+    final static int MENU_DOWNLOAD = 205;
+    final static int MENU_CANCEL = 206;
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        if(!(item.getMenuInfo() instanceof ExpandableListContextMenuInfo)) {
+            return false;
+        }
         ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item
                 .getMenuInfo();
 

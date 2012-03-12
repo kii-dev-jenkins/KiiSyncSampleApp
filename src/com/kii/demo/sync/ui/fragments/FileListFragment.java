@@ -126,6 +126,9 @@ public class FileListFragment extends ListFragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        if(!(item.getMenuInfo() instanceof AdapterContextMenuInfo)) {
+            return false;
+        }
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
                 .getMenuInfo();
         File selectedFile = (File) getListView().getItemAtPosition(
