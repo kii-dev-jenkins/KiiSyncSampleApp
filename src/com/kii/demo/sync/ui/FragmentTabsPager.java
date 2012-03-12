@@ -110,12 +110,14 @@ public class FragmentTabsPager extends FragmentActivity {
 
         mTabsAdapter.addTab(
                 mTabHost.newTabSpec(TAG_DEVICE).setIndicator(
-                        getString(R.string.tab_device)),
+                        getString(R.string.tab_device), getResources()
+                        .getDrawable(R.drawable.device)),
                 FileListFragment.class, null);
         mTabsAdapter.addTab(
                 mTabHost.newTabSpec(TAG_CLOUD).setIndicator(
-                        getString(R.string.tab_cloud)), KiiFileFragment.class,
-                null);
+                        getString(R.string.tab_cloud), getResources()
+                        .getDrawable(R.drawable.cloud)),
+                KiiFileFragment.class, null);
         if (savedInstanceState != null) {
             mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
         }
@@ -214,9 +216,9 @@ public class FragmentTabsPager extends FragmentActivity {
         public void onTabChanged(String tabId) {
             int position = mTabHost.getCurrentTab();
             mViewPager.setCurrentItem(position);
-//            if((tabId!=null) && (tabId.contentEquals(TAG_CLOUD))) {
-//                KiiFileFragment.refreshUI(mContext);
-//            }
+            // if((tabId!=null) && (tabId.contentEquals(TAG_CLOUD))) {
+            // KiiFileFragment.refreshUI(mContext);
+            // }
         }
 
         @Override
