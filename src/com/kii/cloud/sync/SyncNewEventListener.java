@@ -8,7 +8,7 @@ import com.kii.sync.SyncMsg;
 
 public abstract class SyncNewEventListener implements KiiNewEventListener {
     KiiSyncClient client = null;
-    long id = 0;
+    protected long id = 0;
     protected Context mContext;
 
     public SyncNewEventListener(Context context) {

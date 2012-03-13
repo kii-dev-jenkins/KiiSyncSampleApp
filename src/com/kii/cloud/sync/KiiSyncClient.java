@@ -343,6 +343,7 @@ public class KiiSyncClient {
                 mInstance = new KiiSyncClient(context.getApplicationContext());
                 mFileStatusCache = new KiiFileListener(
                         context.getApplicationContext());
+                mFileStatusCache.register();
                 // start the backup service
                 context.startService(new Intent(context, BackupService.class));
             } catch (Exception e) {
