@@ -291,15 +291,6 @@ public class KiiFileFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.resume_upload:
-                fullFefresh();
-                break;
-            case R.id.refresh:
-                syncRefresh();
-                break;
-            case R.id.suspend:
-                syncStop();
-                break;
             case R.id.settings:
                 Intent intent = new Intent(getActivity(),
                         SettingsActivity.class);
