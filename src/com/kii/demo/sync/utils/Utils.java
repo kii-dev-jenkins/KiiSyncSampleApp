@@ -2,11 +2,8 @@ package com.kii.demo.sync.utils;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 
 import android.content.Context;
 import android.content.Intent;
@@ -144,35 +141,6 @@ public class Utils {
             default:
                 return String.format(
                         context.getString(R.string.msg_ERROR_OTHERS), code);
-        }
-    }
-
-    public static String moveFile(File dest, File src) {
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        FileChannel srcChannel = null;
-        FileChannel destChannel = null;
-        try {
-            fis = new FileInputStream(src);
-            srcChannel = fis.getChannel();
-            File destFolder = dest.getParentFile();
-            if (destFolder != null) {
-                destFolder.mkdirs();
-            }
-            fos = new FileOutputStream(dest);
-            destChannel = fos.getChannel();
-
-            destChannel.transferFrom(srcChannel, 0, srcChannel.size());
-            dest.setLastModified(src.lastModified());
-            return dest.getAbsolutePath();
-        } catch (IOException e) {
-            Log.w("FileUtils", "copyFile", e);
-            return null;
-        } finally {
-            closeSilently(srcChannel);
-            closeSilently(destChannel);
-            closeSilently(fis);
-            closeSilently(fos);
         }
     }
 
