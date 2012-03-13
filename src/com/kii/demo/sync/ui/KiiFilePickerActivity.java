@@ -120,23 +120,6 @@ public class KiiFilePickerActivity extends ExpandableListActivity implements
     }
 
     /**
-     * suspend the existing sync if there is any
-     */
-    private void syncStop() {
-        KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
-        if (kiiClient != null) {
-            kiiClient.suspend();
-        }
-    }
-
-    /**
-     * resume upload
-     */
-    private void fullFefresh() {
-        Utils.startSync(this, BackupService.ACTION_REFRESH);
-    }
-
-    /**
      * get new records from server if there are any
      */
     private void syncRefresh() {

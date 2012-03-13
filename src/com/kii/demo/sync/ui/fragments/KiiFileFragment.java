@@ -388,20 +388,6 @@ public class KiiFileFragment extends Fragment {
         }
     };
 
-    private void syncStop() {
-        KiiSyncClient kiiClient = KiiSyncClient.getInstance(getActivity());
-        if (kiiClient != null) {
-            kiiClient.suspend();
-        }
-    }
-
-    /**
-     * resume upload
-     */
-    private void fullFefresh() {
-        Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
-    }
-
     /**
      * get new records from server if there are any
      */
