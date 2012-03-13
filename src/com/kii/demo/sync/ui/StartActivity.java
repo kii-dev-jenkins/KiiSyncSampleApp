@@ -91,6 +91,7 @@ public class StartActivity extends Activity {
         mLogin.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                mLogin.setEnabled(false);
                 loginDemo();
             }
         });
