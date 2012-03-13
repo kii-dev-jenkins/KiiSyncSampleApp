@@ -74,7 +74,7 @@ public class FilePickerActivity extends ListActivity implements
                         if (!Utils.isKiiFileInTrash(file)
                                 && ((status == KiiFile.STATUS_BODY_OUTDATED) || (status == KiiFile.STATUS_NO_BODY))) {
                             client.download(file,
-                                    Utils.getKiiFileDest(file, mContext));
+                                    Utils.getKiiFileDownloadPath(file));
                         }
                     }
                 }

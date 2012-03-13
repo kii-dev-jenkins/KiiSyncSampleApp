@@ -18,7 +18,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -106,12 +105,7 @@ public class DownloadManager {
         try {
             downloadTotalSize = kiFile.getSizeOnDB();
             downloadCurrentSize = 0;
-            if (TextUtils.isEmpty(dest)) {
-                destPath = KiiSyncClient.getInstance(mContext)
-                        .getDownloadFolder() + "/" + kiFile.getTitle();
-            } else {
-                destPath = dest;
-            }
+            destPath = dest;
             downloadKiiFile(new File(destPath), kiFile, true);
             destPath = null;
             return SyncMsg.OK;

@@ -111,15 +111,13 @@ public class KiiFileFragment extends Fragment {
                     case MENU_DOWNLOAD:
                         Toast.makeText(
                                 getActivity(),
-                                "Download at folder:"
-                                        + KiiSyncClient.getInstance(
-                                                getActivity())
-                                                .getDownloadFolder(),
+                                "Download at:"
+                                        + Utils.getKiiFileDownloadPath(kFile),
                                 Toast.LENGTH_SHORT).show();
                         Runnable r1 = new Runnable() {
                             @Override
                             public void run() {
-                                client.download(kFile, null);
+                                client.download(kFile, Utils.getKiiFileDownloadPath(kFile));
                             }
                         };
                         new Thread(r1).start();

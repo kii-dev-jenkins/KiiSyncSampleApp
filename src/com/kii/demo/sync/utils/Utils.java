@@ -16,6 +16,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
+import android.os.Environment;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.MediaColumns;
@@ -141,8 +142,8 @@ public class Utils {
             case SyncMsg.ERROR_FILE_NULL:
                 return context.getString(R.string.msg_ERROR_UPLOAD_FILES);
             default:
-                return String.format(context
-                        .getString(R.string.msg_ERROR_OTHERS), code);
+                return String.format(
+                        context.getString(R.string.msg_ERROR_OTHERS), code);
         }
     }
 
@@ -201,9 +202,7 @@ public class Utils {
             File dest = new File(destPath);
             if (!dest.getParentFile().exists()) {
                 if (dest.getParentFile().mkdirs() == false) {
-                    Log
-                            .e(TAG, "Create folder failed:"
-                                    + dest.getAbsolutePath());
+                    Log.e(TAG, "Create folder failed:" + dest.getAbsolutePath());
                     return null;
                 }
             }
@@ -232,36 +231,15 @@ public class Utils {
                 }
             }
         } catch (Exception ex) {
-            Log
-                    .e(TAG, "generateThumbnailForImage Exception:"
-                            + ex.getMessage());
+            Log.e(TAG, "generateThumbnailForImage Exception:" + ex.getMessage());
             return null;
         }
         return null;
     }
 
-    public static String getKiiFileDest(KiiFile file, Context context) {
-        String title = file.getTitle();
-        String downloadFolder = KiiSyncClient.getInstance(context)
-                .getDownloadFolder();
-        String dest = downloadFolder + "/" + title;
-        File f = new File(dest);
-        if (f.exists()) {
-            int sufpos = title.lastIndexOf(".");
-            String time = String.valueOf(System.currentTimeMillis());
-            if (sufpos < 0) {
-                title = title + "-" + time;
-            } else {
-                title = title.substring(0, sufpos) + "-" + time
-                        + title.substring(sufpos);
-            }
-            dest = downloadFolder + "/" + title;
-        }
-        return dest;
-    }
-
     public static void startSync(Context context, String command) {
-        Intent service = new Intent(context.getApplicationContext(), BackupService.class);
+        Intent service = new Intent(context.getApplicationContext(),
+                BackupService.class);
         if (!TextUtils.isEmpty(command)) {
             service.setAction(command);
         }
@@ -278,8 +256,8 @@ public class Utils {
         try {
             if ((c != null) && c.moveToFirst()) {
                 long id = c.getLong(0);
-                Bitmap b = Images.Thumbnails.getThumbnail(context
-                        .getContentResolver(), id,
+                Bitmap b = Images.Thumbnails.getThumbnail(
+                        context.getContentResolver(), id,
                         Images.Thumbnails.MICRO_KIND,
                         new BitmapFactory.Options());
                 if (b != null) {
@@ -298,12 +276,12 @@ public class Utils {
         if (file == null) {
             return false;
         }
-    
+
         String category = file.getCategory();
         if (category == null) {
             return false;
         }
-    
+
         if (category.contentEquals(KiiSyncClient.CATEGORY_TRASH)) {
             return true;
         }
@@ -358,4 +336,19 @@ public class Utils {
             return file.getBucketName();
         }
     }
+
+    public static String getKiiFileDownloadPath(KiiFile file) {
+        String root = file.getVirtualRoot();
+        String path = file.getVirtualPath();
+        String dest = null;
+        if (root.contentEquals(KiiFile.ANDROID_EXT)) {
+            dest = Environment.getExternalStorageDirectory() + "/" + path;
+        } else if (root.contentEquals(KiiFile.ANDROID_ROOT)) {
+            dest = Environment.getRootDirectory() + "/" + path;
+        } else {
+            dest = Environment.getDownloadCacheDirectory() + "/" + path;
+        }
+        return dest;
+    }
+
 }

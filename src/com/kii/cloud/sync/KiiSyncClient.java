@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -268,17 +267,6 @@ public class KiiSyncClient {
         } else {
             return true;
         }
-    }
-
-    /**
-     * Get the path to store the download files Default directory is
-     * Environment.DIRECTORY_DOWNLOADS if not set
-     * 
-     * @return absolute path of the download directory
-     */
-    public String getDownloadFolder() {
-        return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
     }
 
     /**
@@ -823,7 +811,7 @@ public class KiiSyncClient {
 
         try {
             // download a file
-            download(file, file.getResourceUrl());
+            download(file, Utils.getKiiFileDownloadPath(file));
         } catch (Exception e) {
             Log.e(TAG, "restoreFromTrash download IOException", e);
             return SyncMsg.ERROR_IO;
