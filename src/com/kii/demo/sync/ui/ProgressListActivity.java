@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -136,9 +135,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                 } else if (msg.sync_result == SyncMsg.ERROR_PFS_BUSY) {
                 }
             }
-            Log.d(TAG, "before send sync end");
             handler.sendEmptyMessageDelayed(PROGRESS_END, 500);
-            Log.d(TAG, "after send sync end");
             setHeaderText();
         }
 
@@ -168,9 +165,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
     static final String TAG = "ProgressListActivity";
 
     protected void adpterSetup() {
-        Log.d(TAG, "adapterSetup");
         if (mAdapter == null) {
-            Log.d(TAG, "new Adapter");
             KiiSyncClient client = KiiSyncClient.getInstance(this);
             mAdapter = new KiiFileExpandableListAdapter(this, client,
                     KiiFileExpandableListAdapter.TYPE_PROGRESS, this);
@@ -202,14 +197,9 @@ public class ProgressListActivity extends ExpandableListActivity implements
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            Log.d(TAG, "handleMessage: " + msg.what);
             switch (msg.what) {
                 case PROGRESS_AUTO:
                     mProgress = updateProgress();
-                    Log.d(TAG, "mProgress is " + mProgress);
-                    Log.d(TAG,
-                            "mAdapter.getGroupCount is: "
-                                    + mAdapter.getGroupCount());
                     if ((mProgress > 0) || (mAdapter.getGroupCount() > 0)) {
                         setProgressBarIndeterminateVisibility(true);
                         setProgressBarVisibility(true);
@@ -250,7 +240,6 @@ public class ProgressListActivity extends ExpandableListActivity implements
                         mAdapter.notifyDataSetChanged();
                     }
                     mProgress = updateProgress();
-                    Log.d(TAG, "onSyncEnd, mProgress is " + mProgress);
                     setHeaderText();
                     return;
             }
@@ -347,7 +336,6 @@ public class ProgressListActivity extends ExpandableListActivity implements
     }
 
     private void setHeaderText() {
-        Log.d(TAG, "setHeaderText: " + mProgress);
         final String lastSyncTime = UiUtils.getLastSyncTime(this);
         ProgressListActivity.this.getExpandableListView().post(new Runnable() {
             @Override

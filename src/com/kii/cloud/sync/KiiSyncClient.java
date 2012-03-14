@@ -326,7 +326,6 @@ public class KiiSyncClient {
      * @return KiiSyncClient
      */
     public static synchronized KiiSyncClient getInstance(Context context) {
-        Log.d(TAG, "getInstance, mInstance is null? "+(mInstance==null));
         if (mInstance == null) {
             try {
                 mInstance = new KiiSyncClient(context.getApplicationContext());
@@ -335,7 +334,6 @@ public class KiiSyncClient {
                 mFileStatusCache.register();
                 // start the backup service
                 context.startService(new Intent(context, BackupService.class));
-                Log.d(TAG, "after startService");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -500,7 +498,6 @@ public class KiiSyncClient {
     private int upload(String filePath, boolean commit) {
 
         // if a similiar file having the same unique key, it will be return
-        Log.d(TAG, "upload, filePath is " + filePath);
         KiiFile file = createKiiFileByPath(filePath);
 
         // check if the file has already been synced
