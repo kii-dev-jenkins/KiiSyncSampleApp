@@ -1,13 +1,9 @@
 package com.kii.demo.sync.ui.view;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.text.format.Formatter;
@@ -21,6 +17,7 @@ import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;
+import com.kii.demo.sync.utils.Utils;
 import com.kii.sync.KiiFile;
 
 public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
@@ -147,18 +144,7 @@ public class KiiFileExpandableListAdapter extends BaseExpandableListAdapter {
                 if (ICON_CACHE.containsKey(sThumbnail)) {
                     icon = ICON_CACHE.get(sThumbnail);
                 } else {
-                    File fThumbnail = new File(sThumbnail);
-                    if (fThumbnail.exists() && fThumbnail.isFile()) {
-                        Bitmap bitmap = BitmapFactory.decodeFile(sThumbnail);
-                        if (bitmap.getHeight() > 120) {
-                            // resize the bitmap if too big, save memory
-                            bitmap = Bitmap.createScaledBitmap(
-                                    bitmap,
-                                    (bitmap.getWidth() * 120)
-                                            / bitmap.getHeight(), 120, false);
-                        }
-                        icon = new BitmapDrawable(bitmap);
-                    }
+                    icon = Utils.getThumbnailByResize( sThumbnail);
                     ICON_CACHE.put(sThumbnail, icon);
                 }
             }

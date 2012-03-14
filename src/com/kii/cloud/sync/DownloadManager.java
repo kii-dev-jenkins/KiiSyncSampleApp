@@ -18,6 +18,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.util.Log;
 import android.util.Pair;
 
@@ -146,7 +147,7 @@ public class DownloadManager {
                 Log.e(TAG, "remotePath is empty");
                 throw new IllegalArgumentException("HTTP download URL is empty");
             }
-            Log.d(TAG, "downloadKiiFile, remotePath is "+remotePath);
+            Log.d(TAG, "downloadKiiFile, remotePath is " + remotePath);
 
             // check if the destinated file exist
             // if yes, check if overwrite permitted
@@ -222,15 +223,17 @@ public class DownloadManager {
                     throw new IllegalArgumentException("Failed to rename:"
                             + tempDest.getAbsolutePath());
                 }
-                //TODO: the download is success, update the kiifile status;
+                // TODO: the download is success, update the kiifile status;
                 // after rename, create a new file handler
                 tempDest = new File(destFile.getAbsolutePath());
                 // check if the file exists
                 if (tempDest.exists()) {
                     if (tempDest.setLastModified(srcFile.getUpdateTime()) == false) {
-                        //on some Galaxy phones, it will fail, we simply ignore this error and print an error log
-                        Log.e(TAG, "Failed to restore:"
-                                + tempDest.getAbsolutePath());
+                        // on some Galaxy phones, it will fail, we simply ignore
+                        // this error and print an error log
+                        Log.e(TAG,
+                                "Failed to restore:"
+                                        + tempDest.getAbsolutePath());
                     }
                 } else {
                     throw new IllegalArgumentException(
@@ -281,6 +284,11 @@ public class DownloadManager {
                     }
                 }
                 KiiSyncClient.getInstance(mContext).notifyKiiFileLocalChange();
+                // force the system to run a media scan
+                MediaScannerConnection
+                        .scanFile(mContext,
+                                new String[] { destFile.getAbsolutePath() },
+                                null, null);
             }
         }
     }

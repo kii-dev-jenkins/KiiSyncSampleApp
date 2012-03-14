@@ -159,14 +159,13 @@ public class Utils {
      * folder
      * 
      * @param pathImage
-     * @param uniqueKey
+     * @param destPath
+     * @param mimeType
      * @return
      */
     public static String generateThumbnail(Context context, String pathImage,
             String destPath, String mimeType) {
-
         try {
-
             File dest = new File(destPath);
             if (!dest.getParentFile().exists()) {
                 if (dest.getParentFile().mkdirs() == false) {
@@ -229,6 +228,14 @@ public class Utils {
                         Images.Thumbnails.MICRO_KIND,
                         new BitmapFactory.Options());
                 if (b != null) {
+                    ret = new BitmapDrawable(b);
+                }
+            } else {
+                // create the thumbnail by myself
+                MimeInfo mime = MimeUtil.getInfoByFileName(filename);
+                if (mime != null && mime.isType("image")) {
+                    Bitmap b = ImageUtils.createImageThumbnail2(context,
+                            filename, Images.Thumbnails.MICRO_KIND);
                     ret = new BitmapDrawable(b);
                 }
             }
@@ -317,6 +324,25 @@ public class Utils {
             dest = Environment.getDownloadCacheDirectory() + "/" + path;
         }
         return dest;
+    }
+
+    public static Drawable getThumbnailByResize(String filename) {
+        File fThumbnail = new File(filename);
+        try {
+            if (fThumbnail.exists() && fThumbnail.isFile()) {
+                Bitmap bitmap = BitmapFactory.decodeFile(filename);
+                if (bitmap.getHeight() > 120) {
+                    // resize the bitmap if too big, save memory
+                    bitmap = Bitmap.createScaledBitmap(bitmap,
+                            (bitmap.getWidth() * 120) / bitmap.getHeight(),
+                            120, false);
+                }
+                return new BitmapDrawable(bitmap);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
