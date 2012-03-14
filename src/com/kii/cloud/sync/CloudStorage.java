@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.json.JSONException;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -14,7 +13,6 @@ import com.kii.cloud.storage.dataType.KiiUser;
 import com.kii.cloud.storage.manager.AuthManager;
 import com.kii.cloud.storage.response.CloudExecutionException;
 import com.kii.cloud.storage.response.UserResult;
-import com.kii.mobilesdk.bridge.AppUtil;
 import com.kii.mobilesdk.bridge.KiiUMInfo;
 import com.kii.sync.KiiClient;
 import com.kii.sync.SyncMsg;
@@ -44,13 +42,13 @@ public class CloudStorage implements Authentication {
 
         mBaseURL = baseURL;
 
-        Bundle data = AppUtil.getAppInfo(context);
-        String appId = data.getString(AppUtil.PREF_UM_APP_ID);
+        KiiUMInfo um = new KiiUMInfo(context, null, null, null, null);
+        String appId = um.getAppId();
         if (TextUtils.isEmpty(appId)) {
             throw new RuntimeException(
                      "AppId meta data is not found in Manifest");
         }
-        String appKey = data.getString(AppUtil.PREF_UM_APP_KEY);
+        String appKey = um.getAppKey();
         if (TextUtils.isEmpty(appKey)) {
             throw new RuntimeException("AppKey meta data is not found in Manifest");
         }
