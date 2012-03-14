@@ -130,16 +130,15 @@ public class ProgressListActivity extends ExpandableListActivity implements
         public void onSyncComplete(SyncMsg msg) {
             if (msg != null) {
                 if (msg.sync_result == SyncMsg.ERROR_AUTHENTICAION_ERROR) {
-                    Intent intent = new Intent(
-                            mContext,
-                            StartActivity.class);
+                    Intent intent = new Intent(mContext, StartActivity.class);
                     intent.setAction(StartActivity.ACTION_ENTER_PASSWORD);
                     mContext.startActivity(intent);
                 } else if (msg.sync_result == SyncMsg.ERROR_PFS_BUSY) {
-                    return;
                 }
             }
+            Log.d(TAG, "before send sync end");
             handler.sendEmptyMessageDelayed(PROGRESS_END, 500);
+            Log.d(TAG, "after send sync end");
             setHeaderText();
         }
 
@@ -203,6 +202,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            Log.d(TAG, "handleMessage: " + msg.what);
             switch (msg.what) {
                 case PROGRESS_AUTO:
                     mProgress = updateProgress();
@@ -250,6 +250,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
                         mAdapter.notifyDataSetChanged();
                     }
                     mProgress = updateProgress();
+                    Log.d(TAG, "onSyncEnd, mProgress is " + mProgress);
                     setHeaderText();
                     return;
             }
@@ -346,12 +347,19 @@ public class ProgressListActivity extends ExpandableListActivity implements
     }
 
     private void setHeaderText() {
-        TextView tv = (TextView) findViewById(R.id.header_text);
-        if ((mProgress > 0) && (mProgress < 100)) {
-            tv.setText("Progress: " + mProgress + "%");
-        } else {
-            tv.setText(UiUtils.getLastSyncTime(this));
-        }
+        Log.d(TAG, "setHeaderText: " + mProgress);
+        final String lastSyncTime = UiUtils.getLastSyncTime(this);
+        ProgressListActivity.this.getExpandableListView().post(new Runnable() {
+            @Override
+            public void run() {
+                TextView tv = (TextView) findViewById(R.id.header_text);
+                if ((mProgress > 0) && (mProgress < 100)) {
+                    tv.setText("Progress: " + mProgress + "%");
+                } else {
+                    tv.setText(lastSyncTime);
+                }
+            }
+        });
 
     }
 
