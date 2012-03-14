@@ -8,10 +8,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -19,18 +17,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ListFragment;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -38,7 +32,9 @@ import com.kii.cloud.sync.BackupService;
 import com.kii.cloud.sync.KiiSyncClient;
 import com.kii.cloud.sync.SyncNewEventListener;
 import com.kii.demo.sync.R;
+import com.kii.demo.sync.ui.view.ActionItem;
 import com.kii.demo.sync.ui.view.KiiListItemView;
+import com.kii.demo.sync.ui.view.QuickAction;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;
@@ -56,13 +52,9 @@ public class FileListFragment extends ListFragment {
     private View mView;
     private NewEventListener mListener = null;
 
-    private final static int MENU_RENAME = 1;
-    private final static int MENU_UPLOAD_FILE = 2;
-    private final static int MENU_UPLOAD_FOLDER = 3;
-    private final static int MENU_MOVE_TO_TRASH = 4;
-
     private final static int OPTIONS_MENU_SCAN_CHANGE = 0;
     private final static int OPTIONS_MENU_DOWNLOAD_ALL = 1;
+    QuickAction mQuickAction = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -119,107 +111,31 @@ public class FileListFragment extends ListFragment {
         mFiles = new ArrayList<File>();
         mAdapter = new FilePickerListAdapter(getActivity(), mFiles);
         setListAdapter(mAdapter);
-        registerForContextMenu(getListView());
         mListener = new NewEventListener(getActivity());
         mListener.register();
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if(!(item.getMenuInfo() instanceof AdapterContextMenuInfo)) {
-            return false;
-        }
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-                .getMenuInfo();
-        File selectedFile = (File) getListView().getItemAtPosition(
-                info.position);
-        final String filePath = selectedFile.getAbsolutePath();
-        final KiiSyncClient client = KiiSyncClient.getInstance(getActivity());
-        if (client == null) {
-            return true;
-        }
-
-        switch (item.getItemId()) {
-            case MENU_RENAME:
-                final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-                final EditText input = new EditText(getActivity());
-                alert.setView(input);
-                alert.setTitle("Enter new folder name");
-                alert.setPositiveButton("Ok",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                    int whichButton) {
-                                String newName = input.getText().toString()
-                                        .trim();
-                                client.renameFolder(filePath, newName);
-                                Utils.startSync(getActivity(),
-                                        BackupService.ACTION_REFRESH);
-
-                            }
-                        });
-
-                alert.setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                    int whichButton) {
-                                dialog.cancel();
-                            }
-                        });
-                alert.show();
-                break;
-            case MENU_UPLOAD_FILE:
-                client.upload(filePath);
-                Utils.startSync(getActivity(),
-                        BackupService.ACTION_REFRESH);
-                break;
-            case MENU_UPLOAD_FOLDER:
-                if (selectedFile.isDirectory()) {
-                    File file = new File(filePath);
-                    File[] files = file.listFiles();
-                    for (int ct = 0; ct < files.length; ct++) {
-                        if (files[ct].isFile()) {
-                            client.upload(files[ct].getAbsolutePath());
-                        }
-                    }
-
-                    Utils.startSync(getActivity(),
-                            BackupService.ACTION_REFRESH);
-                }
-                break;
-            case MENU_MOVE_TO_TRASH:
-                client.moveToTrash(filePath, null);
-                Utils.startSync(getActivity(),
-                        BackupService.ACTION_REFRESH);
-                break;
-            default:
-                break;
-        }
-
-        return true;
+    private void uploadFile(final File file) {
+        KiiSyncClient client = KiiSyncClient.getInstance(getActivity());
+        client.upload(file.getAbsolutePath());
+        Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo) {
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-        File selectedFile = (File) getListView().getItemAtPosition(
-                info.position);
-        menu.setHeaderTitle(selectedFile.getName());
-        if (selectedFile.exists()) {
-            if (selectedFile.isDirectory()) {
-                menu.add(0, MENU_RENAME, 0, "Rename");
-                menu.add(0, MENU_UPLOAD_FOLDER, 0,
-                        getString(R.string.menu_item_upload_folder));
-            } else {
-                menu.add(0, MENU_UPLOAD_FILE, 0,
-                        getString(R.string.menu_item_upload_file));
-                menu.add(0, MENU_MOVE_TO_TRASH, 0,
-                        getString(R.string.menu_item_move_to_trash));
-
+    private void uploadFolder(final File file) {
+        KiiSyncClient client = KiiSyncClient.getInstance(getActivity());
+        File[] files = file.listFiles();
+        for (int ct = 0; ct < files.length; ct++) {
+            if (files[ct].isFile()) {
+                client.upload(files[ct].getAbsolutePath());
             }
         }
+        Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
+    }
+
+    private void moveToTrash(File file) {
+        KiiSyncClient client = KiiSyncClient.getInstance(getActivity());
+        client.moveToTrash(file.getAbsolutePath(), null);
+        Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
     }
 
     @Override
@@ -236,7 +152,8 @@ public class FileListFragment extends ListFragment {
                 new ScanTask().execute();
                 break;
             case OPTIONS_MENU_DOWNLOAD_ALL:
-                Utils.startSync(getActivity(), BackupService.ACTION_REFRESH_QUICK);
+                Utils.startSync(getActivity(),
+                        BackupService.ACTION_REFRESH_QUICK);
                 break;
             default:
                 break;
@@ -412,11 +329,49 @@ public class FileListFragment extends ListFragment {
                     break;
                 case R.id.list_complex_more_button:
                     View row = (View) v.getTag();
-                    getListView().showContextMenuForChild(row);
+                    final File f = (File) row.getTag();
+                    mQuickAction = new QuickAction(getActivity());
+                    if (f.isFile()) {
+                        mQuickAction.addActionItem(new ActionItem(
+                                ACTION_ITEM_UPLOAD,
+                                getString(R.string.menu_item_upload_file)));
+                        mQuickAction.addActionItem(new ActionItem(
+                                ACTION_ITEM_MOVE_TO_TRASH,
+                                getString(R.string.menu_item_move_to_trash)));
+                    } else if (f.isDirectory()) {
+                        mQuickAction.addActionItem(new ActionItem(
+                                ACTION_ITEM_UPLOAD_FOLDER,
+                                getString(R.string.menu_item_upload_folder)));
+                    }
+                    mQuickAction
+                            .setOnActionItemClickListener(new QuickAction.OnActionItemClickListener() {
+                                @Override
+                                public void onItemClick(QuickAction source,
+                                        int pos, int actionId) {
+                                    switch (actionId) {
+                                        case ACTION_ITEM_UPLOAD:
+                                            uploadFile(f);
+                                            break;
+                                        case ACTION_ITEM_MOVE_TO_TRASH:
+                                            moveToTrash(f);
+                                            break;
+                                        case ACTION_ITEM_UPLOAD_FOLDER:
+                                            uploadFolder(f);
+                                            break;
+                                    }
+                                }
+                            });
+                    if (mQuickAction.getActionItem(0) != null) {
+                        mQuickAction.show(v);
+                    }
                     break;
             }
         }
     };
+
+    private static final int ACTION_ITEM_MOVE_TO_TRASH = 0;
+    private static final int ACTION_ITEM_UPLOAD = 1;
+    private static final int ACTION_ITEM_UPLOAD_FOLDER = 2;
 
     private class NewEventListener extends SyncNewEventListener {
 
@@ -550,7 +505,7 @@ public class FileListFragment extends ListFragment {
             }
         }
     }
-    
+
     public static List<KiiFile> getLocalChanges() {
         return scanChange;
     }

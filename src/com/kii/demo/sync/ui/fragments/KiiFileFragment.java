@@ -10,8 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +29,9 @@ import com.kii.cloud.sync.SyncNewEventListener;
 import com.kii.demo.sync.R;
 import com.kii.demo.sync.ui.ProgressListActivity;
 import com.kii.demo.sync.ui.SettingsActivity;
+import com.kii.demo.sync.ui.view.ActionItem;
 import com.kii.demo.sync.ui.view.KiiFileExpandableListAdapter;
+import com.kii.demo.sync.ui.view.QuickAction;
 import com.kii.demo.sync.utils.MimeInfo;
 import com.kii.demo.sync.utils.MimeUtil;
 import com.kii.demo.sync.utils.UiUtils;
@@ -53,165 +52,7 @@ public class KiiFileFragment extends Fragment {
     final static int MENU_DOWNLOAD = 205;
     final static int MENU_CANCEL = 206;
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if(!(item.getMenuInfo() instanceof ExpandableListContextMenuInfo)) {
-            return false;
-        }
-        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item
-                .getMenuInfo();
-
-        String title = "Menu";
-
-        int type = ExpandableListView
-                .getPackedPositionType(info.packedPosition);
-        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-
-            int groupPos = ExpandableListView
-                    .getPackedPositionGroup(info.packedPosition);
-            int childPos = ExpandableListView
-                    .getPackedPositionChild(info.packedPosition);
-
-            final KiiFile kFile = (KiiFile) mAdapter.getChild(groupPos,
-                    childPos);
-            if ((kFile != null) && kFile.isFile()) {
-                final KiiSyncClient client = KiiSyncClient
-                        .getInstance(getActivity());
-                if (client == null) {
-                    return true;
-                }
-                switch (item.getGroupId()) {
-                    case MENU_RESTORE_TRASH:
-                        Runnable r = new Runnable() {
-                            @Override
-                            public void run() {
-                                client.restoreFromTrash(kFile);
-                            }
-                        };
-                        new Thread(r).start();
-                        break;
-                    case MENU_MOVE_TRASH:
-                        int ret = client.moveKiiFileToTrash(kFile);
-                        if (ret == SyncMsg.ERROR_RECORD_NOT_FOUND) {
-                            UiUtils.showToast(
-                                    getActivity(),
-                                    getString(R.string.error_cannot_trash_server_file));
-                            return true;
-                        }
-                        break;
-                    case MENU_DELETE:
-                        client.delete(kFile, false);
-                        break;
-                    case MENU_DELETE_LOCAL:
-                        client.delete(kFile, true);
-                        break;
-                    case MENU_CANCEL:
-                        client.cancel(kFile);
-                        break;
-                    case MENU_DOWNLOAD:
-                        Toast.makeText(
-                                getActivity(),
-                                "Download at:"
-                                        + Utils.getKiiFileDownloadPath(kFile),
-                                Toast.LENGTH_SHORT).show();
-                        Runnable r1 = new Runnable() {
-                            @Override
-                            public void run() {
-                                client.download(kFile, Utils.getKiiFileDownloadPath(kFile));
-                            }
-                        };
-                        new Thread(r1).start();
-                        break;
-                }
-
-                Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
-            }
-
-            return true;
-        } else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-            int groupPos = ExpandableListView
-                    .getPackedPositionGroup(info.packedPosition);
-            Toast.makeText(getActivity(),
-                    title + ": Group " + groupPos + " clicked",
-                    Toast.LENGTH_SHORT).show();
-
-            return true;
-        }
-
-        return false;
-
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
-        int type = ExpandableListView
-                .getPackedPositionType(info.packedPosition);
-        int group = ExpandableListView
-                .getPackedPositionGroup(info.packedPosition);
-        int child = ExpandableListView
-                .getPackedPositionChild(info.packedPosition);
-        // Only create a context menu for child items
-        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            KiiFile kFile = (KiiFile) mAdapter.getChild(group, child);
-            if ((kFile != null) && kFile.isFile()) {
-                menu.setHeaderTitle(kFile.getTitle());
-
-                KiiSyncClient kiiClient = KiiSyncClient
-                        .getInstance(getActivity());
-
-                if (kiiClient == null) {
-                    UiUtils.showToast(getActivity(), "Not ready.");
-                    return;
-                }
-
-                int status = kiiClient.getStatus(kFile);
-
-                switch (status) {
-                    case KiiFile.STATUS_DELETE_REQUEST:
-                    case KiiFile.STATUS_DELETE_REQUEST_INCLUDEBODY:
-                    case KiiFile.STATUS_SERVER_DELETE_REQUEST:
-                        UiUtils.showToast(getActivity(),
-                                "No option for deleted file.");
-                        break;
-                    case KiiFile.STATUS_PREPARE_TO_SYNC:
-                    case KiiFile.STATUS_UPLOADING_BODY:
-                        menu.add(MENU_CANCEL, 0, 0, "Cancel Upload");
-                        break;
-                    // TODO: can implement the option to update the backup copy
-                    // or restore the previous version
-                    case KiiFile.STATUS_BODY_OUTDATED:
-                    case KiiFile.STATUS_NO_BODY:
-                    case KiiFile.STATUS_SYNCED:
-                    case KiiFile.STATUS_REQUEST_BODY:
-                    case KiiFile.STATUS_DOWNLOADING_BODY:
-                    case KiiFile.STATUS_UNKNOWN:
-                    default:
-                        String category = kFile.getCategory();
-                        if (TextUtils.isEmpty(category)
-                                || !KiiSyncClient.CATEGORY_TRASH
-                                        .equalsIgnoreCase(category)) {
-                            menu.add(MENU_MOVE_TRASH, 0, 0, "Move To Trash");
-                            if (status == KiiFile.STATUS_NO_BODY) {
-                                menu.add(MENU_DOWNLOAD, 0, 0, "Download");
-                            } else {
-                                menu.add(MENU_DELETE_LOCAL, 0, 0,
-                                        "Delete Local & Backup");
-                            }
-                        } else {
-                            menu.add(MENU_RESTORE_TRASH, 0, 0,
-                                    "Restore From Trash");
-                        }
-                        menu.add(MENU_DELETE, 0, 0, "Delete Backup Copy");
-                        break;
-                }
-            } else {
-                UiUtils.showToast(getActivity(), "No menu for directory.");
-            }
-        }
-    }
+    private QuickAction mQuickAction;
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -235,15 +76,10 @@ public class KiiFileFragment extends Fragment {
         return mView;
     }
 
-    private ExpandableListView getExpandableListView() {
-        return mList;
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mNewEventListener = new NewEventListener(getActivity());
-        registerForContextMenu(getExpandableListView());
         mAdapter = new KiiFileExpandableListAdapter(getActivity(),
                 KiiSyncClient.getInstance(getActivity()),
                 KiiFileExpandableListAdapter.TYPE_DATA, mClickListener);
@@ -361,7 +197,7 @@ public class KiiFileFragment extends Fragment {
     public final static int PROGRESS_UPDATE = 3;
 
     private static void refreshUI(Context context) {
-        //refresh the header text;
+        // refresh the header text;
         TextView tv = (TextView) mView.findViewById(R.id.header_text);
         tv.setText(UiUtils.getLastSyncTime(context));
     }
@@ -380,17 +216,114 @@ public class KiiFileFragment extends Fragment {
                     break;
                 case R.id.list_complex_more_button:
                     View row = (View) v.getTag();
-                    getExpandableListView().showContextMenuForChild(row);
+                    final KiiFile file = (KiiFile) row.getTag();
+                    mQuickAction = new QuickAction(getActivity());
+                    int status = file.getStatus();
+                    String category = file.getCategory();
+                    setActions(status, category);
+                    if (mQuickAction.getActionItem(0) != null) {
+                        mQuickAction
+                                .setOnActionItemClickListener(new QuickAction.OnActionItemClickListener() {
+                                    @Override
+                                    public void onItemClick(QuickAction source,
+                                            int pos, int actionId) {
+                                        handleKiiFileAction(file, actionId);
+                                    }
+                                });
+                        mQuickAction.show(v);
+                    }
                     break;
             }
         }
     };
+
+    private void setActions(int status, String category) {
+        switch (status) {
+            case KiiFile.STATUS_PREPARE_TO_SYNC:
+            case KiiFile.STATUS_UPLOADING_BODY:
+                mQuickAction.addActionItem(new ActionItem(MENU_CANCEL,
+                        getString(R.string.cancel_upload)));
+                break;
+            case KiiFile.STATUS_BODY_OUTDATED:
+            case KiiFile.STATUS_NO_BODY:
+            case KiiFile.STATUS_SYNCED:
+            case KiiFile.STATUS_REQUEST_BODY:
+            case KiiFile.STATUS_DOWNLOADING_BODY:
+            case KiiFile.STATUS_UNKNOWN:
+                if (TextUtils.isEmpty(category)
+                        || !KiiSyncClient.CATEGORY_TRASH
+                                .equalsIgnoreCase(category)) {
+                    mQuickAction.addActionItem(new ActionItem(MENU_MOVE_TRASH,
+                            getString(R.string.move_to_trash)));
+                    if (status == KiiFile.STATUS_NO_BODY) {
+                        mQuickAction.addActionItem(new ActionItem(
+                                MENU_DOWNLOAD, getString(R.string.download)));
+                    } else {
+                        mQuickAction.addActionItem(new ActionItem(
+                                MENU_DELETE_LOCAL,
+                                getString(R.string.delete_local_backup)));
+                    }
+                } else {
+                    mQuickAction.addActionItem(new ActionItem(
+                            MENU_RESTORE_TRASH,
+                            getString(R.string.restore_from_trash)));
+                }
+                mQuickAction.addActionItem(new ActionItem(MENU_DELETE,
+                        getString(R.string.delete_backup_copy)));
+        }
+    }
 
     /**
      * get new records from server if there are any
      */
     private void syncRefresh() {
         Utils.startSync(getActivity(), BackupService.ACTION_REFRESH_QUICK);
+    }
+
+    private void handleKiiFileAction(final KiiFile file, int actionId) {
+        final KiiSyncClient client = KiiSyncClient.getInstance(getActivity());
+        switch (actionId) {
+            case MENU_RESTORE_TRASH:
+                Runnable r = new Runnable() {
+                    @Override
+                    public void run() {
+                        client.restoreFromTrash(file);
+                    }
+                };
+                new Thread(r).start();
+                break;
+            case MENU_MOVE_TRASH:
+                int ret = client.moveKiiFileToTrash(file);
+                if (ret == SyncMsg.ERROR_RECORD_NOT_FOUND) {
+                    UiUtils.showToast(getActivity(),
+                            getString(R.string.error_cannot_trash_server_file));
+                }
+                break;
+            case MENU_DELETE:
+                client.delete(file, false);
+                break;
+            case MENU_DELETE_LOCAL:
+                client.delete(file, true);
+                break;
+            case MENU_CANCEL:
+                client.cancel(file);
+                break;
+            case MENU_DOWNLOAD:
+                Toast.makeText(getActivity(),
+                        "Download at:" + Utils.getKiiFileDownloadPath(file),
+                        Toast.LENGTH_SHORT).show();
+                Runnable r1 = new Runnable() {
+                    @Override
+                    public void run() {
+                        client.download(file,
+                                Utils.getKiiFileDownloadPath(file));
+                    }
+                };
+                new Thread(r1).start();
+                break;
+
+        }
+        Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
     }
 
     public Handler handler = new Handler() {
@@ -471,5 +404,4 @@ public class KiiFileFragment extends Fragment {
         }
 
     };
-
 }

@@ -66,4 +66,10 @@
     <string name="settings">Settings</string>
     <string name="download_all">Download All</string>
     <string name="error_cannot_trash_server_file">Cannot trash server file!</string>
+    <string name="cancel_upload">Cancel upload</string>
+    <string name="delete_backup_copy">Delete backup copy</string>
+    <string name="delete_local_backup">Delete local and backup</string>
+    <string name="move_to_trash">Move to trash</string>
+    <string name="restore_from_trash">Restore from trash</string>
+    <string name="download">Download</string>
 </resources>
