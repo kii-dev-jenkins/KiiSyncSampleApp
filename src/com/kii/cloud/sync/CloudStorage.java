@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.json.JSONException;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -44,13 +43,13 @@ public class CloudStorage implements Authentication {
 
         mBaseURL = baseURL;
 
-        Bundle data = AppUtil.getAppInfo(context);
-        String appId = data.getString(AppUtil.PREF_UM_APP_ID);
+        KiiUMInfo um = mSyncClient.getKiiUMInfo();
+        String appId = um.getAppId();
         if (TextUtils.isEmpty(appId)) {
             throw new RuntimeException(AppUtil.PREF_UM_APP_ID
                     + " meta data is not found in Manifest");
         }
-        String appKey = data.getString(AppUtil.PREF_UM_APP_KEY);
+        String appKey = um.getAppKey();
         if (TextUtils.isEmpty(appKey)) {
             throw new RuntimeException(AppUtil.PREF_UM_APP_KEY
                     + " meta data is not found in Manifest");
