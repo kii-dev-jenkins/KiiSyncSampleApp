@@ -13,7 +13,6 @@ import com.kii.cloud.storage.dataType.KiiUser;
 import com.kii.cloud.storage.manager.AuthManager;
 import com.kii.cloud.storage.response.CloudExecutionException;
 import com.kii.cloud.storage.response.UserResult;
-import com.kii.mobilesdk.bridge.AppUtil;
 import com.kii.mobilesdk.bridge.KiiUMInfo;
 import com.kii.sync.KiiClient;
 import com.kii.sync.SyncMsg;
@@ -46,13 +45,12 @@ public class CloudStorage implements Authentication {
         KiiUMInfo um = mSyncClient.getKiiUMInfo();
         String appId = um.getAppId();
         if (TextUtils.isEmpty(appId)) {
-            throw new RuntimeException(AppUtil.PREF_UM_APP_ID
-                    + " meta data is not found in Manifest");
+            throw new RuntimeException(
+                     "AppId meta data is not found in Manifest");
         }
         String appKey = um.getAppKey();
         if (TextUtils.isEmpty(appKey)) {
-            throw new RuntimeException(AppUtil.PREF_UM_APP_KEY
-                    + " meta data is not found in Manifest");
+            throw new RuntimeException("AppKey meta data is not found in Manifest");
         }
 
         EasyClient.start(context, appId, appKey);
