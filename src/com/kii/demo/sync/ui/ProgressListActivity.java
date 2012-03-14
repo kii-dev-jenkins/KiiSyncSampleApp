@@ -329,10 +329,16 @@ public class ProgressListActivity extends ExpandableListActivity implements
     }
 
     public void handleButtonLeft(View v) {
-        KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
-        if (kiiClient != null) {
-            kiiClient.suspend();
-        }
+        Runnable r = new Runnable() {
+            public void run() {
+                KiiSyncClient kiiClient = KiiSyncClient
+                        .getInstance(ProgressListActivity.this);
+                if (kiiClient != null) {
+                    kiiClient.suspend();
+                }
+            }
+        };
+        new Thread(r).start();
     }
 
     public void handleButtonRight(View v) {

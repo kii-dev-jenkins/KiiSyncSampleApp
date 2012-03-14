@@ -162,7 +162,7 @@ public class KiiSyncClient {
     }
 
     /**
-     * suspend the existing sync session.
+     * suspend the existing sync session. may take a long time, must be run in seperated thread!
      * 
      * @return {@link SyncMsg#OK} Successful.<br>
      *         {@link SyncMsg#ERROR_SETUP} SyncManager is not instantiated.<br>
@@ -326,6 +326,7 @@ public class KiiSyncClient {
      * @return KiiSyncClient
      */
     public static synchronized KiiSyncClient getInstance(Context context) {
+        Log.d(TAG, "getInstance, mInstance is null? "+(mInstance==null));
         if (mInstance == null) {
             try {
                 mInstance = new KiiSyncClient(context.getApplicationContext());
@@ -334,6 +335,7 @@ public class KiiSyncClient {
                 mFileStatusCache.register();
                 // start the backup service
                 context.startService(new Intent(context, BackupService.class));
+                Log.d(TAG, "after startService");
             } catch (Exception e) {
                 e.printStackTrace();
             }

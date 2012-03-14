@@ -207,10 +207,14 @@ public class BackupService extends Service {
     }
 
     private void stopSync() {
-        if (mSyncClient.getKiiUMInfo() != null) {
-            mSyncClient.suspend();
-            handler.removeMessages(AUTO_SYNC_MODE);
-        }
+        new Thread(new Runnable() {
+            public void run() {
+                if (mSyncClient.getKiiUMInfo() != null) {
+                    mSyncClient.suspend();
+                    handler.removeMessages(AUTO_SYNC_MODE);
+                }
+            }
+        }).start();
     }
 
     private boolean shouldAutoSync() {

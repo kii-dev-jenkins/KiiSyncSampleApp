@@ -158,7 +158,7 @@ public class StartActivity extends Activity {
     }
 
     void updateView() {
-        Log.d(TAG, "updateView");
+        Log.d(TAG, "upateView: client is "+KiiSyncClient.getInstance(this));
         KiiUMInfo um = KiiSyncClient.getInstance(this).getKiiUMInfo();
         if (um != null) {
             Intent i = getIntent();
@@ -438,11 +438,15 @@ public class StartActivity extends Activity {
             dialog.setButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-                    KiiSyncClient kiiClient = KiiSyncClient
-                            .getInstance(mContext);
-                    if (kiiClient != null) {
-                        kiiClient.suspend();
-                    }
+                    new Thread(new Runnable() {
+                        public void run() {
+                            KiiSyncClient kiiClient = KiiSyncClient
+                                    .getInstance(mContext);
+                            if (kiiClient != null) {
+                                kiiClient.suspend();
+                            }
+                        }
+                    });
                 }
             });
             dialog.show();

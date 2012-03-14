@@ -45,7 +45,6 @@
 	<string name="pref_wifi_only">WIFI Only</string>
 	<string name="tab_cloud">Cloud</string>
 	<string name="tab_device">Device</string>
-	<string name="tab_progress">Progress</string>
 	<string name="menu_item_upload_file">Upload File</string>
 	<string name="menu_item_upload_folder">Upload Folder</string>
 	<string name="menu_item_move_to_trash">Move to Trash</string>

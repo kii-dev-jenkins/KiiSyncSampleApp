@@ -30,10 +30,15 @@ public class RegisterTask extends AsyncTask<String, Void, Integer> {
         dialog.setCancelable(false);
         dialog.setButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                KiiSyncClient kiiClient = KiiSyncClient.getInstance(mContext);
-                if (kiiClient != null) {
-                    kiiClient.suspend();
-                }
+                new Thread(new Runnable() {
+                    public void run() {
+                        KiiSyncClient kiiClient = KiiSyncClient
+                                .getInstance(mContext);
+                        if (kiiClient != null) {
+                            kiiClient.suspend();
+                        }
+                    }
+                }).start();
             }
         });
         dialog.show();
