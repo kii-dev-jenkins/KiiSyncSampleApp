@@ -40,6 +40,9 @@ import com.kii.demo.sync.utils.Utils;
  * to move between the tabs.
  */
 public class FragmentTabsPager extends FragmentActivity {
+    private static FileListFragment mFileFragment = null;
+    private static KiiFileFragment mKiiFragment = null;
+
     public static class AlertDialogFragment extends DialogFragment {
         private int id;
 
@@ -110,13 +113,13 @@ public class FragmentTabsPager extends FragmentActivity {
 
         mTabsAdapter.addTab(
                 mTabHost.newTabSpec(TAG_DEVICE).setIndicator(
-                        getString(R.string.tab_device), getResources()
-                        .getDrawable(R.drawable.device)),
+                        getString(R.string.tab_device),
+                        getResources().getDrawable(R.drawable.device)),
                 FileListFragment.class, null);
         mTabsAdapter.addTab(
                 mTabHost.newTabSpec(TAG_CLOUD).setIndicator(
-                        getString(R.string.tab_cloud), getResources()
-                        .getDrawable(R.drawable.cloud)),
+                        getString(R.string.tab_cloud),
+                        getResources().getDrawable(R.drawable.cloud)),
                 KiiFileFragment.class, null);
         if (savedInstanceState != null) {
             mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
@@ -193,7 +196,6 @@ public class FragmentTabsPager extends FragmentActivity {
         public void addTab(TabHost.TabSpec tabSpec, Class<?> clss, Bundle args) {
             tabSpec.setContent(new DummyTabFactory(mContext));
             String tag = tabSpec.getTag();
-
             TabInfo info = new TabInfo(tag, clss, args);
             mTabs.add(info);
             mTabHost.addTab(tabSpec);
@@ -208,17 +210,31 @@ public class FragmentTabsPager extends FragmentActivity {
         @Override
         public Fragment getItem(int position) {
             TabInfo info = mTabs.get(position);
-            return Fragment.instantiate(mContext, info.clss.getName(),
+            Fragment f = Fragment.instantiate(mContext, info.clss.getName(),
                     info.args);
+            if (info.clss.getName().contentEquals(
+                    FileListFragment.class.getName())) {
+                mFileFragment = (FileListFragment) f;
+            } else if (info.clss.getName().contentEquals(
+                    KiiFileFragment.class.getName())) {
+                mKiiFragment = (KiiFileFragment) f;
+            }
+            return f;
         }
 
         @Override
         public void onTabChanged(String tabId) {
             int position = mTabHost.getCurrentTab();
             mViewPager.setCurrentItem(position);
-            // if((tabId!=null) && (tabId.contentEquals(TAG_CLOUD))) {
-            // KiiFileFragment.refreshUI(mContext);
-            // }
+            if ((tabId != null)) {
+                if ((tabId.contentEquals(TAG_DEVICE))
+                        && (mFileFragment != null)) {
+                    mFileFragment.refreshFilesList();
+                } else if((tabId.contentEquals(TAG_CLOUD))
+                        && (mKiiFragment != null)) {
+                    //TODO: if necessary, do KiiFragment.refresh
+                }
+            }
         }
 
         @Override

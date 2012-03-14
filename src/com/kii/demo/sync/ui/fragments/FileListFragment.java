@@ -275,7 +275,7 @@ public class FileListFragment extends ListFragment {
         }
     }
 
-    private void refreshFilesList() {
+    public void refreshFilesList() {
         // Clear the files ArrayList
         mFiles.clear();
 
