@@ -229,10 +229,12 @@ public class FragmentTabsPager extends FragmentActivity {
             if ((tabId != null)) {
                 if ((tabId.contentEquals(TAG_DEVICE))
                         && (mFileFragment != null)) {
-                    mFileFragment.refreshFilesList();
-                } else if((tabId.contentEquals(TAG_CLOUD))
+                    if (mFileFragment.isAdded() && !mFileFragment.isHidden()) {
+                        mFileFragment.refreshFilesList();
+                    }
+                } else if ((tabId.contentEquals(TAG_CLOUD))
                         && (mKiiFragment != null)) {
-                    //TODO: if necessary, do KiiFragment.refresh
+                    // TODO: if necessary, do KiiFragment.refresh
                 }
             }
         }
