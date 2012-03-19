@@ -71,4 +71,5 @@
     <string name="move_to_trash">Move to trash</string>
     <string name="restore_from_trash">Restore from trash</string>
     <string name="download">Download</string>
+    <string name="no_last_sync_time">No sync performed</string>
 </resources>

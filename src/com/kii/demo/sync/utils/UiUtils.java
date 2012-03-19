@@ -113,7 +113,7 @@ public class UiUtils {
                     .formatSameDayTime(backupTime, System.currentTimeMillis(),
                             DateFormat.DEFAULT, DateFormat.DEFAULT));
         } else {
-            return context.getString(R.string.none);
+            return context.getString(R.string.no_last_sync_time);
         }
     }
 

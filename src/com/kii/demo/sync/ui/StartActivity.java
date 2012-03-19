@@ -198,6 +198,7 @@ public class StartActivity extends Activity {
             mSync.setEnabled(false);
             mChangePwd.setEnabled(false);
             mSetting.setEnabled(false);
+            updateSyncStatus();
         }
     }
 
