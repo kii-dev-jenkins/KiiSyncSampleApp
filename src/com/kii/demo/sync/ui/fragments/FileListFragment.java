@@ -121,15 +121,27 @@ public class FileListFragment extends ListFragment {
         Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
     }
 
+    private List<File> mUploadFiles = new ArrayList<File>();
+
     private void uploadFolder(final File file) {
         KiiSyncClient client = KiiSyncClient.getInstance(getActivity());
-        File[] files = file.listFiles();
-        for (int ct = 0; ct < files.length; ct++) {
-            if (files[ct].isFile()) {
-                client.upload(files[ct].getAbsolutePath());
+        getRecursiveFiles(file);
+        for (File f : mUploadFiles) {
+            client.upload(f.getAbsolutePath());
+        }
+        mUploadFiles.clear();
+        Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
+    }
+
+    private void getRecursiveFiles(File file) {
+        File[] list = file.listFiles();
+        for ( File f : list ) {
+            if ( f.isDirectory() ) {
+                getRecursiveFiles( f );
+            } else {
+                mUploadFiles.add(f);
             }
         }
-        Utils.startSync(getActivity(), BackupService.ACTION_REFRESH);
     }
 
     private void moveToTrash(File file) {
