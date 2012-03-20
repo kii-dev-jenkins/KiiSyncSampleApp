@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 import android.text.TextUtils;
 
-import com.kii.sync.KiiFile;
 import com.kii.demo.sync.R;
+import com.kii.sync.KiiFile;
 
 public class MimeUtil {
 
@@ -166,7 +166,7 @@ public class MimeUtil {
         if (!TextUtils.isEmpty(fileName)) {
             int dotPos = fileName.lastIndexOf(".");
             if (dotPos >= 0) {
-                suffix = fileName.substring(dotPos + 1);
+                suffix = fileName.substring(dotPos + 1).toLowerCase();
             }
         }
         return suffix;
