@@ -55,7 +55,7 @@ public class CloudStorage implements Authentication {
 
         EasyClient.start(context, appId, appKey);
         EasyClient.getInstance().setBaseURL(baseURL + URL_USERGRID);
-        mUserMgr = EasyClient.getUserManager();
+        mUserMgr = EasyClient.getInstance().getUserManager();
 
     }
 
