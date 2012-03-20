@@ -7,44 +7,42 @@
     <uses-sdk android:minSdkVersion="8" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
         <activity
-            android:label="@string/app_name"
             android:name="com.kii.demo.sync.ui.StartActivity"
+            android:label="@string/app_name"
             android:screenOrientation="portrait" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:name="com.kii.demo.sync.ui.FilePickerActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="FilePicker"
-            android:name="com.kii.demo.sync.ui.FilePickerActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name="com.kii.demo.sync.ui.KiiFilePickerActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="KiiFileViewer"
             android:launchMode="singleTask"
-            android:name="com.kii.demo.sync.ui.KiiFilePickerActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name="com.kii.demo.sync.ui.FileTabActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/hello"
             android:launchMode="singleTask"
-            android:name="com.kii.demo.sync.ui.FileTabActivity"
             android:screenOrientation="portrait" />
 
         <service android:name="com.synclore.android.pfscsdk.PFSyncService" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.synclore.android.pfscsdk.ISessionManager" />
                 <action android:name="com.synclore.android.pfscsdk.IChangeLogger" />
             </intent-filter>
@@ -58,10 +56,10 @@
         </service>
 
         <provider
+            android:name="com.kii.sync.provider.GenericSyncProvider"
             android:authorities="com.kii.sync.generic.6b587cee"
             android:exported="false"
-            android:label="Generic Sync Provider"
-            android:name="com.kii.sync.provider.GenericSyncProvider" >
+            android:label="Generic Sync Provider" >
             <meta-data
                 android:name="app-key"
                 android:value="82946bf6961f4e34d3a53bbc941ac115" />
@@ -74,17 +72,18 @@
         </service>
 
         <receiver android:name=".tasks.KiiRefReceiver" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
         <activity
-            android:launchMode="singleInstance"
             android:name=".ui.ProgressListActivity"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait" >
         </activity>
-        <activity android:name=".ui.FragmentTabsPager"></activity>
+        <activity android:name=".ui.FragmentTabsPager" >
+        </activity>
     </application>
 
 </manifest>
