@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="hello">Kii Demo App for Astro</string>
-	<string name="app_name">PFS Client</string>
+	<string name="app_name">KiiFileSync</string>
 	<string name="spinner_prompt">Choose a sample</string>
 
 	<string name="msg_ERROR_RECORD_NOT_FOUND">The file is not found on device.</string>
