@@ -184,7 +184,7 @@ public class ProgressListActivity extends ExpandableListActivity implements
         KiiSyncClient kiiClient = KiiSyncClient.getInstance(this);
         if (kiiClient != null) {
             int progress = kiiClient.getOverallProgress();
-            if ((progress > 0) && (progress != SyncMsg.SYNC_NOT_RUNNING)) {
+            if (progress > 0) {
                 setProgress(progress);
                 mAdapter.notifyDataSetChanged();
                 return progress;
